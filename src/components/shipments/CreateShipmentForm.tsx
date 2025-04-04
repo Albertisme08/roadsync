@@ -16,11 +16,16 @@ import { Shipment } from "./ShipmentCard";
 const shipmentSchema = z.object({
   origin: z.string().min(3, { message: "Origin must be at least 3 characters" }),
   destination: z.string().min(3, { message: "Destination must be at least 3 characters" }),
-  date: z.string().min(1, { message: "Date is required" }),
+  date: z.string().min(1, { message: "Pickup date is required" }),
+  deliveryDate: z.string().min(1, { message: "Delivery date is required" }),
   freight: z.string().min(3, { message: "Freight description is required" }),
   weight: z.string().min(1, { message: "Weight is required" }),
   price: z.string().min(1, { message: "Price is required" }),
   notes: z.string().optional(),
+})
+.refine(data => new Date(data.deliveryDate) > new Date(data.date), {
+  message: "Delivery date must be after pickup date",
+  path: ["deliveryDate"]
 });
 
 type ShipmentFormValues = z.infer<typeof shipmentSchema>;
@@ -39,6 +44,7 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
       origin: "",
       destination: "",
       date: "",
+      deliveryDate: "",
       freight: "",
       weight: "",
       price: "",
@@ -64,6 +70,7 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
         origin: values.origin,
         destination: values.destination,
         date: values.date,
+        deliveryDate: values.deliveryDate,
         freight: values.freight,
         weight: values.weight,
         price: parseFloat(values.price),
@@ -119,7 +126,7 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="date"
@@ -134,6 +141,22 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="deliveryDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Delivery Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="weight"

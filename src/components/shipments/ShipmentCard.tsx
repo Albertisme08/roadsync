@@ -11,6 +11,7 @@ export interface Shipment {
   origin: string;
   destination: string;
   date: string;
+  deliveryDate: string;
   freight: string;
   weight: string;
   price: number;
@@ -90,8 +91,14 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({ shipment, onAccept }) => {
           
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-gray-500" />
-            <span className="text-gray-600">Date:</span>
+            <span className="text-gray-600">Pickup:</span>
             <span className="font-medium">{shipment.date}</span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="h-4 w-4 text-green-500" />
+            <span className="text-gray-600">Delivery:</span>
+            <span className="font-medium">{shipment.deliveryDate || "Not specified"}</span>
           </div>
           
           <div className="flex items-center gap-2 text-sm">

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import { Package, Truck, Clock, CheckCircle, DollarSign, BarChart3 } from "lucide-react";
+import { Package, Truck, Clock, CheckCircle, DollarSign, BarChart3, Calendar } from "lucide-react";
 import { Shipment } from "@/components/shipments/ShipmentCard";
 
 interface ShipperDashboardProps {
@@ -114,8 +114,14 @@ const ShipperDashboard: React.FC<ShipperDashboardProps> = ({ shipments }) => {
                           <h3 className="font-semibold">
                             {shipment.origin} to {shipment.destination}
                           </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {shipment.date} • {shipment.freight}
+                          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            <span>Pickup: {shipment.date}</span>
+                            <span>|</span>
+                            <span>Delivery: {shipment.deliveryDate || "Not specified"}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {shipment.freight}
                           </p>
                         </div>
                         <div className="flex items-center">
