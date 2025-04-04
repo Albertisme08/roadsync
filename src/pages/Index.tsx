@@ -8,12 +8,10 @@ import CTASection from "@/components/home/CTASection";
 import { useAuth } from "@/contexts/AuthContext";
 import HomeLoadBoard from "@/components/home/HomeLoadBoard";
 import HomeCarrierList from "@/components/home/HomeCarrierList";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [userType, setUserType] = useState<"shipper" | "driver">("shipper");
   const { isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>("loads");
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -25,18 +23,17 @@ const Index = () => {
           <p className="text-gray-600">Browse available loads and carriers in our network</p>
         </div>
         
-        <Tabs defaultValue="loads" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="loads">Available Loads</TabsTrigger>
-            <TabsTrigger value="carriers">Carrier Network</TabsTrigger>
-          </TabsList>
-          <TabsContent value="loads" className="mt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Available Loads</h3>
             <HomeLoadBoard isAuthenticated={isAuthenticated} />
-          </TabsContent>
-          <TabsContent value="carriers" className="mt-2">
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Carrier Network</h3>
             <HomeCarrierList isAuthenticated={isAuthenticated} />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
       
       <FeaturesSection />

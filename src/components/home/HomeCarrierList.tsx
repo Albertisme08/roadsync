@@ -25,25 +25,29 @@ const HomeCarrierList: React.FC<HomeCarrierListProps> = ({ isAuthenticated }) =>
 
   const handleViewCarrier = (carrier: any) => {
     setSelectedCarrier(carrier);
-    setShowCarrierModal(true);
+    if (isAuthenticated) {
+      setShowCarrierModal(true);
+    } else {
+      setShowAuthModal(true);
+    }
   };
 
-  // Auto-refresh simulation (optional)
+  // Auto-refresh for real-time feel
   useEffect(() => {
     const intervalId = setInterval(() => {
       console.log("Refreshing carrier data...");
       // In a real app, you would fetch new data here
-    }, 60000); // 1 minute
+    }, 60000); // 1 minute refresh interval
 
     return () => clearInterval(intervalId);
   }, []);
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <Table className="min-w-full rounded-lg border-collapse">
+      <div className="overflow-x-auto border rounded-lg">
+        <Table className="min-w-full">
           <TableHeader>
-            <TableRow className="border-b hover:bg-gray-50">
+            <TableRow className="hover:bg-gray-50">
               <TableHead>Carrier Name</TableHead>
               <TableHead>
                 <div className="flex items-center">
@@ -65,7 +69,7 @@ const HomeCarrierList: React.FC<HomeCarrierListProps> = ({ isAuthenticated }) =>
             {carriers.map((carrier, index) => (
               <TableRow 
                 key={index} 
-                className="border-b hover:bg-gray-50"
+                className="hover:bg-gray-50"
               >
                 <TableCell className="font-medium">{carrier.name}</TableCell>
                 <TableCell>
@@ -100,6 +104,11 @@ const HomeCarrierList: React.FC<HomeCarrierListProps> = ({ isAuthenticated }) =>
         isOpen={showCarrierModal}
         onClose={() => setShowCarrierModal(false)}
         carrier={selectedCarrier}
+      />
+
+      <CreateAccountModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </>
   );

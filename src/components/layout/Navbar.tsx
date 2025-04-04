@@ -28,7 +28,7 @@ const Navbar: React.FC = () => {
 
       {/* Navigation Links */}
       <div className="hidden md:flex space-x-6">
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <>
             <Link to="/dashboard">
               <button className="hover:underline">Dashboard</button>
@@ -39,14 +39,7 @@ const Navbar: React.FC = () => {
               </button>
             </Link>
           </>
-        ) : (
-          <Link to="/shipments">
-            <button className="hover:underline">Browse Loads</button>
-          </Link>
         )}
-        <Link to="/carriers">
-          <button className="hover:underline">Carriers</button>
-        </Link>
       </div>
 
       {/* Login/Logout Button */}
