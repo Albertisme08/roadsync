@@ -40,14 +40,6 @@ const Index = () => {
                   {isAuthenticated ? "Go to Dashboard" : "Get Started"}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white/10"
-                  onClick={isAuthenticated ? () => navigate("/shipments") : handleLoginClick}
-                >
-                  {isAuthenticated ? "View Shipments" : "Login"}
-                </Button>
               </div>
             </div>
             <div className="lg:w-1/2 flex justify-center">
