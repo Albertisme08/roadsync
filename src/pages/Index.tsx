@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -245,22 +244,33 @@ const Index = () => {
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Join RoadSync today and experience the future of logistics and freight management.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col items-center gap-6">
+            <div className="bg-white/10 p-1 rounded-lg inline-flex">
+              <Button 
+                variant={userType === "shipper" ? "default" : "ghost"} 
+                className={userType === "shipper" ? "bg-white text-brand-blue" : "text-white hover:bg-white/20"}
+                onClick={() => setUserType("shipper")}
+              >
+                <Package className="mr-2 h-5 w-5" />
+                I'm a Shipper
+              </Button>
+              <Button 
+                variant={userType === "driver" ? "default" : "ghost"} 
+                className={userType === "driver" ? "bg-white text-brand-blue" : "text-white hover:bg-white/20"}
+                onClick={() => setUserType("driver")}
+              >
+                <Truck className="mr-2 h-5 w-5" />
+                I'm a Carrier
+              </Button>
+            </div>
             <Button 
               size="lg" 
               variant="default"
               className="bg-white text-brand-blue hover:bg-gray-100"
-              onClick={handleSignUpClick}
+              onClick={isAuthenticated ? () => navigate("/dashboard") : handleSignUpClick}
             >
-              Create an Account
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-white text-white hover:bg-white/10"
-              onClick={handleLoginClick}
-            >
-              Log In
+              {isAuthenticated ? "Go to Dashboard" : `Sign Up as ${userType === "shipper" ? "Shipper" : "Carrier"}`}
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </div>
