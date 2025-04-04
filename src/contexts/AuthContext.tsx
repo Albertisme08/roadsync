@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-type UserRole = "shipper" | "driver" | "employee" | null;
+type UserRole = "shipper" | "driver" | null;
 
 interface User {
   id: string;

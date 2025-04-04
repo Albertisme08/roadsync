@@ -3,7 +3,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Truck, Package, UserCircle, LogOut, Menu, X, Building2, Shield } from "lucide-react";
+import { Truck, Package, UserCircle, LogOut, Menu, X } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -29,7 +29,6 @@ const Navbar: React.FC = () => {
 
   const getNavIcon = () => {
     if (user?.role === "driver") return <Truck className="h-6 w-6 text-brand-blue" />;
-    if (user?.role === "employee") return <Shield className="h-6 w-6 text-brand-blue" />;
     return <Package className="h-6 w-6 text-brand-blue" />;
   };
 
@@ -64,33 +63,19 @@ const Navbar: React.FC = () => {
               >
                 Dashboard
               </Link>
-              {user?.role !== "employee" && (
-                <Link
-                  to="/shipments"
-                  className="text-brand-darkGray hover:text-brand-blue transition-colors"
-                >
-                  {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
-                </Link>
-              )}
-              {user?.role === "employee" && (
-                <Link
-                  to="/shipments"
-                  className="text-brand-darkGray hover:text-brand-blue transition-colors"
-                >
-                  All Shipments
-                </Link>
-              )}
+              <Link
+                to="/shipments"
+                className="text-brand-darkGray hover:text-brand-blue transition-colors"
+              >
+                {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
+              </Link>
               <div className="flex items-center space-x-4">
                 <Link
                   to="/profile"
                   className="flex items-center space-x-1 text-brand-darkGray hover:text-brand-blue transition-colors"
                 >
-                  {user?.role === "employee" ? 
-                    <Building2 className="h-5 w-5" /> : 
-                    <UserCircle className="h-5 w-5" />
-                  }
+                  <UserCircle className="h-5 w-5" />
                   <span>{user?.name}</span>
-                  {user?.role === "employee" && <span className="ml-1 text-xs bg-brand-blue text-white px-2 py-0.5 rounded-full">Staff</span>}
                 </Link>
                 <Button 
                   variant="outline" 
@@ -134,24 +119,13 @@ const Navbar: React.FC = () => {
                 >
                   Dashboard
                 </Link>
-                {user?.role !== "employee" && (
-                  <Link
-                    to="/shipments"
-                    className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
-                    onClick={toggleMenu}
-                  >
-                    {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
-                  </Link>
-                )}
-                {user?.role === "employee" && (
-                  <Link
-                    to="/shipments"
-                    className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
-                    onClick={toggleMenu}
-                  >
-                    All Shipments
-                  </Link>
-                )}
+                <Link
+                  to="/shipments"
+                  className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
+                  onClick={toggleMenu}
+                >
+                  {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
+                </Link>
                 <Link
                   to="/profile"
                   className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
