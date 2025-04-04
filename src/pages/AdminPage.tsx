@@ -52,7 +52,7 @@ const AdminPage = () => {
       console.error("Error approving user:", error);
       toast("Error", {
         description: "Failed to approve user. Please try again.",
-        variant: "destructive",
+        style: { backgroundColor: "hsl(var(--destructive))", color: "hsl(var(--destructive-foreground))" },
       });
     }
   };
@@ -69,7 +69,7 @@ const AdminPage = () => {
       console.error("Error rejecting user:", error);
       toast("Error", { 
         description: "Failed to reject user. Please try again.",
-        variant: "destructive",
+        style: { backgroundColor: "hsl(var(--destructive))", color: "hsl(var(--destructive-foreground))" },
       });
     }
   };
