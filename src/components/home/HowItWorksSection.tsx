@@ -56,9 +56,9 @@ const HowItWorksSection: React.FC = () => {
               <Button 
                 size="lg" 
                 className="w-full"
-                onClick={() => navigate(isAuthenticated ? "/dashboard" : "/shipments")}
+                onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth?mode=register")}
               >
-                {isAuthenticated ? "Go to Dashboard" : "Explore Available Loads"}
+                {isAuthenticated ? "Go to Dashboard" : "Sign Up"}
               </Button>
               <p className="mt-3 text-sm text-gray-500">
                 No account required to start browsing

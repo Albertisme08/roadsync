@@ -60,7 +60,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userType, setUserType }) => {
                 className="bg-brand-blue text-white hover:bg-brand-blue/90 border border-white/20"
                 onClick={isAuthenticated ? () => navigate("/dashboard") : handleExploreClick}
               >
-                {isAuthenticated ? "Go to Dashboard" : `Explore Available ${userType === "shipper" ? "Carriers" : "Loads"}`}
+                {isAuthenticated ? "Go to Dashboard" : `Sign Up`}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
