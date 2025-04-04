@@ -5,12 +5,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Lock } from "lucide-react";
 import CarrierDetailModal from "@/components/carrier/CarrierDetailModal";
 import CreateAccountModal from "@/components/carrier/CreateAccountModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HomeCarrierListProps {
   isAuthenticated: boolean;
 }
 
 const HomeCarrierList: React.FC<HomeCarrierListProps> = ({ isAuthenticated }) => {
+  const { isApproved } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedCarrier, setSelectedCarrier] = useState<any>(null);
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -52,13 +54,13 @@ const HomeCarrierList: React.FC<HomeCarrierListProps> = ({ isAuthenticated }) =>
               <TableHead>
                 <div className="flex items-center">
                   <Lock size={12} className="mr-1 text-gray-500" />
-                  <span className="blur-sm opacity-50">DOT Number</span>
+                  <span className={`${!isApproved ? "blur-sm opacity-50" : ""}`}>DOT Number</span>
                 </div>
               </TableHead>
               <TableHead>
                 <div className="flex items-center">
                   <Lock size={12} className="mr-1 text-gray-500" />
-                  <span className="blur-sm opacity-50">Equipment</span>
+                  <span className={`${!isApproved ? "blur-sm opacity-50" : ""}`}>Equipment</span>
                 </div>
               </TableHead>
               <TableHead>City, State</TableHead>
@@ -75,13 +77,13 @@ const HomeCarrierList: React.FC<HomeCarrierListProps> = ({ isAuthenticated }) =>
                 <TableCell>
                   <div className="flex items-center">
                     <Lock size={12} className="mr-1 text-gray-500" />
-                    <span className="blur-sm opacity-50">{carrier.dot}</span>
+                    <span className={`${!isApproved ? "blur-sm opacity-50" : ""}`}>{carrier.dot}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">
                     <Lock size={12} className="mr-1 text-gray-500" />
-                    <span className="blur-sm opacity-50">{carrier.equipment}</span>
+                    <span className={`${!isApproved ? "blur-sm opacity-50" : ""}`}>{carrier.equipment}</span>
                   </div>
                 </TableCell>
                 <TableCell>{carrier.city}</TableCell>

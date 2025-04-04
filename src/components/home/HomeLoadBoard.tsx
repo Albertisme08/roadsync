@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Calendar, Package, Lock } from "lucide-react";
 import CreateAccountModal from "@/components/carrier/CreateAccountModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HomeLoadBoardProps {
   isAuthenticated: boolean;
 }
 
 const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
+  const { isApproved } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
   
@@ -67,7 +69,7 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
     }
   };
 
-  // Auto-refresh simulation (optional)
+  // Auto-refresh simulation
   useEffect(() => {
     const intervalId = setInterval(() => {
       console.log("Refreshing load data...");
@@ -100,7 +102,7 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
                 <div className="text-right relative">
                   <div className="flex items-center">
                     <Lock size={12} className="mr-1 text-gray-500" />
-                    <div className="text-xl font-bold text-blue-600 blur-sm opacity-50">
+                    <div className={`text-xl font-bold text-blue-600 ${!isApproved ? "blur-sm opacity-50" : ""}`}>
                       ${load.price}
                     </div>
                   </div>
@@ -136,7 +138,7 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
                   <span className="mr-2">📦</span>
                   <div className="flex items-center">
                     <Lock size={12} className="mr-1 text-gray-500" />
-                    <div className="blur-sm opacity-50">
+                    <div className={`${!isApproved ? "blur-sm opacity-50" : ""}`}>
                       {load.weight}
                     </div>
                   </div>

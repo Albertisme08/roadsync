@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
 import CreateAccountModal from './CreateAccountModal';
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CarrierDetailModalProps {
   isOpen: boolean;
@@ -25,12 +26,15 @@ interface CarrierDetailModalProps {
 }
 
 const CarrierDetailModal = ({ isOpen, onClose, carrier }: CarrierDetailModalProps) => {
+  const { isAuthenticated, isApproved } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   if (!carrier) return null;
 
   const handleViewContact = () => {
-    setShowAuthModal(true);
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    }
   };
 
   return (
@@ -49,11 +53,11 @@ const CarrierDetailModal = ({ isOpen, onClose, carrier }: CarrierDetailModalProp
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <p className="text-sm text-muted-foreground">DOT Number</p>
-                <p>{carrier.dot}</p>
+                <p className={!isApproved ? "blur-sm opacity-50" : ""}>{carrier.dot}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Equipment</p>
-                <p>{carrier.equipment}</p>
+                <p className={!isApproved ? "blur-sm opacity-50" : ""}>{carrier.equipment}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Location</p>
@@ -84,12 +88,20 @@ const CarrierDetailModal = ({ isOpen, onClose, carrier }: CarrierDetailModalProp
                 </div>
                 
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Button 
-                    onClick={handleViewContact}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    View Contact Info
-                  </Button>
+                  {isApproved ? (
+                    <div className="text-center">
+                      <p className="font-medium text-green-600 mb-2">MC: MC-123456</p>
+                      <p className="font-medium mb-2">Phone: (555) 123-4567</p>
+                      <p className="font-medium">123 Carrier St, Suite 100</p>
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={handleViewContact}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {isAuthenticated ? "Approval Required" : "View Contact Info"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

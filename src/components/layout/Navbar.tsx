@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -38,6 +38,13 @@ const Navbar: React.FC = () => {
                 {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
               </button>
             </Link>
+            {isAdmin && (
+              <Link to="/admin">
+                <button className="hover:underline text-blue-600 font-medium">
+                  Admin Panel
+                </button>
+              </Link>
+            )}
           </>
         )}
       </div>
@@ -48,6 +55,11 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link to="/profile" className="hidden md:flex items-center space-x-1 hover:underline">
               <span>{user?.name}</span>
+              {user?.approvalStatus === "pending" && (
+                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full ml-2">
+                  Pending Approval
+                </span>
+              )}
             </Link>
             <Button onClick={handleLogout} className="bg-blue-600 hover:bg-blue-700">
               Logout
