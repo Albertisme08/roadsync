@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Truck, Package, ArrowRight, ShieldCheck, CreditCard, Map, MessageSquare, User } from "lucide-react";
+import { Truck, Package, ArrowRight, ShieldCheck, CreditCard, Map, MessageSquare } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -13,8 +14,9 @@ const Index = () => {
     navigate("/auth?mode=login");
   };
 
-  const handleSignUpClick = () => {
-    navigate(`/auth?mode=register&role=${userType}`);
+  const handleExploreClick = () => {
+    // Just navigate to shipments - signup will happen when they try to book
+    navigate("/shipments");
   };
 
   return (
@@ -56,9 +58,9 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   className="bg-brand-blue text-white hover:bg-brand-blue/90 border border-white/20"
-                  onClick={isAuthenticated ? () => navigate("/dashboard") : handleSignUpClick}
+                  onClick={isAuthenticated ? () => navigate("/dashboard") : handleExploreClick}
                 >
-                  {isAuthenticated ? "Go to Dashboard" : `Sign Up as ${userType === "shipper" ? "Shipper" : "Carrier"}`}
+                  {isAuthenticated ? "Go to Dashboard" : `Explore Available ${userType === "shipper" ? "Carriers" : "Loads"}`}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
@@ -173,9 +175,9 @@ const Index = () => {
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center font-bold text-xl">1</div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Create an Account</h3>
+                    <h3 className="text-xl font-semibold mb-2">Browse Loads or Carriers</h3>
                     <p className="text-gray-600">
-                      Sign up as a shipper or driver and complete your profile with relevant details.
+                      Explore available shipments or carriers without signing up first.
                     </p>
                   </div>
                 </div>
@@ -183,9 +185,9 @@ const Index = () => {
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center font-bold text-xl">2</div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Post or Find Loads</h3>
+                    <h3 className="text-xl font-semibold mb-2">Find What You Need</h3>
                     <p className="text-gray-600">
-                      Shippers post loads with details, while drivers browse and filter available shipments.
+                      Discover the perfect load or carrier for your needs with our easy filters.
                     </p>
                   </div>
                 </div>
@@ -193,9 +195,9 @@ const Index = () => {
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center font-bold text-xl">3</div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Connect and Communicate</h3>
+                    <h3 className="text-xl font-semibold mb-2">Quick Sign Up When Ready</h3>
                     <p className="text-gray-600">
-                      Drivers accept loads and communicate with shippers to confirm details.
+                      Create an account only when you're ready to book a load or carrier.
                     </p>
                   </div>
                 </div>
@@ -224,12 +226,12 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   className="w-full"
-                  onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth?mode=register")}
+                  onClick={() => navigate(isAuthenticated ? "/dashboard" : "/shipments")}
                 >
-                  {isAuthenticated ? "Go to Dashboard" : "Get Started Now"}
+                  {isAuthenticated ? "Go to Dashboard" : "Explore Available Loads"}
                 </Button>
                 <p className="mt-3 text-sm text-gray-500">
-                  Join thousands of shippers and drivers already using RoadSync
+                  No account required to start browsing
                 </p>
               </div>
             </div>
@@ -267,9 +269,9 @@ const Index = () => {
               size="lg" 
               variant="default"
               className="bg-white text-brand-blue hover:bg-gray-100"
-              onClick={isAuthenticated ? () => navigate("/dashboard") : handleSignUpClick}
+              onClick={isAuthenticated ? () => navigate("/dashboard") : handleExploreClick}
             >
-              {isAuthenticated ? "Go to Dashboard" : `Sign Up as ${userType === "shipper" ? "Shipper" : "Carrier"}`}
+              {isAuthenticated ? "Go to Dashboard" : "Start Exploring"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>

@@ -1,16 +1,18 @@
 
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AuthPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get("from") || "/dashboard";
   
-  // If user is already logged in, redirect to dashboard
+  // If user is already logged in, redirect to requested page or dashboard
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={from} replace />;
   }
 
   return (

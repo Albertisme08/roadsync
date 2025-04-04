@@ -23,8 +23,8 @@ const Navbar: React.FC = () => {
     navigate("/auth?mode=login");
   };
 
-  const handleSignUpClick = () => {
-    navigate("/auth?mode=register");
+  const handleExploreClick = () => {
+    navigate("/shipments");
   };
 
   const getNavIcon = () => {
@@ -90,18 +90,18 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <>
+              <Link
+                to="/shipments"
+                className="text-brand-darkGray hover:text-brand-blue transition-colors"
+              >
+                Browse Loads
+              </Link>
               <Button
                 variant="ghost"
                 className="text-brand-darkGray hover:text-brand-blue hover:bg-transparent"
                 onClick={handleLoginClick}
               >
                 Login
-              </Button>
-              <Button
-                variant="default"
-                onClick={handleSignUpClick}
-              >
-                Sign Up
               </Button>
             </>
           )}
@@ -146,6 +146,13 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <>
+                <Link
+                  to="/shipments"
+                  className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
+                  onClick={toggleMenu}
+                >
+                  Browse Loads
+                </Link>
                 <Button
                   variant="ghost"
                   className="justify-start px-4 text-brand-darkGray hover:text-brand-blue hover:bg-transparent"
@@ -155,16 +162,6 @@ const Navbar: React.FC = () => {
                   }}
                 >
                   Login
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={() => {
-                    navigate("/auth?mode=register");
-                    toggleMenu();
-                  }}
-                  className="w-full justify-center"
-                >
-                  Sign Up
                 </Button>
               </>
             )}

@@ -54,6 +54,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const AuthForm: React.FC = () => {
   const [searchParams] = useSearchParams();
+  // Force mode to login by default, only show register if explicitly requested
   const mode = searchParams.get("mode") === "register" ? "register" : "login";
   const [submitting, setSubmitting] = useState(false);
   const { login, register } = useAuth();
@@ -311,14 +312,7 @@ const AuthForm: React.FC = () => {
       <CardFooter className="flex justify-center">
         {mode === "login" ? (
           <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Button
-              variant="link"
-              className="p-0 text-brand-blue"
-              onClick={() => navigate("/auth?mode=register")}
-            >
-              Sign up
-            </Button>
+            Don't have an account? You'll be able to create one when you book a load.
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">
