@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import Shipments from "./pages/Shipments";
 import ShipperPage from "./pages/ShipperPage";
 import LoadBoardPage from "./pages/LoadBoardPage";
+import CarriersPage from "./pages/CarriersPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="/shipments" element={<Shipments />} />
                 <Route path="/post-load" element={<ShipperPage />} />
                 <Route path="/load-board" element={<LoadBoardPage />} />
+                <Route path="/carriers" element={<CarriersPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
