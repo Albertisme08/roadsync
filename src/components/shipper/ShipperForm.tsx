@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ShieldAlertIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
   pickupLocation: z.string().min(3, { message: "Pickup location is required" }),
@@ -60,6 +62,7 @@ const equipmentOptions = [
 
 const ShipperForm = () => {
   const { toast } = useToast();
+  const { isApproved } = useAuth();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,6 +84,19 @@ const ShipperForm = () => {
     });
     form.reset();
   };
+
+  if (!isApproved) {
+    return (
+      <Alert className="bg-yellow-50 border-yellow-200">
+        <ShieldAlertIcon className="h-5 w-5 text-yellow-600" />
+        <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+        <AlertDescription className="text-yellow-700">
+          Your account is currently pending approval by an administrator. 
+          You will be able to post loads once your account has been approved.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Form {...form}>

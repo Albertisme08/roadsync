@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import ShipperForm from "@/components/shipper/ShipperForm";
@@ -11,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, ShieldAlert } from "lucide-react";
 import CreateAccountModal from "@/components/carrier/CreateAccountModal";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Sample carrier data
 const sampleCarriers = [
@@ -24,7 +26,7 @@ const sampleCarriers = [
 ];
 
 const ShipperPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isApproved } = useAuth();
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,6 +53,17 @@ const ShipperPage = () => {
       <p className="text-gray-600 mb-6">
         Access our exclusive network of verified carriers or post loads directly to our platform
       </p>
+
+      {isAuthenticated && !isApproved && (
+        <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+          <ShieldAlert className="h-5 w-5 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+          <AlertDescription className="text-yellow-700">
+            Thank you for registering! Your account is currently pending approval by our administrators.
+            You will gain full access to our platform features once your account has been approved.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {isAuthenticated ? (
         <div className="space-y-8">
@@ -84,16 +97,16 @@ const ShipperPage = () => {
                     {sampleCarriers.map((carrier) => (
                       <TableRow key={carrier.id}>
                         <TableCell>{carrier.name}</TableCell>
-                        <TableCell className="blur-sm hover:blur-none transition-all">
+                        <TableCell className={`${!isApproved ? "blur-sm" : "blur-sm hover:blur-none"} transition-all`}>
                           {carrier.mcNumber}
                         </TableCell>
-                        <TableCell className="blur-sm hover:blur-none transition-all">
+                        <TableCell className={`${!isApproved ? "blur-sm" : "blur-sm hover:blur-none"} transition-all`}>
                           {carrier.dotNumber}
                         </TableCell>
-                        <TableCell className="blur-sm hover:blur-none transition-all">
+                        <TableCell className={`${!isApproved ? "blur-sm" : "blur-sm hover:blur-none"} transition-all`}>
                           {carrier.equipment}
                         </TableCell>
-                        <TableCell className="blur-sm hover:blur-none transition-all">
+                        <TableCell className={`${!isApproved ? "blur-sm" : "blur-sm hover:blur-none"} transition-all`}>
                           {carrier.states}
                         </TableCell>
                       </TableRow>
@@ -102,7 +115,9 @@ const ShipperPage = () => {
                 </Table>
               </div>
               <p className="text-sm text-gray-500 mt-3">
-                Hover over blurred information for a preview. Full access requires verification.
+                {isApproved 
+                  ? "Hover over blurred information for a preview. Full access requires verification." 
+                  : "Blurred information will be available once your account is approved."}
               </p>
             </CardContent>
           </Card>

@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "@/lib/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shipment } from "./ShipmentCard";
@@ -36,7 +37,7 @@ interface CreateShipmentFormProps {
 
 const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreated }) => {
   const [submitting, setSubmitting] = useState(false);
-  const { user } = useAuth();
+  const { user, isApproved } = useAuth();
 
   const form = useForm<ShipmentFormValues>({
     resolver: zodResolver(shipmentSchema),
@@ -55,6 +56,11 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
   const onSubmit = async (values: ShipmentFormValues) => {
     if (!user) {
       toast.error("You must be logged in to create a shipment");
+      return;
+    }
+
+    if (!isApproved) {
+      toast.error("Your account must be approved to create shipments");
       return;
     }
 
@@ -87,6 +93,18 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
       setSubmitting(false);
     }
   };
+
+  if (!isApproved) {
+    return (
+      <Alert className="bg-yellow-50 border-yellow-200">
+        <ShieldAlert className="h-5 w-5 text-yellow-600" />
+        <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+        <AlertDescription className="text-yellow-700">
+          Your account is currently pending approval. You will be able to create shipments once an administrator approves your account.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card>

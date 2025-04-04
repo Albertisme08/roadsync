@@ -6,6 +6,8 @@ import ShipmentList from "@/components/shipments/ShipmentList";
 import CreateShipmentForm from "@/components/shipments/CreateShipmentForm";
 import { Shipment } from "@/components/shipments/ShipmentCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ShieldAlert } from "lucide-react";
 
 // Sample shipment data (same as in Dashboard)
 const sampleShipments: Shipment[] = [
@@ -67,7 +69,7 @@ const sampleShipments: Shipment[] = [
 ];
 
 const Shipments: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isApproved } = useAuth();
   const [shipments, setShipments] = useState<Shipment[]>(sampleShipments);
   const isShipper = user?.role === "shipper";
 
@@ -120,11 +122,22 @@ const Shipments: React.FC = () => {
         </p>
       </div>
 
+      {!isApproved && (
+        <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+          <ShieldAlert className="h-5 w-5 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+          <AlertDescription className="text-yellow-700">
+            Your account is currently pending review by an administrator. 
+            You will be able to {isShipper ? "create shipments" : "accept loads"} once your account has been approved.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {isShipper ? (
         <Tabs defaultValue="list" className="space-y-6">
           <TabsList>
             <TabsTrigger value="list">My Shipments</TabsTrigger>
-            <TabsTrigger value="create">Create New Shipment</TabsTrigger>
+            <TabsTrigger value="create" disabled={!isApproved}>Create New Shipment</TabsTrigger>
           </TabsList>
           <TabsContent value="list">
             <ShipmentList 
@@ -133,14 +146,27 @@ const Shipments: React.FC = () => {
             />
           </TabsContent>
           <TabsContent value="create">
-            <CreateShipmentForm onShipmentCreated={handleShipmentCreated} />
+            {isApproved ? (
+              <CreateShipmentForm onShipmentCreated={handleShipmentCreated} />
+            ) : (
+              <Alert className="bg-yellow-50 border-yellow-200">
+                <ShieldAlert className="h-5 w-5 text-yellow-600" />
+                <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+                <AlertDescription className="text-yellow-700">
+                  Your account is currently pending approval. You will be able to create shipments once an administrator approves your account.
+                </AlertDescription>
+              </Alert>
+            )}
           </TabsContent>
         </Tabs>
       ) : (
-        <ShipmentList 
-          shipments={shipments} 
-          onShipmentUpdate={handleShipmentUpdate} 
-        />
+        <>
+          <ShipmentList 
+            shipments={shipments} 
+            onShipmentUpdate={handleShipmentUpdate} 
+            disableActions={!isApproved}
+          />
+        </>
       )}
     </div>
   );

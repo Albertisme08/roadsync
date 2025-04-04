@@ -2,16 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Calendar, Package, Lock } from "lucide-react";
+import { MapPin, Calendar, Package, Lock, ShieldAlert } from "lucide-react";
 import CreateAccountModal from "@/components/carrier/CreateAccountModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface HomeLoadBoardProps {
   isAuthenticated: boolean;
 }
 
 const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
-  const { isApproved } = useAuth();
+  const { isApproved, user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
   
@@ -63,9 +64,12 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
     if (!isAuthenticated) {
       setSelectedLoadId(loadId);
       setShowAuthModal(true);
+    } else if (!isApproved) {
+      // Show a toast or alert that approval is required
+      console.log("You need admin approval to view full load details");
     } else {
-      // Handle authenticated user view
-      console.log(`Authenticated user viewing load: ${loadId}`);
+      // Handle authenticated and approved user view
+      console.log(`Authenticated and approved user viewing load: ${loadId}`);
     }
   };
 
@@ -81,6 +85,14 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
 
   return (
     <>
+      {isAuthenticated && !isApproved && (
+        <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+          <ShieldAlert className="h-5 w-5 text-yellow-600" />
+          <AlertDescription className="text-yellow-700">
+            Your account is pending approval. Some features are limited until an administrator approves your account.
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sampleLoads.map((load) => (
           <Card 
@@ -102,7 +114,7 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
                 <div className="text-right relative">
                   <div className="flex items-center">
                     <Lock size={12} className="mr-1 text-gray-500" />
-                    <div className={`text-xl font-bold text-blue-600 ${!isApproved ? "blur-sm opacity-50" : ""}`}>
+                    <div className={`text-xl font-bold text-blue-600 ${!isAuthenticated || !isApproved ? "blur-sm opacity-50" : ""}`}>
                       ${load.price}
                     </div>
                   </div>
@@ -138,7 +150,7 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
                   <span className="mr-2">📦</span>
                   <div className="flex items-center">
                     <Lock size={12} className="mr-1 text-gray-500" />
-                    <div className={`${!isApproved ? "blur-sm opacity-50" : ""}`}>
+                    <div className={`${!isAuthenticated || !isApproved ? "blur-sm opacity-50" : ""}`}>
                       {load.weight}
                     </div>
                   </div>
@@ -148,8 +160,9 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
               <Button 
                 className="mt-4 w-full"
                 onClick={() => handleViewLoad(load.id)}
+                disabled={isAuthenticated && !isApproved}
               >
-                View Load Details
+                {isAuthenticated && !isApproved ? "Approval Required" : "View Load Details"}
               </Button>
             </CardContent>
           </Card>

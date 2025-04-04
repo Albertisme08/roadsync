@@ -11,8 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TruckIcon, Calendar, MapPin, Lock } from "lucide-react";
+import { TruckIcon, Calendar, MapPin, Lock, ShieldAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Sample load data
 const sampleLoads = [
@@ -89,20 +90,42 @@ const sampleLoads = [
 ];
 
 const LoadBoardPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isApproved } = useAuth();
   const navigate = useNavigate();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
 
   const handleViewDetail = (loadId: string) => {
     // Just view the load, no restrictions
+    if (!isAuthenticated) {
+      setShowLoginDialog(true);
+      return;
+    }
+    
+    if (!isApproved) {
+      // Don't allow detailed view for unapproved users
+      return;
+    }
+    
     setSelectedLoadId(loadId);
   };
 
   const handleAcceptLoad = (loadId: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      setSelectedLoadId(loadId);
+      setShowLoginDialog(true);
+      return;
+    }
+    
+    if (!isApproved) {
+      // Show approval required message
+      return;
+    }
+    
+    // Only proceed if user is approved
     setSelectedLoadId(loadId);
-    setShowLoginDialog(true);
   };
 
   return (
@@ -111,6 +134,17 @@ const LoadBoardPage = () => {
       <p className="text-gray-600 mb-6">
         Browse available loads and find your next shipment
       </p>
+
+      {isAuthenticated && !isApproved && (
+        <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+          <ShieldAlert className="h-5 w-5 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+          <AlertDescription className="text-yellow-700">
+            Your account is currently pending approval by an administrator. 
+            You will be able to accept loads and view complete details once your account has been approved.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sampleLoads.map((load) => (
@@ -178,8 +212,11 @@ const LoadBoardPage = () => {
               <Button 
                 className="mt-4 w-full"
                 onClick={(e) => handleAcceptLoad(load.id, e)}
+                disabled={isAuthenticated && !isApproved}
               >
-                Accept Shipment
+                {isAuthenticated && !isApproved 
+                  ? "Approval Required" 
+                  : "Accept Shipment"}
               </Button>
             </CardContent>
           </Card>
