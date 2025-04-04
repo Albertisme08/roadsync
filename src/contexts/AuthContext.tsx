@@ -24,6 +24,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
+// Create the context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -101,6 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUser(null);
   };
 
+  // Create the context value object outside of the JSX
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,

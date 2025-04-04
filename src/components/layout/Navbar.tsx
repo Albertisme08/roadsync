@@ -19,6 +19,14 @@ const Navbar: React.FC = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleLoginClick = () => {
+    navigate("/auth?mode=login");
+  };
+
+  const handleSignUpClick = () => {
+    navigate("/auth?mode=register");
+  };
+
   return (
     <header className="sticky top-0 w-full bg-white shadow-sm z-50">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -81,15 +89,16 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <>
-              <Link
-                to="/auth?mode=login"
-                className="text-brand-darkGray hover:text-brand-blue transition-colors"
+              <Button
+                variant="ghost"
+                className="text-brand-darkGray hover:text-brand-blue hover:bg-transparent"
+                onClick={handleLoginClick}
               >
                 Login
-              </Link>
+              </Button>
               <Button
                 variant="default"
-                onClick={() => navigate("/auth?mode=register")}
+                onClick={handleSignUpClick}
               >
                 Sign Up
               </Button>
@@ -136,13 +145,16 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <Link
-                  to="/auth?mode=login"
-                  className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
-                  onClick={toggleMenu}
+                <Button
+                  variant="ghost"
+                  className="justify-start px-4 text-brand-darkGray hover:text-brand-blue hover:bg-transparent"
+                  onClick={() => {
+                    navigate("/auth?mode=login");
+                    toggleMenu();
+                  }}
                 >
                   Login
-                </Link>
+                </Button>
                 <Button
                   variant="default"
                   onClick={() => {

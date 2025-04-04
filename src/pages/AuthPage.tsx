@@ -1,12 +1,14 @@
 
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AuthPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
-
+  const location = useLocation();
+  
+  // If user is already logged in, redirect to dashboard
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }

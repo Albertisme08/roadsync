@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +7,14 @@ import { Truck, Package, ArrowRight, ShieldCheck, CreditCard, Map, MessageSquare
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+
+  const handleLoginClick = () => {
+    navigate("/auth?mode=login");
+  };
+
+  const handleSignUpClick = () => {
+    navigate("/auth?mode=register");
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -37,7 +44,7 @@ const Index = () => {
                   size="lg" 
                   variant="outline" 
                   className="border-white text-white hover:bg-white/10"
-                  onClick={() => navigate("/auth?mode=login")}
+                  onClick={isAuthenticated ? () => navigate("/shipments") : handleLoginClick}
                 >
                   {isAuthenticated ? "View Shipments" : "Login"}
                 </Button>
@@ -229,7 +236,7 @@ const Index = () => {
               size="lg" 
               variant="default"
               className="bg-white text-brand-blue hover:bg-gray-100"
-              onClick={() => navigate("/auth?mode=register")}
+              onClick={handleSignUpClick}
             >
               Create an Account
             </Button>
@@ -237,7 +244,7 @@ const Index = () => {
               size="lg" 
               variant="outline"
               className="border-white text-white hover:bg-white/10"
-              onClick={() => navigate("/auth?mode=login")}
+              onClick={handleLoginClick}
             >
               Log In
             </Button>
