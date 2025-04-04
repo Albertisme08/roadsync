@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
 import CreateAccountModal from "./CreateAccountModal";
+import CarrierDetailModal from "./CarrierDetailModal";
 
 const CarrierList = () => {
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
+  const [showRequestAccessModal, setShowRequestAccessModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedCarrier, setSelectedCarrier] = useState<any>(null);
+  const [showCarrierModal, setShowCarrierModal] = useState(false);
 
   const carriers = [
     { name: "Never Late Express Inc", city: "Bakersfield, CA", dot: "3522606", equipment: "Refrigerated", status: "Active" },
@@ -28,12 +31,13 @@ const CarrierList = () => {
     carrier.city.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleViewCarrier = () => {
-    setShowModal(true);
+  const handleViewCarrier = (carrier: any) => {
+    setSelectedCarrier(carrier);
+    setShowCarrierModal(true);
   };
 
   const handleRequestAccess = () => {
-    setShowModal(true);
+    setShowRequestAccessModal(true);
   };
 
   return (
@@ -74,7 +78,7 @@ const CarrierList = () => {
                 <TableCell className="text-white">{carrier.city}</TableCell>
                 <TableCell className="text-right">
                   <Button 
-                    onClick={handleViewCarrier}
+                    onClick={() => handleViewCarrier(carrier)}
                     variant="default"
                     className="bg-blue-600 hover:bg-blue-700"
                   >
@@ -97,9 +101,15 @@ const CarrierList = () => {
         </Button>
       </div>
 
+      <CarrierDetailModal
+        isOpen={showCarrierModal}
+        onClose={() => setShowCarrierModal(false)}
+        carrier={selectedCarrier}
+      />
+
       <CreateAccountModal 
-        isOpen={showModal} 
-        onClose={() => setShowModal(false)} 
+        isOpen={showRequestAccessModal} 
+        onClose={() => setShowRequestAccessModal(false)} 
       />
     </div>
   );
