@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ShipperDashboard from "@/components/dashboard/ShipperDashboard";
 import DriverDashboard from "@/components/dashboard/DriverDashboard";
 import { Shipment } from "@/components/shipments/ShipmentCard";
+import { Button } from "@/components/ui/button";
 
 // Sample shipment data
 const sampleShipments: Shipment[] = [
@@ -68,6 +69,7 @@ const sampleShipments: Shipment[] = [
 const Dashboard: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const [shipments, setShipments] = useState<Shipment[]>(sampleShipments);
+  const navigate = useNavigate();
 
   // In a real app, you would fetch data from your API
   useEffect(() => {
@@ -89,16 +91,47 @@ const Dashboard: React.FC = () => {
     return () => clearTimeout(timer);
   }, [user]);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth?mode=login" replace />;
-  }
+  const handleLoginClick = () => {
+    navigate("/auth?redirectTo=/dashboard");
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
-      {user?.role === "shipper" ? (
-        <ShipperDashboard shipments={shipments} />
+      {!isAuthenticated ? (
+        <div className="space-y-6">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold tracking-tight mb-2">
+              Welcome to RoadSync
+            </h1>
+            <p className="text-muted-foreground">
+              To view shipper details and manage shipments, please log in or create an account.
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Blurred content */}
+            <div className="filter blur-sm pointer-events-none">
+              <ShipperDashboard shipments={shipments} />
+            </div>
+            
+            {/* Login overlay */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+              <div className="bg-white p-6 rounded-lg shadow-lg text-center space-y-4 max-w-md">
+                <h2 className="text-xl font-semibold">Access Required</h2>
+                <p>Please log in or create an account to view shipper details and manage shipments.</p>
+                <Button onClick={handleLoginClick} className="w-full">
+                  Log in / Create Account
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
-        <DriverDashboard shipments={shipments} />
+        user?.role === "shipper" ? (
+          <ShipperDashboard shipments={shipments} />
+        ) : (
+          <DriverDashboard shipments={shipments} />
+        )
       )}
     </div>
   );

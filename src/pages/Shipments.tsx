@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ShipmentList from "@/components/shipments/ShipmentList";
 import CreateShipmentForm from "@/components/shipments/CreateShipmentForm";
 import { Shipment } from "@/components/shipments/ShipmentCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 // Sample shipment data (same as in Dashboard)
 const sampleShipments: Shipment[] = [
@@ -69,6 +70,7 @@ const sampleShipments: Shipment[] = [
 const Shipments: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const [shipments, setShipments] = useState<Shipment[]>(sampleShipments);
+  const navigate = useNavigate();
   const isShipper = user?.role === "shipper";
 
   // In a real app, you would fetch data from your API
@@ -103,44 +105,67 @@ const Shipments: React.FC = () => {
     );
   };
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth?mode=login" replace />;
-  }
+  const handleLoginClick = () => {
+    navigate("/auth?redirectTo=/shipments");
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight mb-2">
-          {isShipper ? "Manage Your Shipments" : "Available Loads"}
+          {isAuthenticated && isShipper ? "Manage Your Shipments" : "Available Loads"}
         </h1>
         <p className="text-muted-foreground">
-          {isShipper 
+          {isAuthenticated && isShipper 
             ? "Create and track shipments for your freight" 
             : "Browse available loads and accept shipments"}
         </p>
       </div>
 
-      {isShipper ? (
-        <Tabs defaultValue="list" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="list">My Shipments</TabsTrigger>
-            <TabsTrigger value="create">Create New Shipment</TabsTrigger>
-          </TabsList>
-          <TabsContent value="list">
+      {!isAuthenticated ? (
+        <div className="relative">
+          {/* Blurred content */}
+          <div className="filter blur-sm pointer-events-none">
             <ShipmentList 
               shipments={shipments} 
               onShipmentUpdate={handleShipmentUpdate} 
             />
-          </TabsContent>
-          <TabsContent value="create">
-            <CreateShipmentForm onShipmentCreated={handleShipmentCreated} />
-          </TabsContent>
-        </Tabs>
+          </div>
+          
+          {/* Login overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center space-y-4 max-w-md">
+              <h2 className="text-xl font-semibold">Access Required</h2>
+              <p>Please log in or create an account to view shipper details and manage shipments.</p>
+              <Button onClick={handleLoginClick} className="w-full">
+                Log in / Create Account
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : (
-        <ShipmentList 
-          shipments={shipments} 
-          onShipmentUpdate={handleShipmentUpdate} 
-        />
+        isShipper ? (
+          <Tabs defaultValue="list" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="list">My Shipments</TabsTrigger>
+              <TabsTrigger value="create">Create New Shipment</TabsTrigger>
+            </TabsList>
+            <TabsContent value="list">
+              <ShipmentList 
+                shipments={shipments} 
+                onShipmentUpdate={handleShipmentUpdate} 
+              />
+            </TabsContent>
+            <TabsContent value="create">
+              <CreateShipmentForm onShipmentCreated={handleShipmentCreated} />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <ShipmentList 
+            shipments={shipments} 
+            onShipmentUpdate={handleShipmentUpdate} 
+          />
+        )
       )}
     </div>
   );
