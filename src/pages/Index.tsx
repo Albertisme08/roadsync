@@ -1,19 +1,21 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Truck, Package, ArrowRight, ShieldCheck, CreditCard, Map, MessageSquare } from "lucide-react";
+import { Truck, Package, ArrowRight, ShieldCheck, CreditCard, Map, MessageSquare, User } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [userType, setUserType] = useState<"shipper" | "driver">("shipper");
 
   const handleLoginClick = () => {
     navigate("/auth?mode=login");
   };
 
   const handleSignUpClick = () => {
-    navigate("/auth?mode=register");
+    navigate(`/auth?mode=register&role=${userType}`);
   };
 
   return (
@@ -31,13 +33,33 @@ const Index = () => {
                 helping shippers find reliable drivers and enabling drivers to find 
                 consistent, well-paying loads.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <div className="flex flex-col space-y-4 pt-4">
+                <div className="flex justify-center sm:justify-start">
+                  <div className="bg-white/10 p-1 rounded-lg inline-flex">
+                    <Button 
+                      variant={userType === "shipper" ? "default" : "ghost"} 
+                      className={userType === "shipper" ? "bg-white text-brand-blue" : "text-white hover:bg-white/20"}
+                      onClick={() => setUserType("shipper")}
+                    >
+                      <Package className="mr-2 h-5 w-5" />
+                      I'm a Shipper
+                    </Button>
+                    <Button 
+                      variant={userType === "driver" ? "default" : "ghost"} 
+                      className={userType === "driver" ? "bg-white text-brand-blue" : "text-white hover:bg-white/20"}
+                      onClick={() => setUserType("driver")}
+                    >
+                      <Truck className="mr-2 h-5 w-5" />
+                      I'm a Carrier
+                    </Button>
+                  </div>
+                </div>
                 <Button 
                   size="lg" 
-                  className="bg-white text-brand-blue hover:bg-gray-100"
-                  onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth?mode=register")}
+                  className="bg-brand-blue text-white hover:bg-brand-blue/90 border border-white/20"
+                  onClick={isAuthenticated ? () => navigate("/dashboard") : handleSignUpClick}
                 >
-                  {isAuthenticated ? "Go to Dashboard" : "Get Started"}
+                  {isAuthenticated ? "Go to Dashboard" : `Sign Up as ${userType === "shipper" ? "Shipper" : "Carrier"}`}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
