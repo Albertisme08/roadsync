@@ -10,9 +10,14 @@ const CarrierList = () => {
   const [showModal, setShowModal] = useState(false);
 
   const carriers = [
-    { name: "Never Late Express", city: "Bakersfield, CA", dot: "3522606", status: "Active" },
-    { name: "Alias Trucking Company", city: "Azusa, CA", dot: "1234567", status: "Active" },
-    { name: "A Rivas Trucking", city: "Madera, CA", dot: "1635351", status: "Active" }
+    { name: "Never Late Express Inc", city: "Bakersfield, CA", dot: "3522606", equipment: "Refrigerated", status: "Active" },
+    { name: "Alias Trucking Company", city: "Azusa, CA", dot: "—", equipment: "General Freight", status: "Active" },
+    { name: "Rivas Trucking LLC", city: "Madera, CA", dot: "1635351", equipment: "General Freight", status: "Active" },
+    { name: "FastTruck", city: "Atlanta, GA", dot: "1234567", equipment: "General Freight", status: "Active" },
+    { name: "Eagle", city: "Mesa, AZ", dot: "9132736", equipment: "General Freight", status: "Active" },
+    { name: "Speedy", city: "Columbus, OH", dot: "—", equipment: "General Freight", status: "Active" },
+    { name: "Railable", city: "Springfield, MO", dot: "—", equipment: "Refrigerated", status: "Active" },
+    { name: "Transport", city: "Jackson, MS", dot: "—", equipment: "Flatbed", status: "Active" }
   ];
 
   const handleViewCarrier = () => {
@@ -29,7 +34,8 @@ const CarrierList = () => {
             <TableRow className="border-gray-800 hover:bg-[#1a2334]">
               <TableHead className="text-gray-300">Company</TableHead>
               <TableHead className="text-gray-300">City, State</TableHead>
-              <TableHead className="text-gray-300">Status</TableHead>
+              <TableHead className="text-gray-300">DOT Number</TableHead>
+              <TableHead className="text-gray-300">Equipment</TableHead>
               <TableHead className="text-gray-300">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -41,9 +47,8 @@ const CarrierList = () => {
               >
                 <TableCell className="font-medium">{carrier.name}</TableCell>
                 <TableCell>{carrier.city}</TableCell>
-                <TableCell>
-                  <span className="bg-green-500 px-2 py-1 rounded-full text-xs">{carrier.status}</span>
-                </TableCell>
+                <TableCell>{carrier.dot}</TableCell>
+                <TableCell>{carrier.equipment}</TableCell>
                 <TableCell>
                   <Button 
                     onClick={handleViewCarrier}
