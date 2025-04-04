@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -67,12 +67,11 @@ const CarrierList = () => {
           <div className="bg-white p-8 rounded-lg shadow-lg text-black text-center">
             <h2 className="text-2xl font-bold mb-4">Create an Account</h2>
             <p className="mb-6">Unlock full carrier details like phone, MC#, DOT#, and address.</p>
-            <Button
-              onClick={handleCreateAccount}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
-            >
-              Create Account
-            </Button>
+            <Link to="/auth?mode=register">
+              <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow-md transition duration-300">
+                Create Account
+              </button>
+            </Link>
             <button
               onClick={() => setShowBlur(false)}
               className="mt-4 text-gray-600 hover:underline text-sm"
