@@ -15,12 +15,12 @@ const Index = () => {
       <HeroSection userType={userType} setUserType={setUserType} />
       
       <div className="bg-white py-8 text-center">
-        <Link to="/carriers">
+        <Link to="/post-load">
           <Button 
             variant="outline" 
             className="bg-blue-700 text-white hover:bg-blue-800 border-0 px-6 py-2"
           >
-            Browse Carriers
+            Post a Load
           </Button>
         </Link>
       </div>
