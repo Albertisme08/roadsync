@@ -5,7 +5,8 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle 
+  DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -20,12 +21,14 @@ function CreateAccountModal({ isOpen, onClose }: CreateAccountModalProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl">Create an Account</DialogTitle>
+          <DialogDescription>
+            Create an account or log in to view full details.
+          </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <div className="flex gap-3 mt-2">
             <Button
               className="flex-1"
-              onClick={() => {}}
             >
               <Link to="/auth?mode=register" className="w-full">
                 Sign Up
