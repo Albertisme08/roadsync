@@ -10,6 +10,11 @@ interface User {
   name: string;
   role: UserRole;
   approvalStatus: ApprovalStatus;
+  businessName?: string;
+  dotNumber?: string;
+  mcNumber?: string;
+  phone?: string;
+  description?: string;
 }
 
 interface AuthContextType {
@@ -23,7 +28,12 @@ interface AuthContextType {
     name: string,
     email: string,
     password: string,
-    role: UserRole
+    role: UserRole,
+    businessName?: string,
+    dotNumber?: string,
+    mcNumber?: string,
+    phone?: string,
+    description?: string
   ) => Promise<void>;
   logout: () => void;
   approveUser: (userId: string) => void;
@@ -91,7 +101,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     name: string,
     email: string,
     password: string,
-    role: UserRole
+    role: UserRole,
+    businessName?: string,
+    dotNumber?: string,
+    mcNumber?: string,
+    phone?: string,
+    description?: string
   ): Promise<void> => {
     setIsLoading(true);
     
@@ -109,6 +124,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         name,
         role: isAdmin ? "admin" : role,
         approvalStatus: isAdmin ? "approved" : "pending",
+        businessName,
+        dotNumber,
+        mcNumber,
+        phone,
+        description
       };
       
       // Add to all users
