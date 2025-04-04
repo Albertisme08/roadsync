@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import ShipmentCard, { Shipment } from "@/components/shipments/ShipmentCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/sonner";
 import { Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 

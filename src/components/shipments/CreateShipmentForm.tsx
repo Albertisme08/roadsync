@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shipment } from "./ShipmentCard";
 

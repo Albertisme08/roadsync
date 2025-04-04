@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/sonner";
 import { Loader2 } from "lucide-react";
 
 const profileSchema = z.object({
