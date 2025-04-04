@@ -5,7 +5,6 @@ import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import CTASection from "@/components/home/CTASection";
-import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [userType, setUserType] = useState<"shipper" | "driver">("shipper");
@@ -16,12 +15,9 @@ const Index = () => {
       
       <div className="bg-white py-8 text-center">
         <Link to="/shipments">
-          <Button 
-            variant="outline" 
-            className="bg-blue-700 text-white hover:bg-blue-800 border-0 px-6 py-2"
-          >
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300">
             Post a Load
-          </Button>
+          </button>
         </Link>
       </div>
       
