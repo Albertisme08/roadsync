@@ -31,7 +31,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
