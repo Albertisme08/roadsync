@@ -145,7 +145,7 @@ const ShipperPage = () => {
                 {!showRequestForm ? (
                   <div className="flex flex-col gap-4 w-full max-w-lg">
                     <button
-                      onClick={() => setIsModalOpen(true)}
+                      onClick={() => setShowRequestForm(true)}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300"
                     >
                       Request Access to Carrier Network
