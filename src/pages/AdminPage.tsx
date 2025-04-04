@@ -12,15 +12,16 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, RefreshCw, LogOut } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, LogOut, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/lib/sonner";
 
 const AdminPage = () => {
   const { user, isAdmin, getPendingUsers, approveUser, rejectUser, logout } = useAuth();
   const [pendingUsers, setPendingUsers] = useState<any[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const navigate = useNavigate();
   
   // Fetch pending users on mount and every minute
@@ -42,25 +43,41 @@ const AdminPage = () => {
   }, [isAdmin, getPendingUsers]);
   
   const handleApprove = (userId: string, userName: string) => {
-    approveUser(userId);
-    setPendingUsers(getPendingUsers());
-    
-    toast({
-      title: "User Approved",
-      description: `${userName} has been approved and notified.`,
-      variant: "default",
-    });
+    try {
+      approveUser(userId);
+      setPendingUsers(getPendingUsers());
+      
+      toast({
+        title: "User Approved",
+        description: `${userName} has been approved and notified.`,
+      });
+    } catch (error) {
+      console.error("Error approving user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to approve user. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
   
   const handleReject = (userId: string, userName: string) => {
-    rejectUser(userId);
-    setPendingUsers(getPendingUsers());
-    
-    toast({
-      title: "User Rejected",
-      description: `${userName} has been rejected and notified.`,
-      variant: "default",
-    });
+    try {
+      rejectUser(userId);
+      setPendingUsers(getPendingUsers());
+      
+      toast({
+        title: "User Rejected",
+        description: `${userName} has been rejected and notified.`,
+      });
+    } catch (error) {
+      console.error("Error rejecting user:", error);
+      toast({
+        title: "Error", 
+        description: "Failed to reject user. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleManualRefresh = () => {
@@ -70,7 +87,6 @@ const AdminPage = () => {
     toast({
       title: "Refreshed",
       description: "User list has been refreshed.",
-      variant: "default",
     });
     
     setTimeout(() => setIsRefreshing(false), 500);
@@ -79,10 +95,31 @@ const AdminPage = () => {
   const handleLogout = () => {
     logout();
     navigate("/");
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully.",
+    });
   };
   
+  if (!user) {
+    // Redirect to login if not logged in
+    return <Navigate to="/auth?from=/admin" replace />;
+  }
+  
   if (!isAdmin) {
-    return <Navigate to="/" replace />;
+    // Show access denied for non-admin users
+    return (
+      <div className="container mx-auto py-16 px-4 flex flex-col items-center justify-center min-h-[60vh]">
+        <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />
+        <h1 className="text-3xl font-bold text-center mb-2">Access Denied</h1>
+        <p className="text-gray-600 text-center mb-6">
+          You don't have permission to access the admin dashboard.
+        </p>
+        <Button onClick={() => navigate("/")} className="mt-4">
+          Return to Homepage
+        </Button>
+      </div>
+    );
   }
   
   return (

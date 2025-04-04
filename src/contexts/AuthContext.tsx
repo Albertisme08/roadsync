@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect } from "react";
 import { AuthContextType } from "../types/auth.types";
 import { useAuthActions } from "../hooks/useAuthActions";
+import { isAdminEmail } from "../utils/storage.utils";
 
 // Create the context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,12 +28,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loadInitialData();
   }, []);
 
+  // Determine if user is an admin (has admin role and email matches allowed admin emails)
+  const isAdmin = !!user && user.role === "admin" && isAdminEmail(user.email);
+
   // Create the context value object
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isApproved: !!user && user.approvalStatus === "approved",
-    isAdmin: !!user && user.role === "admin",
+    isAdmin,
     isLoading,
     login,
     register,

@@ -22,3 +22,8 @@ export const getAllUsersFromStorage = (): User[] => {
 export const setAllUsersInStorage = (users: User[]): void => {
   localStorage.setItem("allUsers", JSON.stringify(users));
 };
+
+export const isAdminEmail = (email: string): boolean => {
+  const adminEmails = ["alopezcargo@outlook.com", "fwdfwdit@gmail.com"];
+  return adminEmails.includes(email.toLowerCase());
+};

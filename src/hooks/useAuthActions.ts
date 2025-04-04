@@ -6,7 +6,8 @@ import {
   setUserInStorage, 
   removeUserFromStorage,
   getAllUsersFromStorage,
-  setAllUsersInStorage
+  setAllUsersInStorage,
+  isAdminEmail
 } from "../utils/storage.utils";
 
 export const useAuthActions = () => {
@@ -27,10 +28,27 @@ export const useAuthActions = () => {
       
       // Check if user exists in our mock database
       const existingUsers = getAllUsersFromStorage();
-      const existingUser = existingUsers.find((u: User) => u.email === email);
+      const existingUser = existingUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
       
       if (existingUser) {
-        // For demo purposes, we're not checking password
+        // For admin emails, always ensure admin role and approved status
+        if (isAdminEmail(email)) {
+          existingUser.role = "admin";
+          existingUser.approvalStatus = "approved";
+          
+          // Update this user in all users array too
+          const updatedUsers = existingUsers.map(u => 
+            u.id === existingUser.id ? existingUser : u
+          );
+          setAllUsersInStorage(updatedUsers);
+          setAllUsers(updatedUsers);
+        }
+        
+        // Check if user is rejected
+        if (existingUser.approvalStatus === "rejected") {
+          throw new Error("Your account has been rejected. Please contact support.");
+        }
+        
         setUserInStorage(existingUser);
         setUser(existingUser);
       } else {
@@ -58,8 +76,18 @@ export const useAuthActions = () => {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
+      // Check if user already exists
+      const existingUsers = getAllUsersFromStorage();
+      const userExists = existingUsers.some(
+        (user) => user.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (userExists) {
+        throw new Error("User with this email already exists");
+      }
+      
       // Check for admin email
-      const isAdmin = email === "alopezcargo@outlook.com" || email === "fwdfwdit@gmail.com";
+      const isAdmin = isAdminEmail(email);
       
       // Mock successful registration
       const newUser: User = {
@@ -76,7 +104,6 @@ export const useAuthActions = () => {
       };
       
       // Add to all users
-      const existingUsers = getAllUsersFromStorage();
       existingUsers.push(newUser);
       setAllUsersInStorage(existingUsers);
       setAllUsers(existingUsers);
@@ -154,6 +181,12 @@ export const useAuthActions = () => {
   const loadInitialData = () => {
     const storedUser = getUserFromStorage();
     if (storedUser) {
+      // Ensure admin users always have admin role
+      if (isAdminEmail(storedUser.email)) {
+        storedUser.role = "admin";
+        storedUser.approvalStatus = "approved";
+        setUserInStorage(storedUser);
+      }
       setUser(storedUser);
     }
     
