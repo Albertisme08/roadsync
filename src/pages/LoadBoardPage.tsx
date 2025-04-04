@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TruckIcon, Calendar, MapPin } from "lucide-react";
+import { TruckIcon, Calendar, MapPin, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Sample load data
@@ -91,28 +91,18 @@ const sampleLoads = [
 const LoadBoardPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [viewedLoads, setViewedLoads] = useState<string[]>([]);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
 
-  const handleViewLoad = (loadId: string) => {
-    if (!isAuthenticated && viewedLoads.length >= 2 && !viewedLoads.includes(loadId)) {
-      setShowLoginDialog(true);
-      return;
-    }
-    
-    if (!viewedLoads.includes(loadId)) {
-      setViewedLoads([...viewedLoads, loadId]);
-    }
+  const handleViewDetail = (loadId: string) => {
+    // Just view the load, no restrictions
+    setSelectedLoadId(loadId);
   };
 
-  const handleAcceptLoad = (loadId: string) => {
-    if (!isAuthenticated) {
-      setShowLoginDialog(true);
-      return;
-    }
-    
-    // In a real application, this would make an API call to accept the load
-    alert(`Load ${loadId} accepted successfully!`);
+  const handleAcceptLoad = (loadId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedLoadId(loadId);
+    setShowLoginDialog(true);
   };
 
   return (
@@ -123,105 +113,89 @@ const LoadBoardPage = () => {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sampleLoads.map((load) => {
-          const isViewed = viewedLoads.includes(load.id) || isAuthenticated;
-          const shouldBlur = !isViewed && viewedLoads.length >= 2;
-          
-          return (
-            <Card 
-              key={load.id} 
-              className={`overflow-hidden h-full flex flex-col transition-all hover:shadow-md ${
-                shouldBlur ? "opacity-70" : ""
-              }`}
-              onClick={() => handleViewLoad(load.id)}
-            >
-              <CardContent className="p-5 flex-grow">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1 flex items-center">
-                      <MapPin size={16} className="mr-1 text-brand-blue" />
-                      {load.pickup}
-                    </h3>
-                    <h3 className="font-semibold text-lg flex items-center">
-                      <MapPin size={16} className="mr-1 text-brand-green" />
-                      {load.delivery}
-                    </h3>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xl font-bold text-brand-blue">
+        {sampleLoads.map((load) => (
+          <Card 
+            key={load.id} 
+            className="overflow-hidden h-full flex flex-col transition-all hover:shadow-md"
+            onClick={() => handleViewDetail(load.id)}
+          >
+            <CardContent className="p-5 flex-grow">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1 flex items-center">
+                    <MapPin size={16} className="mr-1 text-brand-blue" />
+                    {load.pickup}
+                  </h3>
+                  <h3 className="font-semibold text-lg flex items-center">
+                    <MapPin size={16} className="mr-1 text-brand-green" />
+                    {load.delivery}
+                  </h3>
+                </div>
+                <div className="text-right relative">
+                  <div className="flex items-center">
+                    <Lock size={12} className="mr-1 text-gray-500" />
+                    <div className="text-xl font-bold text-brand-blue blur-sm opacity-50">
                       ${load.price}
                     </div>
                   </div>
                 </div>
-                
-                <div className={`space-y-2 ${shouldBlur ? "blur-md" : ""}`}>
-                  <div className="flex items-center text-sm">
-                    <Calendar size={14} className="mr-2 text-gray-500" />
-                    <div>
-                      <span className="text-gray-600">Pickup: </span>
-                      <span>{load.pickupDate}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center text-sm">
-                    <Calendar size={14} className="mr-2 text-gray-500" />
-                    <div>
-                      <span className="text-gray-600">Delivery: </span>
-                      <span>{load.deliveryDate}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center text-sm">
-                    <TruckIcon size={14} className="mr-2 text-gray-500" />
-                    <div>
-                      <span className="text-gray-600">Freight: </span>
-                      <span>{load.freightType}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center text-sm">
-                    <span className="mr-2">📦</span>
-                    <div>
-                      <span className="text-gray-600">Weight: </span>
-                      <span>{load.weight}</span>
-                    </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center text-sm">
+                  <Calendar size={14} className="mr-2 text-gray-500" />
+                  <div>
+                    <span className="text-gray-600">Pickup: </span>
+                    <span>{load.pickupDate}</span>
                   </div>
                 </div>
                 
-                <Button 
-                  className={`mt-4 w-full ${shouldBlur ? "blur-md" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAcceptLoad(load.id);
-                  }}
-                >
-                  Accept Shipment
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+                <div className="flex items-center text-sm">
+                  <Calendar size={14} className="mr-2 text-gray-500" />
+                  <div>
+                    <span className="text-gray-600">Delivery: </span>
+                    <span>{load.deliveryDate}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center text-sm">
+                  <TruckIcon size={14} className="mr-2 text-gray-500" />
+                  <div>
+                    <span className="text-gray-600">Freight: </span>
+                    <span>{load.freightType}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center text-sm">
+                  <span className="mr-2">📦</span>
+                  <div>
+                    <span className="text-gray-600">Weight: </span>
+                    <span>{load.weight}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <Button 
+                className="mt-4 w-full"
+                onClick={(e) => handleAcceptLoad(load.id, e)}
+              >
+                Accept Shipment
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Create account dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl">Create an Account to Book Loads</DialogTitle>
+            <DialogTitle className="text-xl">Create an Account</DialogTitle>
             <DialogDescription>
-              Get full access to all loads and start booking shipments today.
+              Create an account or log in to access this feature.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
-            <p className="text-gray-600">
-              Creating an account allows you to:
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-gray-600">
-              <li>View all available loads</li>
-              <li>Book shipments directly on the platform</li>
-              <li>Track your shipments in real-time</li>
-              <li>Get paid faster with our secure payment system</li>
-            </ul>
             <div className="flex gap-3 mt-2">
               <Button 
                 className="flex-1" 

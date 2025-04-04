@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,7 +8,6 @@ import CreateAccountModal from "./CreateAccountModal";
 import CarrierDetailModal from "./CarrierDetailModal";
 
 const CarrierList = () => {
-  const navigate = useNavigate();
   const [showRequestAccessModal, setShowRequestAccessModal] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCarrier, setSelectedCarrier] = useState<any>(null);
@@ -34,10 +32,6 @@ const CarrierList = () => {
   const handleViewCarrier = (carrier: any) => {
     setSelectedCarrier(carrier);
     setShowCarrierModal(true);
-  };
-
-  const handleRequestAccess = () => {
-    setShowRequestAccessModal(true);
   };
 
   return (
@@ -91,25 +85,10 @@ const CarrierList = () => {
         </Table>
       </div>
 
-      <div className="flex justify-center mt-8">
-        <Button 
-          onClick={handleRequestAccess}
-          variant="default"
-          className="bg-blue-600 hover:bg-blue-700 py-3 px-8 w-full md:w-auto text-base"
-        >
-          Request Access to Carrier Network
-        </Button>
-      </div>
-
       <CarrierDetailModal
         isOpen={showCarrierModal}
         onClose={() => setShowCarrierModal(false)}
         carrier={selectedCarrier}
-      />
-
-      <CreateAccountModal 
-        isOpen={showRequestAccessModal} 
-        onClose={() => setShowRequestAccessModal(false)} 
       />
     </div>
   );
