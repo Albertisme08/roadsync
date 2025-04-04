@@ -30,6 +30,14 @@ export const useAuthActions = () => {
       const existingUsers = getAllUsersFromStorage();
       const existingUser = existingUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
       
+      // Special handling for admin logins
+      if (role === "admin") {
+        // Check if the email is in the allowed admin emails list
+        if (!isAdminEmail(email)) {
+          throw new Error("You don't have admin privileges");
+        }
+      }
+      
       if (existingUser) {
         // For admin emails, always ensure admin role and approved status
         if (isAdminEmail(email)) {
