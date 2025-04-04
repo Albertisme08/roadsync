@@ -32,7 +32,6 @@ const CarrierList = () => {
             <TableRow className="border-gray-800 hover:bg-[#1a2334]">
               <TableHead className="text-gray-300">Company</TableHead>
               <TableHead className="text-gray-300">City, State</TableHead>
-              <TableHead className="text-gray-300">DOT Number</TableHead>
               <TableHead className="text-gray-300">Status</TableHead>
               <TableHead className="text-gray-300">Action</TableHead>
             </TableRow>
@@ -45,7 +44,6 @@ const CarrierList = () => {
               >
                 <TableCell className="font-medium">{carrier.name}</TableCell>
                 <TableCell>{carrier.city}</TableCell>
-                <TableCell>{carrier.dot}</TableCell>
                 <TableCell>
                   <span className="bg-green-500 px-2 py-1 rounded-full text-xs">{carrier.status}</span>
                 </TableCell>
@@ -68,7 +66,7 @@ const CarrierList = () => {
         <div className="fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg text-black text-center">
             <h2 className="text-2xl font-bold mb-4">Create an Account</h2>
-            <p className="mb-6">Unlock full carrier details like phone, MC#, and address.</p>
+            <p className="mb-6">Unlock full carrier details like phone, MC#, DOT#, and address.</p>
             <Button
               onClick={handleCreateAccount}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
