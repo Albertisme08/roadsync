@@ -144,12 +144,12 @@ const ShipperPage = () => {
               <div className="flex justify-center mt-8">
                 {!showRequestForm ? (
                   <div className="flex flex-col gap-4 w-full max-w-lg">
-                    <Button 
-                      className="px-8 py-6 text-lg bg-brand-blue hover:bg-brand-blue/90"
-                      onClick={() => setShowRequestForm(true)}
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300"
                     >
                       Request Access to Carrier Network
-                    </Button>
+                    </button>
                     <Button
                       onClick={() => setIsModalOpen(true)}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-8 rounded shadow-md transition duration-300 text-lg"
