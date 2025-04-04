@@ -26,17 +26,61 @@ export const useAuthActions = () => {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      // Check if user exists in our mock database
-      const existingUsers = getAllUsersFromStorage();
-      const existingUser = existingUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
-      
-      // Special handling for admin logins
+      // Check if user is trying to login as admin
       if (role === "admin") {
-        // Check if the email is in the allowed admin emails list
+        // Special handling for admin users
         if (!isAdminEmail(email)) {
           throw new Error("You don't have admin privileges");
         }
+        
+        // Check password for admin users
+        if (password !== "Skaterboo8!") {
+          throw new Error("Invalid admin password");
+        }
+        
+        // Get existing users
+        const existingUsers = getAllUsersFromStorage();
+        let adminUser = existingUsers.find(
+          (u) => u.email.toLowerCase() === email.toLowerCase()
+        );
+        
+        // If admin user doesn't exist, create one
+        if (!adminUser) {
+          adminUser = {
+            id: Math.random().toString(36).substring(2, 9),
+            email: email,
+            name: "Admin User",
+            role: "admin",
+            approvalStatus: "approved"
+          };
+          
+          // Add to all users
+          existingUsers.push(adminUser);
+          setAllUsersInStorage(existingUsers);
+          setAllUsers(existingUsers);
+        } else {
+          // Ensure the user has admin role and is approved
+          adminUser.role = "admin";
+          adminUser.approvalStatus = "approved";
+          
+          // Update in all users
+          const updatedUsers = existingUsers.map((u) =>
+            u.id === adminUser!.id ? adminUser! : u
+          );
+          setAllUsersInStorage(updatedUsers);
+          setAllUsers(updatedUsers);
+        }
+        
+        // Set as current user
+        setUserInStorage(adminUser);
+        setUser(adminUser);
+        setIsLoading(false);
+        return;
       }
+      
+      // Regular login flow for non-admin users
+      const existingUsers = getAllUsersFromStorage();
+      const existingUser = existingUsers.find((u: User) => u.email.toLowerCase() === email.toLowerCase());
       
       if (existingUser) {
         // For admin emails, always ensure admin role and approved status

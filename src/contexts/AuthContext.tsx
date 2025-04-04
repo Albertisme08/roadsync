@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect } from "react";
 import { AuthContextType } from "../types/auth.types";
 import { useAuthActions } from "../hooks/useAuthActions";
-import { isAdminEmail } from "../utils/storage.utils";
+import { isAdminEmail, seedAdminUsers } from "../utils/storage.utils";
 
 // Create the context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,8 +23,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loadInitialData 
   } = useAuthActions();
 
-  // Load initial data on component mount
+  // Load initial data and seed admin users on component mount
   useEffect(() => {
+    // Seed admin users first
+    seedAdminUsers();
+    // Then load initial data
     loadInitialData();
   }, []);
 
