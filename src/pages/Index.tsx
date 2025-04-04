@@ -13,10 +13,15 @@ const Index = () => {
     <div className="flex flex-col min-h-screen">
       <HeroSection userType={userType} setUserType={setUserType} />
       
-      <div className="bg-white py-8 text-center">
+      <div className="bg-white py-8 text-center flex gap-4 justify-center">
         <Link to="/shipments">
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300">
             Post a Load
+          </button>
+        </Link>
+        <Link to="/carriers">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300">
+            Carriers
           </button>
         </Link>
       </div>
