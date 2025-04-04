@@ -54,7 +54,7 @@ const CTASection: React.FC<CTASectionProps> = ({ userType, setUserType }) => {
             size="lg" 
             variant="default"
             className="bg-white text-brand-blue hover:bg-gray-100"
-            onClick={isAuthenticated ? () => navigate("/dashboard") : handleExploreClick}
+            onClick={isAuthenticated ? () => navigate("/dashboard") : () => navigate("/auth?mode=register")}
           >
             {isAuthenticated ? "Go to Dashboard" : userType === "shipper" ? "Post a Load" : "Sign Up"}
             <ArrowRight className="ml-2 h-5 w-5" />

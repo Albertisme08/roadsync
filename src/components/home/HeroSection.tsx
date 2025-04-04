@@ -17,8 +17,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userType, setUserType }) => {
   const { isAuthenticated } = useAuth();
 
   const handleExploreClick = () => {
-    // Just navigate to shipments - signup will happen when they try to book
-    navigate("/shipments");
+    // Navigate directly to registration page
+    navigate("/auth?mode=register");
   };
 
   return (
