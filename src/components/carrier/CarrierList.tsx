@@ -1,12 +1,13 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import CreateAccountModal from "./CreateAccountModal";
 
 const CarrierList = () => {
   const navigate = useNavigate();
-  const [showBlur, setShowBlur] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const carriers = [
     { name: "Never Late Express", city: "Bakersfield, CA", dot: "3522606", status: "Active" },
@@ -15,11 +16,7 @@ const CarrierList = () => {
   ];
 
   const handleViewCarrier = () => {
-    setShowBlur(true);
-  };
-
-  const handleCreateAccount = () => {
-    navigate("/auth?mode=register");
+    setShowModal(true);
   };
 
   return (
@@ -62,25 +59,10 @@ const CarrierList = () => {
         </Table>
       </div>
 
-      {showBlur && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg text-black text-center">
-            <h2 className="text-2xl font-bold mb-4">Create an Account</h2>
-            <p className="mb-6">Unlock full carrier details like phone, MC#, DOT#, and address.</p>
-            <Link to="/auth?mode=register">
-              <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow-md transition duration-300">
-                Create Account
-              </button>
-            </Link>
-            <button
-              onClick={() => setShowBlur(false)}
-              className="mt-4 text-gray-600 hover:underline text-sm"
-            >
-              Browse More
-            </button>
-          </div>
-        </div>
-      )}
+      <CreateAccountModal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+      />
     </div>
   );
 };
