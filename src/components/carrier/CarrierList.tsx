@@ -2,12 +2,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Search } from "lucide-react";
 import CreateAccountModal from "./CreateAccountModal";
 
 const CarrierList = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   const carriers = [
     { name: "Never Late Express Inc", city: "Bakersfield, CA", dot: "3522606", equipment: "Refrigerated", status: "Active" },
@@ -20,36 +23,56 @@ const CarrierList = () => {
     { name: "Transport", city: "Jackson, MS", dot: "—", equipment: "Flatbed", status: "Active" }
   ];
 
+  const filteredCarriers = carriers.filter(carrier =>
+    carrier.name.toLowerCase().includes(search.toLowerCase()) ||
+    carrier.city.toLowerCase().includes(search.toLowerCase())
+  );
+
   const handleViewCarrier = () => {
     setShowModal(true);
   };
 
+  const handleRequestAccess = () => {
+    setShowModal(true);
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Carrier Directory</h1>
+    <div className="container mx-auto py-8 px-4 bg-[#132947] min-h-screen text-white">
+      <h1 className="text-3xl font-bold mb-6">Carrier Network</h1>
+      
+      <div className="relative mb-6 w-full md:w-1/2">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <Input
+          type="text"
+          placeholder="Search by Carrier or City"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-10 bg-[#1a2334] border-gray-700 text-white placeholder:text-gray-400 focus-visible:ring-blue-500 w-full"
+        />
+      </div>
       
       <div className="overflow-x-auto">
-        <Table className="min-w-full bg-[#132947] rounded-lg">
+        <Table className="min-w-full bg-[#132947] rounded-lg border-collapse">
           <TableHeader>
-            <TableRow className="border-gray-800 hover:bg-[#1a2334]">
-              <TableHead className="text-gray-300">Company</TableHead>
-              <TableHead className="text-gray-300">City, State</TableHead>
+            <TableRow className="border-b border-gray-800 hover:bg-[#1a2334]">
+              <TableHead className="text-gray-300">Carrier Name</TableHead>
               <TableHead className="text-gray-300">DOT Number</TableHead>
               <TableHead className="text-gray-300">Equipment</TableHead>
-              <TableHead className="text-gray-300">Action</TableHead>
+              <TableHead className="text-gray-300">City, State</TableHead>
+              <TableHead className="text-right text-gray-300">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {carriers.map((carrier, index) => (
+            {filteredCarriers.map((carrier, index) => (
               <TableRow 
                 key={index} 
-                className="border-gray-800 hover:bg-[#1B3252]"
+                className="border-b border-gray-800 hover:bg-[#1B3252]"
               >
-                <TableCell className="font-medium">{carrier.name}</TableCell>
-                <TableCell>{carrier.city}</TableCell>
-                <TableCell>{carrier.dot}</TableCell>
-                <TableCell>{carrier.equipment}</TableCell>
-                <TableCell>
+                <TableCell className="font-medium text-white">{carrier.name}</TableCell>
+                <TableCell className="text-white">{carrier.dot}</TableCell>
+                <TableCell className="text-white">{carrier.equipment}</TableCell>
+                <TableCell className="text-white">{carrier.city}</TableCell>
+                <TableCell className="text-right">
                   <Button 
                     onClick={handleViewCarrier}
                     variant="default"
@@ -62,6 +85,16 @@ const CarrierList = () => {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="flex justify-center mt-8">
+        <Button 
+          onClick={handleRequestAccess}
+          variant="default"
+          className="bg-blue-600 hover:bg-blue-700 py-3 px-8 w-full md:w-auto text-base"
+        >
+          Request Access to Carrier Network
+        </Button>
       </div>
 
       <CreateAccountModal 
