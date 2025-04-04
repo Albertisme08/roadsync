@@ -69,6 +69,12 @@ const Navbar: React.FC = () => {
               >
                 {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
               </Link>
+              <Link
+                to="/carriers"
+                className="text-brand-darkGray hover:text-brand-blue transition-colors"
+              >
+                Carriers
+              </Link>
               <div className="flex items-center space-x-4">
                 <Link
                   to="/profile"
@@ -90,6 +96,12 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <>
+              <Link
+                to="/carriers"
+                className="text-brand-darkGray hover:text-brand-blue transition-colors"
+              >
+                Carriers
+              </Link>
               <Link
                 to="/shipments"
                 className="text-brand-darkGray hover:text-brand-blue transition-colors"
@@ -127,6 +139,13 @@ const Navbar: React.FC = () => {
                   {user?.role === "shipper" ? "My Shipments" : "Available Loads"}
                 </Link>
                 <Link
+                  to="/carriers"
+                  className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
+                  onClick={toggleMenu}
+                >
+                  Carriers
+                </Link>
+                <Link
                   to="/profile"
                   className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
                   onClick={toggleMenu}
@@ -146,6 +165,13 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <>
+                <Link
+                  to="/carriers"
+                  className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
+                  onClick={toggleMenu}
+                >
+                  Carriers
+                </Link>
                 <Link
                   to="/shipments"
                   className="text-brand-darkGray hover:text-brand-blue transition-colors py-2 px-4"
