@@ -62,10 +62,10 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-md font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-sm">
-              <li className="text-gray-300">Email: support@roadsync.com</li>
-              <li className="text-gray-300">Phone: (555) 123-4567</li>
+              <li className="text-gray-300">Owner: Albert Lopez</li>
+              <li className="text-gray-300">Email: alopezcargo@outlook.com</li>
               <li className="text-gray-300">
-                Address: 123 Logistics Way, Freight City, FC 12345
+                Address: Los Angeles, United States
               </li>
             </ul>
           </div>
