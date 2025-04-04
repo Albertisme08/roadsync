@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
 import Shipments from "./pages/Shipments";
+import ShipperPage from "./pages/ShipperPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/shipments" element={<Shipments />} />
+                <Route path="/post-load" element={<ShipperPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

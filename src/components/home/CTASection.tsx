@@ -17,8 +17,11 @@ const CTASection: React.FC<CTASectionProps> = ({ userType, setUserType }) => {
   const { isAuthenticated } = useAuth();
 
   const handleExploreClick = () => {
-    // Just navigate to shipments - signup will happen when they try to book
-    navigate("/shipments");
+    if (userType === "shipper") {
+      navigate("/post-load");
+    } else {
+      navigate("/shipments");
+    }
   };
 
   return (
@@ -53,7 +56,7 @@ const CTASection: React.FC<CTASectionProps> = ({ userType, setUserType }) => {
             className="bg-white text-brand-blue hover:bg-gray-100"
             onClick={isAuthenticated ? () => navigate("/dashboard") : handleExploreClick}
           >
-            {isAuthenticated ? "Go to Dashboard" : "Start Exploring"}
+            {isAuthenticated ? "Go to Dashboard" : userType === "shipper" ? "Post a Load" : "Find Loads"}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
