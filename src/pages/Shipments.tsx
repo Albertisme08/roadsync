@@ -71,7 +71,7 @@ const sampleShipments: Shipment[] = [
 
 const Shipments: React.FC = () => {
   const { user, isAuthenticated, isApproved } = useAuth();
-  const [shipments, setShipments] = useState<Shipment[]>([]); // Initially empty
+  const [shipments, setShipments] = useState<Shipment[]>([]); // Properly typed shipments state
   const isShipper = user?.role === "shipper";
   const { loadInitialData } = useLoad();
 
