@@ -13,6 +13,7 @@ import { Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "@/lib/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shipment } from "./ShipmentCard";
+import CityAutosuggest from "@/components/common/CityAutosuggest";
 
 const shipmentSchema = z.object({
   origin: z.string().min(3, { message: "Origin must be at least 3 characters" }),
@@ -122,9 +123,11 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Origin</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. New York, NY" {...field} />
-                    </FormControl>
+                    <CityAutosuggest
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="e.g. New York, NY"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -136,9 +139,11 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Destination</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. Los Angeles, CA" {...field} />
-                    </FormControl>
+                    <CityAutosuggest
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="e.g. Los Angeles, CA"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

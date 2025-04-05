@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -35,6 +36,7 @@ import {
 import { toast } from "@/lib/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import CityAutosuggest from "@/components/common/CityAutosuggest";
 
 const formSchema = z.object({
   pickupLocation: z.string().min(3, { message: "Pickup location is required" }),
@@ -158,9 +160,11 @@ const ShipperForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Pickup Location</FormLabel>
-                <FormControl>
-                  <Input placeholder="City, State" {...field} />
-                </FormControl>
+                <CityAutosuggest
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="City, State"
+                />
                 <FormDescription>Enter the pickup city and state</FormDescription>
                 <FormMessage />
               </FormItem>
@@ -173,9 +177,11 @@ const ShipperForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Delivery Location</FormLabel>
-                <FormControl>
-                  <Input placeholder="City, State" {...field} />
-                </FormControl>
+                <CityAutosuggest
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="City, State"
+                />
                 <FormDescription>Enter the delivery city and state</FormDescription>
                 <FormMessage />
               </FormItem>
