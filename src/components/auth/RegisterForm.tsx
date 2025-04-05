@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -30,17 +29,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { UserRole } from "@/types/auth.types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Format phone number as (XXX) XXX-XXXX
 const formatPhoneNumber = (value: string): string => {
   if (!value) return value;
   
-  // Remove all non-digit characters
   const phoneNumber = value.replace(/\D/g, '');
   
-  // Limit to 10 digits
   const truncated = phoneNumber.substring(0, 10);
   
-  // Format the phone number
   if (truncated.length < 4) {
     return truncated;
   } else if (truncated.length < 7) {
@@ -49,14 +44,11 @@ const formatPhoneNumber = (value: string): string => {
   return `(${truncated.substring(0, 3)}) ${truncated.substring(3, 6)}-${truncated.substring(6)}`;
 };
 
-// Simple validation for MC/DOT numbers
 const isValidMCNumber = (value: string): boolean => {
-  // MC numbers typically start with "MC-" followed by digits
   return /^MC-\d{5,8}$/.test(value) || /^\d{5,8}$/.test(value);
 };
 
 const isValidDOTNumber = (value: string): boolean => {
-  // DOT numbers are typically 5-8 digits
   return /^\d{5,8}$/.test(value);
 };
 
@@ -73,7 +65,7 @@ const RegisterForm: React.FC = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      role: undefined as unknown as "shipper" | "carrier", // Start with no role selected
+      role: undefined as unknown as "shipper" | "carrier",
       businessName: "",
       description: "",
       phone: "",
@@ -91,11 +83,9 @@ const RegisterForm: React.FC = () => {
   const watchedMcNumber = form.watch("mcNumber");
   const watchedDotNumber = form.watch("dotNumber");
 
-  // Handle ID type change
   const handleIdTypeChange = (value: "mc" | "dot" | "none") => {
     setIdType(value);
     
-    // Clear the values when switching
     if (value === "mc") {
       form.setValue("dotNumber", "");
     } else if (value === "dot") {
@@ -107,7 +97,6 @@ const RegisterForm: React.FC = () => {
   };
 
   const handleRegister = async (values: RegisterFormValues) => {
-    // Validate MC/DOT numbers if role is shipper and an ID type is selected
     if (values.role === "shipper") {
       if (idType === "mc" && values.mcNumber) {
         if (!isValidMCNumber(values.mcNumber)) {
@@ -120,14 +109,12 @@ const RegisterForm: React.FC = () => {
           return;
         }
       } else if (idType === "none") {
-        // Allow registration to continue, but with a warning
         toast.warning("You are registering without an MC/DOT number. Some features may be limited until approved by an admin.");
       }
     }
     
     setSubmitting(true);
     try {
-      // Extract common fields
       const commonData = {
         name: values.name, 
         email: values.email, 
@@ -138,7 +125,6 @@ const RegisterForm: React.FC = () => {
         description: values.description || ""
       };
       
-      // Add role-specific data
       if (values.role === "carrier") {
         await register(
           commonData.name,
@@ -156,7 +142,6 @@ const RegisterForm: React.FC = () => {
           values.maxWeight || ""
         );
       } else {
-        // Shipper data
         await register(
           commonData.name,
           commonData.email,
@@ -182,7 +167,6 @@ const RegisterForm: React.FC = () => {
     }
   };
 
-  // Phone number input change handler
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
     const formattedValue = formatPhoneNumber(e.target.value);
     onChange(formattedValue);
@@ -194,7 +178,6 @@ const RegisterForm: React.FC = () => {
         onSubmit={form.handleSubmit(handleRegister)}
         className="space-y-4"
       >
-        {/* Personal Information Section */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Personal Information</h3>
           
@@ -278,7 +261,6 @@ const RegisterForm: React.FC = () => {
           />
         </div>
 
-        {/* Business Information Section */}
         <div className="space-y-4 pt-2">
           <h3 className="text-lg font-medium">Business Information</h3>
           
@@ -327,7 +309,6 @@ const RegisterForm: React.FC = () => {
 
           {selectedRole === "shipper" && (
             <>
-              {/* MC/DOT Selection for Shippers */}
               <div className="space-y-4 border p-4 rounded-md bg-slate-50">
                 <FormItem className="space-y-3">
                   <FormLabel>Identification Type<span className="text-red-500 ml-1">*</span></FormLabel>
@@ -376,70 +357,61 @@ const RegisterForm: React.FC = () => {
                           }}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Without an MC or DOT number, we need additional information to verify your account. Please describe your shipping volumes, frequency, dock facilities, and any special requirements.
-                      </FormDescription>
                     </FormItem>
                   )}
                 </FormItem>
 
-                {/* MC Number Field */}
-                {idType === "mc" && (
-                  <FormField
-                    control={form.control}
-                    name="mcNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>MC Number<span className="text-red-500 ml-1">*</span></FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="MC-12345678 or 12345678" 
-                            {...field} 
-                            value={field.value || ""}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Enter your MC number with or without the "MC-" prefix
-                        </FormDescription>
-                        <FormMessage />
-                        {watchedMcNumber && !isValidMCNumber(watchedMcNumber) && (
-                          <p className="text-sm font-medium text-destructive">
-                            Please enter a valid MC number (e.g., MC-12345678 or 12345678)
-                          </p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                )}
+                <FormField
+                  control={form.control}
+                  name="mcNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>MC Number<span className="text-red-500 ml-1">*</span></FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="MC-12345678 or 12345678" 
+                          {...field} 
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your MC number with or without the "MC-" prefix
+                      </FormDescription>
+                      <FormMessage />
+                      {watchedMcNumber && !isValidMCNumber(watchedMcNumber) && (
+                        <p className="text-sm font-medium text-destructive">
+                          Please enter a valid MC number (e.g., MC-12345678 or 12345678)
+                        </p>
+                      )}
+                    </FormItem>
+                  )}
+                />
 
-                {/* DOT Number Field */}
-                {idType === "dot" && (
-                  <FormField
-                    control={form.control}
-                    name="dotNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>DOT Number<span className="text-red-500 ml-1">*</span></FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Enter DOT Number" 
-                            {...field} 
-                            value={field.value || ""}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Enter your DOT number (typically 5-8 digits)
-                        </FormDescription>
-                        <FormMessage />
-                        {watchedDotNumber && !isValidDOTNumber(watchedDotNumber) && (
-                          <p className="text-sm font-medium text-destructive">
-                            Please enter a valid DOT number (5-8 digits)
-                          </p>
-                        )}
-                      </FormItem>
-                    )}
-                  />
-                )}
+                <FormField
+                  control={form.control}
+                  name="dotNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>DOT Number<span className="text-red-500 ml-1">*</span></FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Enter DOT Number" 
+                          {...field} 
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your DOT number (typically 5-8 digits)
+                      </FormDescription>
+                      <FormMessage />
+                      {watchedDotNumber && !isValidDOTNumber(watchedDotNumber) && (
+                        <p className="text-sm font-medium text-destructive">
+                          Please enter a valid DOT number (5-8 digits)
+                        </p>
+                      )}
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField
