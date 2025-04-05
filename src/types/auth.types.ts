@@ -17,6 +17,10 @@ export interface User {
   mcNumber?: string;
   phone?: string;
   description?: string;
+  city?: string;
+  address?: string;
+  equipmentType?: string;
+  maxWeight?: string;
 }
 
 // Authentication context type
@@ -36,7 +40,11 @@ export interface AuthContextType {
     dotNumber: string,
     mcNumber: string,
     phone: string,
-    description: string
+    description: string,
+    city?: string,
+    address?: string,
+    equipmentType?: string,
+    maxWeight?: string
   ) => Promise<void>;
   logout: () => void;
   approveUser: (userId: string) => void;

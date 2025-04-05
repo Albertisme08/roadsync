@@ -161,8 +161,7 @@ const AdminPage = () => {
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Business</TableHead>
-                    <TableHead>DOT/MC</TableHead>
-                    <TableHead>Phone</TableHead>
+                    <TableHead>Details</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -171,10 +170,34 @@ const AdminPage = () => {
                     <TableRow key={user.id} className="group">
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
-                      <TableCell className="capitalize">{user.role}</TableCell>
+                      <TableCell className="capitalize">
+                        <Badge variant={user.role === "shipper" ? "secondary" : "default"}>
+                          {user.role}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{user.businessName || "N/A"}</TableCell>
-                      <TableCell>{user.dotNumber || user.mcNumber || "N/A"}</TableCell>
-                      <TableCell>{user.phone || "N/A"}</TableCell>
+                      <TableCell className="max-w-xs">
+                        {user.role === "shipper" ? (
+                          <>
+                            <div><span className="font-semibold">City:</span> {user.city || "N/A"}</div>
+                            {user.address && <div><span className="font-semibold">Address:</span> {user.address}</div>}
+                            <div><span className="font-semibold">Phone:</span> {user.phone || "N/A"}</div>
+                          </>
+                        ) : (
+                          <>
+                            {(user.dotNumber || user.mcNumber) && (
+                              <div>
+                                {user.dotNumber && <span><span className="font-semibold">DOT:</span> {user.dotNumber}</span>}
+                                {user.dotNumber && user.mcNumber && " | "}
+                                {user.mcNumber && <span><span className="font-semibold">MC:</span> {user.mcNumber}</span>}
+                              </div>
+                            )}
+                            {user.equipmentType && <div><span className="font-semibold">Equipment:</span> {user.equipmentType}</div>}
+                            {user.maxWeight && <div><span className="font-semibold">Max Weight:</span> {user.maxWeight} lbs</div>}
+                            <div><span className="font-semibold">Phone:</span> {user.phone || "N/A"}</div>
+                          </>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button

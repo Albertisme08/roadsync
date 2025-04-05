@@ -62,8 +62,12 @@ const RegisterForm: React.FC = () => {
       businessName: "",
       description: "",
       phone: "",
+      city: "",
+      address: "",
       dotNumber: "",
       mcNumber: "",
+      equipmentType: "",
+      maxWeight: "",
     },
     mode: "onChange",
   });
@@ -76,18 +80,54 @@ const RegisterForm: React.FC = () => {
       // Validate carrier data manually
       const validatedData = validateCarrierData(values);
       
-      await register(
-        validatedData.name, 
-        validatedData.email, 
-        validatedData.password, 
-        validatedData.role as UserRole,
-        validatedData.businessName || "",
-        validatedData.dotNumber || "",
-        validatedData.mcNumber || "",
-        validatedData.phone,
-        validatedData.description || ""
-      );
-      toast.success("Registration successful");
+      // Extract common fields
+      const commonData = {
+        name: validatedData.name, 
+        email: validatedData.email, 
+        password: validatedData.password, 
+        role: validatedData.role as UserRole,
+        businessName: validatedData.businessName,
+        phone: validatedData.phone,
+        description: validatedData.description || ""
+      };
+      
+      // Add role-specific data
+      if (validatedData.role === "carrier") {
+        const carrierData = validatedData as typeof carrierSchema._type;
+        await register(
+          commonData.name,
+          commonData.email,
+          commonData.password,
+          commonData.role,
+          commonData.businessName,
+          carrierData.dotNumber || "",
+          carrierData.mcNumber || "",
+          commonData.phone,
+          commonData.description,
+          undefined,
+          undefined,
+          carrierData.equipmentType,
+          carrierData.maxWeight
+        );
+      } else {
+        // Shipper data
+        const shipperData = validatedData as typeof shipperSchema._type;
+        await register(
+          commonData.name,
+          commonData.email,
+          commonData.password,
+          commonData.role,
+          commonData.businessName,
+          shipperData.dotNumber || "",
+          shipperData.mcNumber || "",
+          commonData.phone,
+          commonData.description,
+          shipperData.city,
+          shipperData.address
+        );
+      }
+      
+      toast.success("Registration successful. Your account is pending approval.");
       navigate("/dashboard");
     } catch (error) {
       console.error("Register error:", error);
@@ -240,6 +280,46 @@ const RegisterForm: React.FC = () => {
             )}
           />
 
+          {selectedRole === "shipper" && (
+            <>
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City<span className="text-red-500 ml-1">*</span></FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Your city" 
+                        {...field} 
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Your address" 
+                        {...field} 
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+
           <FormField
             control={form.control}
             name="description"
@@ -290,6 +370,43 @@ const RegisterForm: React.FC = () => {
                         placeholder="12345678" 
                         {...field} 
                         value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="equipmentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Equipment Type<span className="text-red-500 ml-1">*</span></FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Flatbed, Van, Reefer, etc." 
+                        {...field} 
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="maxWeight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Maximum Weight Capacity (lbs)<span className="text-red-500 ml-1">*</span></FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="40000" 
+                        {...field}
+                        value={field.value || ""}
+                        inputMode="numeric"
                       />
                     </FormControl>
                     <FormMessage />

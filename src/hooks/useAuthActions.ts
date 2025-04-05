@@ -120,7 +120,11 @@ export const useAuthActions = () => {
     dotNumber?: string,
     mcNumber?: string,
     phone?: string,
-    description?: string
+    description?: string,
+    city?: string,
+    address?: string,
+    equipmentType?: string,
+    maxWeight?: string
   ): Promise<void> => {
     setIsLoading(true);
     
@@ -147,12 +151,16 @@ export const useAuthActions = () => {
         email,
         name,
         role: isAdmin ? "admin" : role,
-        approvalStatus: isAdmin ? "approved" : "pending",
+        approvalStatus: isAdmin ? "approved" : "pending", // All new users except admin are pending by default
         businessName,
         dotNumber,
         mcNumber,
         phone,
-        description
+        description,
+        city,
+        address,
+        equipmentType,
+        maxWeight
       };
       
       // Add to all users

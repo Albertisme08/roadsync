@@ -35,6 +35,8 @@ const baseFields = {
 export const shipperSchema = z.object({
   ...baseFields,
   role: z.literal("shipper"),
+  city: z.string().min(1, { message: "City is required" }),
+  address: z.string().optional(),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
 });
@@ -45,12 +47,14 @@ export const carrierSchema = z.object({
   role: z.literal("carrier"),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
+  equipmentType: z.string().min(1, { message: "Equipment type is required" }),
+  maxWeight: z.string().min(1, { message: "Maximum weight is required" }),
 }).refine(data => data.dotNumber || data.mcNumber, {
   message: "Please enter either an MC number or a DOT number",
   path: ["dotNumber"], // This adds the error to the dotNumber field
 });
 
-// First create the combined schema
+// Create the combined schema
 export const registerSchema = z.discriminatedUnion("role", [
   shipperSchema,
   carrierSchema,
