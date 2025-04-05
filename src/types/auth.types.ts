@@ -1,5 +1,4 @@
 
-
 // User roles
 export type UserRole = "shipper" | "carrier" | "admin";
 
@@ -57,4 +56,5 @@ export interface AuthContextType {
   rejectUser: (userId: string) => void;
   restoreUser: (userId: string, approvalStatus: ApprovalStatus) => void; // New function to restore rejected users
   getPendingUsers: () => User[];
+  loadInitialData: () => void; // Added this missing function to the interface
 }

@@ -69,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     rejectUser,
     restoreUser,
     getPendingUsers,
+    loadInitialData, // Make sure we're exposing the loadInitialData function in the context
   };
 
   return (
