@@ -20,13 +20,13 @@ const ShipmentList: React.FC<ShipmentListProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   
-  // Determine if the user is a driver or shipper
-  const isDriver = user?.role === "driver";
+  // Determine if the user is a carrier or shipper
+  const isCarrier = user?.role === "carrier";
 
   // Filter shipments based on search term and status
   const filteredShipments = shipments.filter(shipment => {
-    // For drivers, only show shipments assigned to them or with "pending" status
-    if (isDriver) {
+    // For carriers, only show shipments assigned to them or with "pending" status
+    if (isCarrier) {
       if (shipment.driverId && shipment.driverId !== user?.id) {
         return false;
       }
@@ -111,7 +111,7 @@ const ShipmentList: React.FC<ShipmentListProps> = ({
             key={shipment.id} 
             shipment={shipment} 
             onUpdate={onShipmentUpdate}
-            isDriver={isDriver}
+            isDriver={isCarrier}
             disableActions={disableActions || !isApproved}
           />
         ))}
