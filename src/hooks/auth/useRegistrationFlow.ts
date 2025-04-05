@@ -58,7 +58,7 @@ export const useRegistrationFlow = () => {
   };
 
   // Set user information
-  const setUserInfo = (email: string, name: string, role: string) => {
+  const setUserInfo = (email: string, name: string = "", role: string = "") => {
     setFlowState(prev => ({
       ...prev,
       email,

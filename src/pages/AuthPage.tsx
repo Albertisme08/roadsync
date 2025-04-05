@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import AdminLoginForm from "@/components/auth/AdminLoginForm";
@@ -13,9 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const AuthPage: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, verifyEmail } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -27,6 +30,7 @@ const AuthPage: React.FC = () => {
   const stepParam = searchParams.get("step") as RegistrationStep | null;
   const emailParam = searchParams.get("email");
   const tokenParam = searchParams.get("token");
+  const [verificationResult, setVerificationResult] = useState<{success: boolean, message: string} | null>(null);
 
   // Initialize registration flow
   const {
@@ -34,18 +38,40 @@ const AuthPage: React.FC = () => {
     initiateRegistration,
     setUserInfo,
     sendVerificationEmail,
-    verifyEmail,
+    verifyEmail: verifyEmailInFlow,
     resetFlow
   } = useRegistrationFlow();
 
   // Check URL for verification request
-  React.useEffect(() => {
-    if (stepParam === "email-verification" && emailParam && tokenParam) {
-      // This would be when user clicks the verification link from their email
-      setUserInfo(emailParam, "", "");
-      verifyEmail(tokenParam);
+  useEffect(() => {
+    // Handle verification link from email
+    if (tokenParam && emailParam && !stepParam) {
+      try {
+        const success = verifyEmail(tokenParam, emailParam);
+        if (success) {
+          setVerificationResult({
+            success: true,
+            message: "Your email has been verified successfully! You can now log in."
+          });
+        } else {
+          setVerificationResult({
+            success: false,
+            message: "Invalid or expired verification link. Please request a new one."
+          });
+        }
+      } catch (error) {
+        console.error("Verification error:", error);
+        setVerificationResult({
+          success: false,
+          message: "An error occurred during verification. Please try again later."
+        });
+      }
     }
-  }, [stepParam, emailParam, tokenParam]);
+    // Handle registration flow steps
+    else if (stepParam === "email-verification" && emailParam) {
+      setUserInfo(emailParam, "", "");
+    }
+  }, [stepParam, emailParam, tokenParam, verifyEmail]);
   
   // If user is already logged in, redirect to requested page or dashboard
   if (isAuthenticated) {
@@ -58,8 +84,96 @@ const AuthPage: React.FC = () => {
     return <Navigate to={from} replace />;
   }
 
+  // If user is registered but not verified, show verification needed message
+  const isUnverifiedUser = user && user.verificationStatus === "unverified";
+
   // Determine which component to render based on step or admin login
   const renderAuthComponent = () => {
+    // Display verification result if we just processed a verification link
+    if (verificationResult !== null) {
+      return (
+        <Card className="w-full max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Email Verification</CardTitle>
+            <CardDescription>
+              {verificationResult.success 
+                ? "Your email has been successfully verified" 
+                : "Email verification failed"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert variant={verificationResult.success ? "default" : "destructive"}>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>
+                {verificationResult.success ? "Success!" : "Verification Failed"}
+              </AlertTitle>
+              <AlertDescription>
+                {verificationResult.message}
+              </AlertDescription>
+            </Alert>
+            
+            {verificationResult.success ? (
+              <p className="mt-4 text-center">
+                <a href="/auth?mode=login" className="text-primary hover:underline">
+                  Click here to log in
+                </a>
+              </p>
+            ) : (
+              <p className="mt-4 text-center">
+                <a href="/auth?mode=login" className="text-primary hover:underline">
+                  Return to login
+                </a>
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Show verification notice for unverified users
+    if (isUnverifiedUser) {
+      return (
+        <Card className="w-full max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Email Verification Required</CardTitle>
+            <CardDescription>
+              Please verify your email address to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Alert variant="default">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Verification Required</AlertTitle>
+              <AlertDescription>
+                We've sent a verification link to <strong>{user.email}</strong>. 
+                Please check your inbox and click the link to verify your email address.
+              </AlertDescription>
+            </Alert>
+            <div className="flex justify-center mt-4">
+              <button 
+                className="text-primary hover:underline"
+                onClick={() => {
+                  if (user) {
+                    toast.info("Sending verification email...");
+                    try {
+                      // Resend verification
+                      const token = resendVerification(user.id);
+                      toast.success("Verification email sent! Please check your inbox.");
+                    } catch (error) {
+                      console.error("Failed to resend verification:", error);
+                      toast.error("Failed to resend verification email. Please try again.");
+                    }
+                  }
+                }}
+              >
+                Resend verification email
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
     if (isAdminLogin) {
       return (
         <Card className="w-full max-w-md mx-auto">
@@ -82,8 +196,8 @@ const AuthPage: React.FC = () => {
         return (
           <EmailVerification 
             email={flowState.email}
-            onVerify={verifyEmail}
-            onResendVerification={sendVerificationEmail}
+            onVerify={verifyEmailInFlow}
+            onResendVerification={() => sendVerificationEmail()}
             onBack={resetFlow}
           />
         );

@@ -5,6 +5,9 @@ export type UserRole = "shipper" | "carrier" | "admin";
 // Approval status for user accounts
 export type ApprovalStatus = "pending" | "approved" | "rejected";
 
+// Verification status for email verification
+export type VerificationStatus = "unverified" | "verified";
+
 // User model
 export interface User {
   id: string;
@@ -25,6 +28,9 @@ export interface User {
   rejectionDate?: number; // Timestamp for when user was rejected
   restorationDate?: number; // Timestamp for when user was restored
   _showRestoreOptions?: boolean; // UI state flag for showing restore options
+  verificationStatus?: VerificationStatus; // New field for email verification status
+  verificationToken?: string; // Token for email verification
+  verificationExpiry?: number; // Expiry timestamp for verification token
 }
 
 // Authentication context type
@@ -61,4 +67,6 @@ export interface AuthContextType {
   getPendingUsers: () => User[];
   loadInitialData: () => void; // Added this missing function to the interface
   checkExistingUser?: (email: string) => { exists: boolean; status?: string; user?: User }; // New function to check existing users
+  verifyEmail: (token: string, email: string) => boolean; // New function to verify email
+  resendVerification: (userId: string) => string; // New function to resend verification email
 }

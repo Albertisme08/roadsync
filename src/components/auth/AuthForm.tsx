@@ -13,6 +13,9 @@ import {
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { useRegistrationFlow } from "@/hooks/auth/useRegistrationFlow";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 const AuthForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +23,9 @@ const AuthForm: React.FC = () => {
   const mode = searchParams.get("mode") === "register" ? "register" : "login";
   const navigate = useNavigate();
   const { initiateRegistration } = useRegistrationFlow();
+  const { user } = useAuth();
+  
+  const isUnverifiedUser = user && user.verificationStatus === "unverified";
 
   const handleRegisterClick = () => {
     // Initialize registration flow before navigating to register form
@@ -40,6 +46,16 @@ const AuthForm: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {isUnverifiedUser && (
+          <Alert variant="warning" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Email Verification Required</AlertTitle>
+            <AlertDescription>
+              Please check your email and verify your account before continuing.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {mode === "login" ? <LoginForm /> : <RegisterForm />}
       </CardContent>
       <CardFooter className="flex justify-center">

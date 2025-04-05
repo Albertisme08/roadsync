@@ -1,10 +1,11 @@
 
-import { User, UserRole } from "@/types/auth.types";
+import { User, UserRole, VerificationStatus } from "@/types/auth.types";
 import { 
   getAllUsersFromStorage,
   setAllUsersInStorage,
   setUserInStorage,
-  isAdminEmail
+  isAdminEmail,
+  generateVerificationToken
 } from "@/utils/storage.utils";
 import { toast } from "sonner";
 
@@ -39,7 +40,8 @@ export const useRegistration = (
       phone: '(555) 123-4567',
       description: 'A test user for demonstration purposes',
       city: 'San Francisco',
-      address: '123 Test Street'
+      address: '123 Test Street',
+      verificationStatus: 'verified' // Make test user verified by default
     };
 
     const existingUsers = getAllUsersFromStorage();
@@ -96,7 +98,11 @@ export const useRegistration = (
       
       const isAdmin = isAdminEmail(email);
       
-      // Create new user with pending status (unless admin)
+      // Generate verification token
+      const verificationToken = generateVerificationToken();
+      const verificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
+      
+      // Create new user with pending status (unless admin) and unverified status
       const newUser: User = {
         id: userExists && existingUser ? existingUser.id : Math.random().toString(36).substring(2, 9),
         email,
@@ -111,7 +117,11 @@ export const useRegistration = (
         city,
         address,
         equipmentType,
-        maxWeight
+        maxWeight,
+        // Set verification status - admin users are automatically verified
+        verificationStatus: isAdmin ? "verified" : "unverified",
+        verificationToken: isAdmin ? undefined : verificationToken,
+        verificationExpiry: isAdmin ? undefined : verificationExpiry
       };
       
       console.log("Registering new user with data:", newUser);
@@ -122,19 +132,23 @@ export const useRegistration = (
         // Update existing user
         updatedUsers = [...existingUsers];
         updatedUsers[existingUserIndex] = newUser;
-        toast.info("Your information has been updated. Your account is still pending approval.");
+        toast.info("Your information has been updated. Please check your email to verify your account.");
       } else {
         // Add new user
         updatedUsers = [...existingUsers, newUser];
-        toast.info("Registration successful. Your account is pending approval.");
+        toast.info("Registration started. Please check your email to verify your account.");
       }
       
       setAllUsersInStorage(updatedUsers);
-      
       setAllUsers(updatedUsers);
       
       setUserInStorage(newUser);
       setUser(newUser);
+      
+      // Send verification email
+      if (!isAdmin) {
+        await sendVerificationEmail(email, verificationToken as string);
+      }
       
       const pendingUsers = updatedUsers.filter(u => u.approvalStatus === "pending");
       console.log("All users after registration:", updatedUsers.length);
@@ -144,12 +158,89 @@ export const useRegistration = (
       if (isAdmin) {
         console.log(`Welcome email sent to admin: ${email}`);
       } else {
-        console.log(`New user registration: ${name} (${email}) - needs approval`);
-        console.log(`Pending user data added to localStorage: ${JSON.stringify(newUser)}`);
+        console.log(`New user registration: ${name} (${email}) - needs verification and approval`);
+        console.log(`Verification email sent to: ${email} with token: ${verificationToken}`);
       }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Resend verification email to user
+  const resendVerification = async (userId: string): Promise<string> => {
+    const existingUsers = getAllUsersFromStorage();
+    const userIndex = existingUsers.findIndex(user => user.id === userId);
+    
+    if (userIndex === -1) {
+      throw new Error("User not found");
+    }
+    
+    const user = existingUsers[userIndex];
+    
+    // Generate new verification token
+    const verificationToken = generateVerificationToken();
+    const verificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
+    
+    // Update user with new token
+    user.verificationToken = verificationToken;
+    user.verificationExpiry = verificationExpiry;
+    
+    // Update storage
+    existingUsers[userIndex] = user;
+    setAllUsersInStorage(existingUsers);
+    setAllUsers(existingUsers);
+    
+    if (user.id === JSON.parse(localStorage.getItem("user") || "{}").id) {
+      setUserInStorage(user);
+      setUser(user);
+    }
+    
+    // Send verification email
+    await sendVerificationEmail(user.email, verificationToken);
+    console.log(`Verification email resent to: ${user.email} with token: ${verificationToken}`);
+    
+    return verificationToken;
+  };
+
+  // Verify user email with token
+  const verifyEmail = (token: string, email: string): boolean => {
+    const existingUsers = getAllUsersFromStorage();
+    const userIndex = existingUsers.findIndex(user => 
+      user.email.toLowerCase() === email.toLowerCase() && 
+      user.verificationToken === token
+    );
+    
+    if (userIndex === -1) {
+      console.log("Invalid verification token or email");
+      return false;
+    }
+    
+    const user = existingUsers[userIndex];
+    
+    // Check if token has expired
+    if (user.verificationExpiry && user.verificationExpiry < Date.now()) {
+      console.log("Verification token has expired");
+      return false;
+    }
+    
+    // Mark user as verified
+    user.verificationStatus = "verified";
+    user.verificationToken = undefined;
+    user.verificationExpiry = undefined;
+    
+    // Update storage
+    existingUsers[userIndex] = user;
+    setAllUsersInStorage(existingUsers);
+    setAllUsers(existingUsers);
+    
+    if (user.id === JSON.parse(localStorage.getItem("user") || "{}").id) {
+      setUserInStorage(user);
+      setUser(user);
+    }
+    
+    console.log(`Email verified for user: ${user.email}`);
+    toast.success("Email verified successfully!");
+    return true;
   };
 
   // This function checks if a user already exists and returns their status
@@ -174,6 +265,8 @@ export const useRegistration = (
     register,
     sendVerificationEmail,
     addTestUser,
-    checkExistingUser
+    checkExistingUser,
+    verifyEmail,
+    resendVerification
   };
 };

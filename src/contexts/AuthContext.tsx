@@ -26,7 +26,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     restoreUser,
     getPendingUsers,
     loadInitialData,
-    checkExistingUser
+    checkExistingUser,
+    verifyEmail,
+    resendVerification
   } = useAuthActions();
 
   // Track if we've done the initial data load
@@ -45,6 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Determine if user is an admin (has admin role and email matches allowed admin emails)
   const isAdmin = !!user && user.role === "admin" && isAdminEmail(user.email);
 
+  // Check if user is authenticated (verified and has a valid session)
+  const isAuthenticated = !!user && (user.verificationStatus === "verified" || user.role === "admin");
+
   // Log any changes to allUsers for debugging
   useEffect(() => {
     if (allUsers) {
@@ -62,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const value: AuthContextType = {
     user,
     allUsers,
-    isAuthenticated: !!user,
+    isAuthenticated,
     isApproved: !!user && user.approvalStatus === "approved",
     isAdmin,
     isLoading,
@@ -77,7 +82,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     restoreUser,
     getPendingUsers,
     loadInitialData,
-    checkExistingUser
+    checkExistingUser,
+    verifyEmail,
+    resendVerification
   };
 
   return (

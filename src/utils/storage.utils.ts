@@ -46,6 +46,7 @@ export const seedAdminUsers = (): void => {
       name: "Admin User",
       role: "admin",
       approvalStatus: "approved",
+      verificationStatus: "verified" // Admins are auto-verified
     }));
     
     // Add admin users to existing users
@@ -53,4 +54,10 @@ export const seedAdminUsers = (): void => {
     setAllUsersInStorage(updatedUsers);
     console.log("Admin users seeded successfully");
   }
+};
+
+// Generate a random verification token
+export const generateVerificationToken = (): string => {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
 };
