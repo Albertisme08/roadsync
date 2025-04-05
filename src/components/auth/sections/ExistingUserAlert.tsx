@@ -23,7 +23,7 @@ const ExistingUserAlert: React.FC<ExistingUserAlertProps> = ({ show, status }) =
       </AlertTitle>
       <AlertDescription>
         {status === "pending" 
-          ? "Your account is still pending approval. You can update your information and resubmit if needed."
+          ? "Your account is still pending approval. You will receive an email notification once your account has been reviewed."
           : status === "approved" 
             ? "An account with this email already exists. Please log in instead."
             : "Your account was previously rejected. Please contact support or try with a different email."}

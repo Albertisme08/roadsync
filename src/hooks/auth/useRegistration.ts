@@ -17,11 +17,11 @@ export const useRegistration = (
   // Removed email verification functionality as it's no longer needed
   const sendVerificationEmail = (email: string, token: string) => {
     // Simply log that verification is bypassed
-    console.log(`[EMAIL VERIFICATION BYPASSED] User automatically approved: ${email}`);
+    console.log(`[EMAIL VERIFICATION BYPASSED] New user registered: ${email}`);
     
     // Show toast notification about account creation
     toast.success(
-      `Account created successfully! You can now log in to your account.`,
+      `Account created successfully! Your account is pending admin approval.`,
       {
         duration: 6000
       }
@@ -42,7 +42,7 @@ export const useRegistration = (
       name: 'John Doe',
       email: 'john.doe@example.com',
       role: 'shipper',
-      approvalStatus: 'approved', // Auto-approve test users
+      approvalStatus: 'pending', // Set test users to pending approval
       businessName: 'Test Shipping Company',
       phone: '(555) 123-4567',
       description: 'A test user for demonstration purposes',
@@ -107,13 +107,13 @@ export const useRegistration = (
       
       const isAdmin = isAdminEmail(email);
       
-      // Create new user with approved status - no verification needed
+      // Create new user with pending status by default (admins are auto-approved)
       const newUser: User = {
         id: userExists && existingUser ? existingUser.id : Math.random().toString(36).substring(2, 9),
         email,
         name,
         role: isAdmin ? "admin" : role,
-        approvalStatus: "approved", // Auto-approve all users
+        approvalStatus: isAdmin ? "approved" : "pending", // Auto-approve only admins
         businessName,
         dotNumber,
         mcNumber,
@@ -136,11 +136,19 @@ export const useRegistration = (
         // Update existing user
         updatedUsers = [...existingUsers];
         updatedUsers[existingUserIndex] = newUser;
-        toast.success("Your account has been updated and is ready to use.");
+        if (isAdmin) {
+          toast.success("Your account has been updated and is ready to use.");
+        } else {
+          toast.success("Your account has been updated and is pending approval.");
+        }
       } else {
         // Add new user
         updatedUsers = [...existingUsers, newUser];
-        toast.success("Registration successful! You can now log in to your account.");
+        if (isAdmin) {
+          toast.success("Registration successful! You can now log in to your account.");
+        } else {
+          toast.success("Registration successful! Your account is pending admin approval.");
+        }
       }
       
       // Ensure users are saved to local storage (both ways for redundancy)
@@ -157,7 +165,7 @@ export const useRegistration = (
       if (isAdmin) {
         console.log(`Welcome email sent to admin: ${email}`);
       } else {
-        console.log(`New user registration: ${name} (${email}) - added with approved status`);
+        console.log(`New user registration: ${name} (${email}) - added with pending status`);
       }
     } finally {
       setIsLoading(false);
