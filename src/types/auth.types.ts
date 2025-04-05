@@ -35,6 +35,9 @@ export interface AuthContextType {
   isAdmin: boolean;
   isLoading: boolean;
   allUsers: User[]; // Add this to expose all users to components
+  setUser: (user: User | null) => void; // Add setter for user
+  setAllUsers: (users: User[]) => void; // Add setter for allUsers
+  setIsLoading: (isLoading: boolean) => void; // Add setter for isLoading
   login: (email: string, password: string, role: UserRole) => Promise<void>;
   register: (
     name: string,

@@ -26,6 +26,40 @@ export const useRegistration = (
     });
   };
 
+  // This function adds a test user to the system
+  const addTestUser = () => {
+    const testUser: User = {
+      id: Math.random().toString(36).substring(2, 9),
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      role: 'shipper',
+      approvalStatus: 'pending',
+      businessName: 'Test Shipping Company',
+      phone: '(555) 123-4567',
+      description: 'A test user for demonstration purposes',
+      city: 'San Francisco',
+      address: '123 Test Street'
+    };
+
+    const existingUsers = getAllUsersFromStorage();
+    
+    // Check if test user already exists
+    const userExists = existingUsers.some(
+      (user) => user.email.toLowerCase() === testUser.email.toLowerCase()
+    );
+    
+    if (!userExists) {
+      const updatedUsers = [...existingUsers, testUser];
+      setAllUsersInStorage(updatedUsers);
+      setAllUsers(updatedUsers);
+      console.log("Test user added successfully:", testUser);
+      return true;
+    }
+    
+    console.log("Test user already exists");
+    return false;
+  };
+
   const register = async (
     name: string,
     email: string,
@@ -103,6 +137,7 @@ export const useRegistration = (
 
   return {
     register,
-    sendVerificationEmail
+    sendVerificationEmail,
+    addTestUser // Adding this new function to our hook
   };
 };
