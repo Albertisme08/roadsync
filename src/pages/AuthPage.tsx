@@ -1,9 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import AdminLoginForm from "@/components/auth/AdminLoginForm";
+import EmailVerification from "@/components/auth/EmailVerification";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRegistrationFlow, RegistrationStep } from "@/hooks/auth/useRegistrationFlow";
 import {
   Card,
   CardContent,
@@ -20,6 +22,30 @@ const AuthPage: React.FC = () => {
   
   // Check if the user is trying to access the admin page
   const isAdminLogin = from === "/admin";
+
+  // Get registration flow step from query params if available
+  const stepParam = searchParams.get("step") as RegistrationStep | null;
+  const emailParam = searchParams.get("email");
+  const tokenParam = searchParams.get("token");
+
+  // Initialize registration flow
+  const {
+    flowState,
+    initiateRegistration,
+    setUserInfo,
+    sendVerificationEmail,
+    verifyEmail,
+    resetFlow
+  } = useRegistrationFlow();
+
+  // Check URL for verification request
+  React.useEffect(() => {
+    if (stepParam === "email-verification" && emailParam && tokenParam) {
+      // This would be when user clicks the verification link from their email
+      setUserInfo(emailParam, "", "");
+      verifyEmail(tokenParam);
+    }
+  }, [stepParam, emailParam, tokenParam]);
   
   // If user is already logged in, redirect to requested page or dashboard
   if (isAuthenticated) {
@@ -32,9 +58,10 @@ const AuthPage: React.FC = () => {
     return <Navigate to={from} replace />;
   }
 
-  return (
-    <div className="flex flex-col min-h-[80vh] items-center justify-center p-4 bg-gray-50">
-      {isAdminLogin ? (
+  // Determine which component to render based on step or admin login
+  const renderAuthComponent = () => {
+    if (isAdminLogin) {
+      return (
         <Card className="w-full max-w-md mx-auto">
           <CardHeader>
             <CardTitle>Admin Access</CardTitle>
@@ -46,9 +73,30 @@ const AuthPage: React.FC = () => {
             <AdminLoginForm />
           </CardContent>
         </Card>
-      ) : (
-        <AuthForm />
-      )}
+      );
+    }
+
+    // Check if we're in a specific step of the registration flow
+    switch (flowState.step) {
+      case "email-verification":
+        return (
+          <EmailVerification 
+            email={flowState.email}
+            onVerify={verifyEmail}
+            onResendVerification={sendVerificationEmail}
+            onBack={resetFlow}
+          />
+        );
+        
+      // We'll implement the rest of the steps in future iterations
+      default:
+        return <AuthForm />;
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-[80vh] items-center justify-center p-4 bg-gray-50">
+      {renderAuthComponent()}
     </div>
   );
 };

@@ -12,6 +12,20 @@ export const useRegistration = (
   setAllUsers: (users: User[]) => void,
   setIsLoading: (isLoading: boolean) => void
 ) => {
+  // This function simulates sending a verification email
+  const sendVerificationEmail = (email: string, token: string) => {
+    // In a real app, this would make an API call to send an email
+    console.log(`[EMAIL SERVICE] Verification email sent to ${email} with token: ${token}`);
+    console.log(`[EMAIL SERVICE] Verification link: https://yourdomain.com/verify?token=${token}&email=${email}`);
+    
+    // Return a promise to simulate async behavior
+    return new Promise<void>(resolve => {
+      setTimeout(() => {
+        resolve();
+      }, 1000);
+    });
+  };
+
   const register = async (
     name: string,
     email: string,
@@ -88,6 +102,7 @@ export const useRegistration = (
   };
 
   return {
-    register
+    register,
+    sendVerificationEmail
   };
 };
