@@ -39,7 +39,7 @@ const RegisterForm: React.FC = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "shipper",
+      role: "shipper" as const,
       businessName: "",
       description: "",
       phone: "",
