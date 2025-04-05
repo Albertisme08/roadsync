@@ -108,6 +108,7 @@ export const useAdminUsers = () => {
   // Reset to showing pending users
   useEffect(() => {
     console.log("AdminUsers hook initial load - Setting default filter to pending");
+    // Ensure the status filter is set to pending by default
     setFilters(prev => ({
       ...prev,
       status: "pending"
@@ -116,11 +117,11 @@ export const useAdminUsers = () => {
     // Force refresh data on initial load
     handleManualRefresh(false);
     
-    // Set up an interval to refresh data automatically every 15 seconds (more frequent)
+    // Set up an interval to refresh data automatically every 15 seconds
     const refreshInterval = setInterval(() => {
       console.log("Auto-refreshing user data");
       handleManualRefresh(false); // Silent refresh without toast
-    }, 15000); // Changed from 30s to 15s
+    }, 15000);
     
     return () => clearInterval(refreshInterval); // Clean up the interval on unmount
   }, []);
@@ -139,3 +140,4 @@ export const useAdminUsers = () => {
     } : { total: 0, pending: 0, approved: 0, rejected: 0 }
   };
 };
+

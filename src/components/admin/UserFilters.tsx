@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { ApprovalStatus, UserRole } from "@/types/auth.types";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface FiltersState {
   role: "all" | UserRole;
@@ -31,6 +32,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
   };
 
   const handleRoleChange = (value: string) => {
+    console.log("Role changed to:", value);
     setFilters((prev) => ({ 
       ...prev, 
       role: value as "all" | UserRole
@@ -38,6 +40,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
   };
 
   const handleStatusChange = (value: string) => {
+    console.log("Status changed to:", value);
     setFilters((prev) => ({ 
       ...prev, 
       status: value as "all" | ApprovalStatus
@@ -66,16 +69,17 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
           />
         </div>
 
-        {/* Role filter */}
+        {/* Role filter dropdown */}
         <div className="w-full md:w-40">
           <Select 
             value={filters.role} 
             onValueChange={handleRoleChange}
+            defaultValue="all"
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Role" />
+            <SelectTrigger className="bg-white">
+              <SelectValue placeholder="All Roles" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper" className="bg-white z-50">
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="shipper">Shippers</SelectItem>
               <SelectItem value="carrier">Carriers</SelectItem>
@@ -84,16 +88,17 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
           </Select>
         </div>
 
-        {/* Status filter */}
+        {/* Status filter dropdown */}
         <div className="w-full md:w-40">
           <Select 
             value={filters.status} 
             onValueChange={handleStatusChange}
+            defaultValue="pending"
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper" className="bg-white z-50">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
@@ -115,3 +120,4 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
     </Card>
   );
 };
+
