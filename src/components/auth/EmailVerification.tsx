@@ -10,9 +10,10 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Loader2, Check, AlertTriangle, Mail, Info } from "lucide-react";
+import { Loader2, Check, AlertTriangle, Mail, Info, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface EmailVerificationProps {
   email: string;
@@ -33,6 +34,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const [resending, setResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendCount, setResendCount] = useState(0);
+  const [showTroubleshooting, setShowTroubleshooting] = useState(false);
 
   const handleVerify = () => {
     if (!token) return;
@@ -124,16 +126,29 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
           />
         </div>
         
-        {resendCount >= 2 && (
-          <div className="text-sm text-amber-600">
-            <p>Still not receiving emails? Try these steps:</p>
-            <ul className="list-disc pl-5 mt-2">
-              <li>Check your spam/junk folder</li>
-              <li>Add our email address to your contacts</li>
-              <li>Check if you entered the correct email address</li>
-              <li>Try using a different email provider</li>
-            </ul>
-          </div>
+        {resendCount >= 1 && (
+          <Accordion type="single" collapsible>
+            <AccordionItem value="troubleshooting">
+              <AccordionTrigger className="text-sm font-medium text-amber-600">
+                Not receiving verification emails?
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="text-sm space-y-3">
+                  <p>Here are some troubleshooting steps:</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Check your <strong>spam/junk folder</strong></li>
+                    <li>Make sure you entered the <strong>correct email address</strong> during registration</li>
+                    <li>Add our email address to your contacts to prevent filtering</li>
+                    <li>Check if your email provider blocks automated emails</li>
+                    <li>Try using a different email provider or service</li>
+                    <li>Disable email filters or whitelist our domain temporarily</li>
+                    <li>Check your internet connection and try again</li>
+                  </ul>
+                  <p className="mt-2 italic text-gray-600">If you continue to experience issues, please contact support.</p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         )}
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
