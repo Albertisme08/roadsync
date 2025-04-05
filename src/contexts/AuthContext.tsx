@@ -24,6 +24,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     approveUser, 
     rejectUser,
     restoreUser,
+    removeUser, // Include this function
+    restoreRemovedUser, // Include this function
     getPendingUsers,
     loadInitialData,
     checkExistingUser,
@@ -74,6 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     approveUser,
     rejectUser,
     restoreUser,
+    removeUser, // Add this property
+    restoreRemovedUser, // Add this property
     getPendingUsers,
     loadInitialData,
     checkExistingUser,
