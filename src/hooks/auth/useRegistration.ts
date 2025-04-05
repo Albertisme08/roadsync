@@ -91,6 +91,7 @@ export const useRegistration = (
       
       const isAdmin = isAdminEmail(email);
       
+      // Create new user with pending status (unless admin)
       const newUser: User = {
         id: Math.random().toString(36).substring(2, 9),
         email,
@@ -138,6 +139,6 @@ export const useRegistration = (
   return {
     register,
     sendVerificationEmail,
-    addTestUser // Adding this new function to our hook
+    addTestUser
   };
 };
