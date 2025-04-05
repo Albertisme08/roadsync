@@ -66,7 +66,7 @@ const ShipmentList: React.FC<ShipmentListProps> = ({
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All statuses</SelectItem>
+              <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="accepted">Accepted</SelectItem>
               <SelectItem value="in_transit">In Transit</SelectItem>
@@ -96,7 +96,7 @@ const ShipmentList: React.FC<ShipmentListProps> = ({
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All statuses</SelectItem>
+            <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="accepted">Accepted</SelectItem>
             <SelectItem value="in_transit">In Transit</SelectItem>
