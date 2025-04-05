@@ -27,26 +27,27 @@ const baseFields = {
   phone: z.string().refine(validatePhoneNumber, { 
     message: "Please enter a valid U.S. phone number" 
   }),
+  businessName: z.string().min(1, { message: "Business name is required" }),
+  description: z.string().optional(),
 };
 
 // Schema for shipper role
 export const shipperSchema = z.object({
   ...baseFields,
   role: z.literal("shipper"),
-  businessName: z.string().min(1, { message: "Business name is required" }),
-  description: z.string().optional(),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
 });
 
-// Schema for carrier role
+// Schema for carrier role with MC/DOT number requirement
 export const carrierSchema = z.object({
   ...baseFields,
   role: z.literal("carrier"),
-  businessName: z.string().min(1, { message: "Business name is required" }),
-  description: z.string().optional(),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
+}).refine(data => data.dotNumber || data.mcNumber, {
+  message: "Please enter either an MC number or a DOT number",
+  path: ["dotNumber"], // This adds the error to the dotNumber field
 });
 
 // First create the combined schema
@@ -59,7 +60,6 @@ export const registerSchema = z.discriminatedUnion("role", [
 });
 
 // Add separate carrier validation that doesn't break TypeScript's discriminated union
-// Note: We're making DOT and MC numbers optional as requested
 export const validateCarrierData = (data: z.infer<typeof registerSchema>) => {
   return data;
 };

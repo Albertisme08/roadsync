@@ -266,7 +266,7 @@ const RegisterForm: React.FC = () => {
                 name="mcNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>MC Number (Optional)</FormLabel>
+                    <FormLabel>MC Number {selectedRole === "carrier" && <span className="text-sm text-gray-500">(Required: Enter either MC or DOT)</span>}</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="MC-12345678" 
@@ -284,7 +284,7 @@ const RegisterForm: React.FC = () => {
                 name="dotNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>DOT Number (Optional)</FormLabel>
+                    <FormLabel>DOT Number {selectedRole === "carrier" && <span className="text-sm text-gray-500">(Required: Enter either MC or DOT)</span>}</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="12345678" 
