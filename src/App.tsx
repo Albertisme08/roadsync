@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LoadProvider } from "@/contexts/LoadContext";
 
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -25,28 +26,30 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/shipments" element={<Shipments />} />
-                <Route path="/post-load" element={<ShipperPage />} />
-                <Route path="/load-board" element={<LoadBoardPage />} />
-                <Route path="/carriers" element={<CarriersPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </TooltipProvider>
+        <LoadProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/shipments" element={<Shipments />} />
+                  <Route path="/post-load" element={<ShipperPage />} />
+                  <Route path="/load-board" element={<LoadBoardPage />} />
+                  <Route path="/carriers" element={<CarriersPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </TooltipProvider>
+        </LoadProvider>
       </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>

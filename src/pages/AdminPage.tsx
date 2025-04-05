@@ -1,12 +1,14 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { LoadApprovalDashboard } from "@/components/admin/LoadApprovalDashboard";
 import { useRegistration } from "@/hooks/auth/useRegistration";
 import { toast } from "@/lib/sonner";
+import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminPage = () => {
   const { user, isAdmin, loadInitialData, allUsers, setAllUsers, setUser, setIsLoading } = useAuth();
@@ -84,8 +86,22 @@ const AdminPage = () => {
             Add Test Pending User
           </Button>
         </div>
+        
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="w-full border-b mb-0">
+            <TabsTrigger value="users" className="flex-1">User Management</TabsTrigger>
+            <TabsTrigger value="loads" className="flex-1">Load Approvals</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="users">
+            <AdminDashboard />
+          </TabsContent>
+          
+          <TabsContent value="loads">
+            <LoadApprovalDashboard />
+          </TabsContent>
+        </Tabs>
       </div>
-      <AdminDashboard />
     </>
   );
 };

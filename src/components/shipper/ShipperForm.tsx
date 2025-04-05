@@ -1,10 +1,10 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, ShieldAlertIcon } from "lucide-react";
+import { useLoad } from "@/contexts/LoadContext";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -61,8 +61,9 @@ const equipmentOptions = [
 ];
 
 const ShipperForm = () => {
-  const { toast } = useToast();
   const { isApproved } = useAuth();
+  const { addLoad } = useLoad();
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -78,20 +79,23 @@ const ShipperForm = () => {
 
   const onSubmit = (data: FormValues) => {
     if (!isApproved) {
-      toast({
-        title: "Account Pending Approval",
+      toast("Account Pending Approval", {
         description: "Your account must be approved before you can post loads.",
-        variant: "destructive"
       });
       return;
     }
 
-    console.log(data);
-    toast({
-      title: "Load posted successfully!",
-      description: "Your load has been posted to our carrier network.",
+    const loadId = addLoad({
+      ...data,
+      availableDate: data.availableDate,
     });
-    form.reset();
+
+    if (loadId) {
+      toast("Load Posted", {
+        description: "Your load has been submitted and is pending admin approval.",
+      });
+      form.reset();
+    }
   };
 
   if (!isApproved) {
@@ -178,7 +182,7 @@ const ShipperForm = () => {
               <FormItem>
                 <FormLabel>Load Weight (lbs)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Weight in pounds" {...field} />
+                  <Input type="text" placeholder="Weight in pounds" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -192,7 +196,7 @@ const ShipperForm = () => {
               <FormItem>
                 <FormLabel>Rate Offered ($)</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Rate in dollars" {...field} />
+                  <Input type="text" placeholder="Rate in dollars" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -276,12 +280,20 @@ const ShipperForm = () => {
           )}
         />
         
+        <div className="bg-gray-50 p-4 rounded-md mb-4">
+          <h3 className="text-sm font-medium mb-2">Note about load posting:</h3>
+          <p className="text-sm text-gray-600">
+            Your load will be reviewed by an administrator before it becomes visible to carriers.
+            You'll receive an email notification once your load is approved or rejected.
+          </p>
+        </div>
+        
         <Button 
           type="submit" 
           size="lg" 
           className="w-full py-6 text-lg bg-brand-blue hover:bg-brand-blue/90"
         >
-          Post Load
+          Submit Load for Approval
         </Button>
       </form>
     </Form>
