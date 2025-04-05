@@ -48,15 +48,15 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     }
   };
 
+  // Helper function to show restore options
+  const showRestoreOptions = (user: User) => {
+    setViewUser({ ...user, _showRestoreOptions: true });
+  };
+
   const handleRestore = (userId: string, userName: string) => {
     onRestore(userId, userName, restoreStatus);
     setViewUser(null); // Close dialog after restore
     toast.success(`User ${userName} has been restored with status: ${restoreStatus}`);
-  };
-
-  // Helper to show restore options
-  const showRestoreOptions = (user: User) => {
-    setViewUser({ ...user, _showRestoreOptions: true });
   };
 
   return (
