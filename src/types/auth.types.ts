@@ -33,6 +33,7 @@ export interface User {
   verificationToken?: string; // Token for email verification (kept for backwards compatibility)
   verificationExpiry?: number; // Expiry timestamp for verification token (kept for backwards compatibility)
   registrationDate?: number; // Timestamp for when user registered
+  isFirstVisit?: boolean; // Flag to track if this is the user's first visit to sections of the app
 }
 
 // Authentication context type
