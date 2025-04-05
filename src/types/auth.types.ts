@@ -12,6 +12,7 @@ export interface User {
   email: string;
   role: UserRole;
   approvalStatus: ApprovalStatus;
+  approvalDate?: number; // Timestamp for when user was approved
   businessName?: string;
   dotNumber?: string;
   mcNumber?: string;
@@ -30,6 +31,7 @@ export interface AuthContextType {
   isApproved: boolean;
   isAdmin: boolean;
   isLoading: boolean;
+  allUsers: User[]; // Add this to expose all users to components
   login: (email: string, password: string, role: UserRole) => Promise<void>;
   register: (
     name: string,

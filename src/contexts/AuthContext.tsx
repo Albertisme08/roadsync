@@ -13,6 +13,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { 
     user, 
+    allUsers,
     isLoading, 
     login, 
     register, 
@@ -37,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Create the context value object
   const value: AuthContextType = {
     user,
+    allUsers,
     isAuthenticated: !!user,
     isApproved: !!user && user.approvalStatus === "approved",
     isAdmin,

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User, UserRole, ApprovalStatus } from "../types/auth.types";
 import { 
@@ -190,8 +191,14 @@ export const useAuthActions = () => {
   };
   
   const approveUser = (userId: string) => {
+    const approvalDate = Date.now(); // Current timestamp
+    
     const updatedUsers = allUsers.map(u => 
-      u.id === userId ? { ...u, approvalStatus: "approved" as ApprovalStatus } : u
+      u.id === userId ? { 
+        ...u, 
+        approvalStatus: "approved" as ApprovalStatus,
+        approvalDate // Add approval date timestamp
+      } : u
     );
     
     setAllUsers(updatedUsers);
@@ -199,7 +206,11 @@ export const useAuthActions = () => {
     
     // If the approved user is the current user, update their status
     if (user && user.id === userId) {
-      const updatedUser = { ...user, approvalStatus: "approved" as ApprovalStatus };
+      const updatedUser = { 
+        ...user, 
+        approvalStatus: "approved" as ApprovalStatus,
+        approvalDate
+      };
       setUser(updatedUser);
       setUserInStorage(updatedUser);
     }
