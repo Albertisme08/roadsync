@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -77,10 +76,10 @@ const Shipments: React.FC = () => {
   useEffect(() => {
     // Simulate loading data
     const timer = setTimeout(() => {
-      // If user is a driver, randomly assign some shipments to this driver
-      if (user?.role === "driver" && user?.id) {
+      // If user is a carrier, randomly assign some shipments to this carrier
+      if (user?.role === "carrier" && user?.id) {
         const updatedShipments = shipments.map(shipment => {
-          // Randomly assign some shipments to this driver (for demo purposes)
+          // Randomly assign some shipments to this carrier (for demo purposes)
           if (["accepted", "in_transit", "delivered"].includes(shipment.status) && Math.random() > 0.5) {
             return { ...shipment, driverId: user.id };
           }
