@@ -147,11 +147,6 @@ const RegisterForm: React.FC = () => {
 
   const handleRegister = async (values: RegisterFormValues) => {
     if (values.role === "carrier") {
-      if (!values.mcNumber && !values.dotNumber) {
-        toast.error("Carriers must provide either an MC number or a DOT number");
-        return;
-      }
-      
       if (values.mcNumber && !isValidMCNumber(values.mcNumber)) {
         toast.error("Please enter a valid MC number (e.g., MC-12345678 or 12345678)");
         return;

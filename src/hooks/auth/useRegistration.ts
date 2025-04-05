@@ -81,7 +81,7 @@ export const useRegistration = (
     setIsLoading(true);
     
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Faster registration
       
       const existingUsers = getAllUsersFromStorage() || [];
       console.log("Existing users before registration:", existingUsers.length);
@@ -138,12 +138,11 @@ export const useRegistration = (
       } else {
         // Add new user
         updatedUsers = [...existingUsers, newUser];
-        toast.info("Registration started. Please check your email to verify your account.");
+        toast.success("Registration successful! Your account is pending approval.");
       }
       
-      // Ensure users are saved to local storage
+      // Ensure users are saved to local storage (both ways for redundancy)
       localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
-      
       setAllUsersInStorage(updatedUsers);
       setAllUsers(updatedUsers);
       
