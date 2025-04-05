@@ -28,16 +28,7 @@ const shipperSchema = z.object({
   description: z.string().min(1, { message: "Business description is required for shippers" }),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
-}).refine(
-  (data) => {
-    // Shipper validation: DOT and MC numbers should be empty
-    return !data.dotNumber && !data.mcNumber;
-  },
-  {
-    message: "Shippers should not provide MC or DOT numbers",
-    path: ["dotNumber"],
-  }
-);
+});
 
 // Schema for driver role
 const driverSchema = z.object({
