@@ -22,6 +22,8 @@ export interface User {
   address?: string;
   equipmentType?: string;
   maxWeight?: string;
+  rejectionDate?: number; // Timestamp for when user was rejected
+  restorationDate?: number; // Timestamp for when user was restored
 }
 
 // Authentication context type
@@ -51,5 +53,6 @@ export interface AuthContextType {
   logout: () => void;
   approveUser: (userId: string) => void;
   rejectUser: (userId: string) => void;
+  restoreUser: (userId: string, approvalStatus: ApprovalStatus) => void; // New function to restore rejected users
   getPendingUsers: () => User[];
 }

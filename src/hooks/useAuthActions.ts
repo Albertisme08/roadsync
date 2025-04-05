@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, UserRole, ApprovalStatus } from "../types/auth.types";
 import { 
@@ -197,7 +196,8 @@ export const useAuthActions = () => {
       u.id === userId ? { 
         ...u, 
         approvalStatus: "approved" as ApprovalStatus,
-        approvalDate // Add approval date timestamp
+        approvalDate, // Add approval date timestamp
+        rejectionDate: undefined // Clear any rejection date
       } : u
     );
     
@@ -209,7 +209,8 @@ export const useAuthActions = () => {
       const updatedUser = { 
         ...user, 
         approvalStatus: "approved" as ApprovalStatus,
-        approvalDate
+        approvalDate,
+        rejectionDate: undefined
       };
       setUser(updatedUser);
       setUserInStorage(updatedUser);
@@ -236,8 +237,14 @@ export const useAuthActions = () => {
   };
   
   const rejectUser = (userId: string) => {
+    const rejectionDate = Date.now(); // Current timestamp
+    
     const updatedUsers = allUsers.map(u => 
-      u.id === userId ? { ...u, approvalStatus: "rejected" as ApprovalStatus } : u
+      u.id === userId ? { 
+        ...u, 
+        approvalStatus: "rejected" as ApprovalStatus,
+        rejectionDate // Add rejection date timestamp
+      } : u
     );
     
     setAllUsers(updatedUsers);
@@ -245,7 +252,11 @@ export const useAuthActions = () => {
     
     // If the rejected user is the current user, update their status
     if (user && user.id === userId) {
-      const updatedUser = { ...user, approvalStatus: "rejected" as ApprovalStatus };
+      const updatedUser = { 
+        ...user, 
+        approvalStatus: "rejected" as ApprovalStatus,
+        rejectionDate
+      };
       setUser(updatedUser);
       setUserInStorage(updatedUser);
     }
@@ -254,6 +265,48 @@ export const useAuthActions = () => {
     const rejectedUser = updatedUsers.find(u => u.id === userId);
     if (rejectedUser) {
       console.log(`Rejection email sent to ${rejectedUser.email}: We're sorry, your RoadSync account has not been approved.`);
+      // In a real app, this would trigger an email API call
+    }
+  };
+
+  const restoreUser = (userId: string, newStatus: ApprovalStatus = "pending") => {
+    const restorationDate = Date.now(); // Current timestamp
+    
+    const updatedUsers = allUsers.map(u => 
+      u.id === userId ? { 
+        ...u, 
+        approvalStatus: newStatus,
+        restorationDate, // Add restoration date timestamp
+        rejectionDate: undefined, // Clear rejection date
+        approvalDate: newStatus === "approved" ? restorationDate : undefined // Add approval date if restoring directly to approved
+      } : u
+    );
+    
+    setAllUsers(updatedUsers);
+    setAllUsersInStorage(updatedUsers);
+    
+    // If the restored user is the current user, update their status
+    if (user && user.id === userId) {
+      const updatedUser = { 
+        ...user, 
+        approvalStatus: newStatus,
+        restorationDate,
+        rejectionDate: undefined,
+        approvalDate: newStatus === "approved" ? restorationDate : undefined
+      };
+      setUser(updatedUser);
+      setUserInStorage(updatedUser);
+    }
+    
+    // Send restoration notification (simulated)
+    const restoredUser = updatedUsers.find(u => u.id === userId);
+    if (restoredUser) {
+      const statusMessage = newStatus === "approved" 
+        ? "Your account has been restored and approved. You can now use all platform features."
+        : "Your account has been restored and is pending review.";
+        
+      console.log(`Restoration email sent to ${restoredUser.email}: ${statusMessage}`);
+      // In a real app, this would trigger an email API call
     }
   };
   
@@ -292,6 +345,7 @@ export const useAuthActions = () => {
     logout,
     approveUser,
     rejectUser,
+    restoreUser,
     getPendingUsers,
     loadInitialData
   };

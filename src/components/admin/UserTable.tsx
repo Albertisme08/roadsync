@@ -10,19 +10,23 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Eye } from "lucide-react";
-import { User } from "@/types/auth.types";
+import { CheckCircle, XCircle, Eye, RefreshCw } from "lucide-react";
+import { User, ApprovalStatus } from "@/types/auth.types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/lib/sonner";
 
 interface UserTableProps {
   users: User[];
   onApprove: (userId: string, userName: string) => void;
   onReject: (userId: string, userName: string) => void;
+  onRestore: (userId: string, userName: string, newStatus: ApprovalStatus) => void;
 }
 
-export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject }) => {
+export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject, onRestore }) => {
   const [viewUser, setViewUser] = useState<User | null>(null);
+  const [restoreStatus, setRestoreStatus] = useState<ApprovalStatus>("pending");
 
   // Helper function to format dates
   const formatDate = (timestamp: number | undefined) => {
@@ -42,6 +46,12 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
+  };
+
+  const handleRestore = (userId: string, userName: string) => {
+    onRestore(userId, userName, restoreStatus);
+    setViewUser(null); // Close dialog after restore
+    toast.success(`User ${userName} has been restored with status: ${restoreStatus}`);
   };
 
   return (
@@ -115,6 +125,17 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                           </Button>
                         </>
                       )}
+                      
+                      {user.approvalStatus === "rejected" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex items-center border-amber-500 text-amber-600 hover:bg-amber-50"
+                          onClick={() => setViewUser({...user, _showRestoreOptions: true})}
+                        >
+                          <RefreshCw className="mr-1 h-4 w-4" /> Restore
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -182,7 +203,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : viewUser.role === "carrier" ? (
                   <div>
                     <h3 className="font-medium text-sm text-muted-foreground">Carrier Information</h3>
                     <div className="grid gap-1 mt-1">
@@ -200,11 +221,11 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                       </div>
                     </div>
                   </div>
-                )}
+                ) : null}
               </div>
 
               <div className="mt-2">
-                <h3 className="font-medium text-sm text-muted-foreground">Approval Information</h3>
+                <h3 className="font-medium text-sm text-muted-foreground">Status Information</h3>
                 <div className="grid gap-1 mt-1">
                   <div>
                     <span className="font-medium">Approval Status:</span> {getStatusBadge(viewUser.approvalStatus)}
@@ -212,6 +233,16 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                   <div>
                     <span className="font-medium">Approval Date:</span> {viewUser.approvalDate ? formatDate(viewUser.approvalDate) : "Not yet approved"}
                   </div>
+                  {viewUser.rejectionDate && (
+                    <div>
+                      <span className="font-medium">Rejection Date:</span> {formatDate(viewUser.rejectionDate)}
+                    </div>
+                  )}
+                  {viewUser.restorationDate && (
+                    <div>
+                      <span className="font-medium">Last Restored:</span> {formatDate(viewUser.restorationDate)}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -235,6 +266,35 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                   >
                     <XCircle className="mr-1 h-4 w-4" /> Reject User
                   </Button>
+                </div>
+              )}
+              
+              {viewUser.approvalStatus === "rejected" || viewUser._showRestoreOptions ? (
+                <div className="border rounded-md p-4 bg-amber-50 mt-4">
+                  <h3 className="font-medium mb-2">Restore User</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Choose a status to restore this user to:
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <Select
+                      value={restoreStatus}
+                      onValueChange={(value) => setRestoreStatus(value as ApprovalStatus)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending Review</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      onClick={() => handleRestore(viewUser.id, viewUser.name || viewUser.email)}
+                      className="bg-amber-500 hover:bg-amber-600"
+                    >
+                      <RefreshCw className="mr-1 h-4 w-4" /> Restore User
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

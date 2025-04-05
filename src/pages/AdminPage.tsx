@@ -31,7 +31,7 @@ import { UserFilters } from "@/components/admin/UserFilters";
 import { User, ApprovalStatus, UserRole } from "@/types/auth.types";
 
 const AdminPage = () => {
-  const { user, isAdmin, allUsers, approveUser, rejectUser, logout } = useAuth();
+  const { user, isAdmin, allUsers, approveUser, rejectUser, restoreUser, logout } = useAuth();
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState({
@@ -102,6 +102,24 @@ const AdminPage = () => {
       console.error("Error rejecting user:", error);
       toast("Error", { 
         description: "Failed to reject user. Please try again.",
+        style: { backgroundColor: "hsl(var(--destructive))", color: "hsl(var(--destructive-foreground))" },
+      });
+    }
+  };
+
+  const handleRestore = (userId: string, userName: string, newStatus: ApprovalStatus) => {
+    try {
+      restoreUser(userId, newStatus);
+      
+      const statusText = newStatus === "approved" ? "approved" : "set to pending review";
+      
+      toast("User Restored", {
+        description: `${userName} has been restored and ${statusText}.`,
+      });
+    } catch (error) {
+      console.error("Error restoring user:", error);
+      toast("Error", {
+        description: "Failed to restore user. Please try again.",
         style: { backgroundColor: "hsl(var(--destructive))", color: "hsl(var(--destructive-foreground))" },
       });
     }
@@ -200,6 +218,7 @@ const AdminPage = () => {
             users={filteredUsers} 
             onApprove={handleApprove} 
             onReject={handleReject}
+            onRestore={handleRestore}
           />
         </CardContent>
       </Card>

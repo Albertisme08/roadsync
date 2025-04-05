@@ -19,7 +19,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     register, 
     logout, 
     approveUser, 
-    rejectUser, 
+    rejectUser,
+    restoreUser, // Add the new restore function
     getPendingUsers,
     loadInitialData 
   } = useAuthActions();
@@ -48,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout,
     approveUser,
     rejectUser,
+    restoreUser, // Add the new restore function to the context
     getPendingUsers,
   };
 
