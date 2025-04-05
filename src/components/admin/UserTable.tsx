@@ -286,7 +286,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      onReject(viewUser.id, user.name || viewUser.email);
+                      onReject(viewUser.id, viewUser.name || viewUser.email);
                       setViewUser(null);
                     }}
                   >
