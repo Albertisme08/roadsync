@@ -1,4 +1,3 @@
-
 // User roles
 export type UserRole = "shipper" | "carrier" | "admin";
 
@@ -31,6 +30,7 @@ export interface User {
   verificationStatus?: VerificationStatus; // New field for email verification status
   verificationToken?: string; // Token for email verification
   verificationExpiry?: number; // Expiry timestamp for verification token
+  registrationDate?: number; // Added timestamp for when user registered
 }
 
 // Authentication context type
