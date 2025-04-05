@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -23,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/lib/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { registerSchema, RegisterFormValues, validateDriverData } from "./validationSchemas";
+import { registerSchema, RegisterFormValues, validateCarrierData } from "./validationSchemas";
 import { Textarea } from "@/components/ui/textarea";
 import { UserRole } from "@/types/auth.types";
 
@@ -54,10 +53,10 @@ const RegisterForm: React.FC = () => {
   const handleRegister = async (values: RegisterFormValues) => {
     setSubmitting(true);
     try {
-      // Validate driver data manually
-      if (values.role === "driver") {
+      // Validate carrier data manually
+      if (values.role === "carrier") {
         try {
-          validateDriverData(values);
+          validateCarrierData(values);
         } catch (error) {
           if (error instanceof Error) {
             form.setError("dotNumber", { message: error.message });
@@ -196,7 +195,7 @@ const RegisterForm: React.FC = () => {
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="shipper">Shipper</SelectItem>
-                    <SelectItem value="driver">Carrier</SelectItem>
+                    <SelectItem value="carrier">Carrier</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -247,7 +246,7 @@ const RegisterForm: React.FC = () => {
             )}
           />
 
-          {selectedRole === "driver" && (
+          {selectedRole === "carrier" && (
             <>
               <FormField
                 control={form.control}
