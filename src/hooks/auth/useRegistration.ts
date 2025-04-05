@@ -1,4 +1,3 @@
-
 import { User, UserRole, VerificationStatus } from "@/types/auth.types";
 import { 
   getAllUsersFromStorage,
@@ -166,7 +165,7 @@ export const useRegistration = (
     }
   };
 
-  // Resend verification email to user
+  // Resend verification email to user - now explicitly returns Promise<string> to match type definition
   const resendVerification = async (userId: string): Promise<string> => {
     const existingUsers = getAllUsersFromStorage();
     const userIndex = existingUsers.findIndex(user => user.id === userId);

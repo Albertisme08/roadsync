@@ -68,5 +68,5 @@ export interface AuthContextType {
   loadInitialData: () => void; // Added this missing function to the interface
   checkExistingUser?: (email: string) => { exists: boolean; status?: string; user?: User }; // New function to check existing users
   verifyEmail: (token: string, email: string) => boolean; // New function to verify email
-  resendVerification: (userId: string) => string; // New function to resend verification email
+  resendVerification: (userId: string) => Promise<string>; // Updated to return Promise<string>
 }

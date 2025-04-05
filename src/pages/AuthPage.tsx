@@ -18,7 +18,7 @@ import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const AuthPage: React.FC = () => {
-  const { isAuthenticated, user, verifyEmail } = useAuth();
+  const { isAuthenticated, user, verifyEmail, resendVerification } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -152,12 +152,12 @@ const AuthPage: React.FC = () => {
             <div className="flex justify-center mt-4">
               <button 
                 className="text-primary hover:underline"
-                onClick={() => {
+                onClick={async () => {
                   if (user) {
                     toast.info("Sending verification email...");
                     try {
-                      // Resend verification
-                      const token = resendVerification(user.id);
+                      // Resend verification - now with async/await since it returns a Promise
+                      const token = await resendVerification(user.id);
                       toast.success("Verification email sent! Please check your inbox.");
                     } catch (error) {
                       console.error("Failed to resend verification:", error);
