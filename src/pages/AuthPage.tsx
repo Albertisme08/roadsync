@@ -83,14 +83,16 @@ const AuthPage: React.FC = () => {
 
   const isUnverifiedUser = user && user.verificationStatus === "unverified";
 
-  const handleResendVerification = async () => {
-    if (!user) return Promise.reject("No user found");
+  const handleResendVerification = async (): Promise<string> => {
+    if (!user) {
+      return Promise.reject("No user found");
+    }
     
     toast.info("Sending verification email...");
     try {
       const token = await resendVerification();
       toast.success("Verification email sent! Please check your inbox.");
-      return Promise.resolve(token);
+      return token;
     } catch (error) {
       console.error("Failed to resend verification:", error);
       toast.error("Failed to resend verification email. Please try again.");
@@ -205,7 +207,7 @@ const AuthPage: React.FC = () => {
           <EmailVerification 
             email={flowState.email}
             onVerify={verifyEmailInFlow}
-            onResendVerification={() => sendVerificationEmail()}
+            onResendVerification={handleResendVerification}
             onBack={resetFlow}
           />
         );
