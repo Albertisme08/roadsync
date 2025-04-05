@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
@@ -90,7 +91,8 @@ const AuthPage: React.FC = () => {
     
     toast.info("Sending verification email...");
     try {
-      const token = await resendVerification();
+      // Pass user.id to resendVerification since it requires an argument
+      const token = await resendVerification(user.id);
       toast.success("Verification email sent! Please check your inbox.");
       return token;
     } catch (error) {

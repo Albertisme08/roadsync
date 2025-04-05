@@ -172,7 +172,7 @@ export const useRegistration = (
     }
   };
 
-  // Resend verification email to user - now explicitly returns Promise<string> to match type definition
+  // Resend verification email to user - explicitly returns Promise<string>
   const resendVerification = async (userId: string): Promise<string> => {
     const existingUsers = getAllUsersFromStorage();
     const userIndex = existingUsers.findIndex(user => user.id === userId);

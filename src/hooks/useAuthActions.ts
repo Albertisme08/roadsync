@@ -59,11 +59,15 @@ export const useAuthActions = () => {
   }, []);
 
   // Wrap resendVerification to automatically use current user's ID
-  const resendCurrentUserVerification = async (): Promise<string> => {
-    if (!user || !user.id) {
+  const resendCurrentUserVerification = async (userId?: string): Promise<string> => {
+    // If userId is provided, use it; otherwise, use the current user's ID
+    const idToUse = userId || (user ? user.id : undefined);
+    
+    if (!idToUse) {
       return Promise.reject("No user logged in or user ID not available");
     }
-    return resendVerification(user.id);
+    
+    return resendVerification(idToUse);
   };
 
   return {
