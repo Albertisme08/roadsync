@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -92,9 +93,17 @@ const ShipperForm = () => {
       return;
     }
 
+    // Make sure all required fields are included and not optional
     const loadId = addLoad({
-      ...data,
-      shipperId: user.id,
+      pickupLocation: data.pickupLocation,
+      deliveryLocation: data.deliveryLocation,
+      equipmentType: data.equipmentType,
+      weight: data.weight,
+      rate: data.rate,
+      availableDate: data.availableDate,
+      contactInfo: data.contactInfo,
+      notes: data.notes || "",
+      shipperId: user.id
     });
 
     if (loadId) {
