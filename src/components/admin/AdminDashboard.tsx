@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -32,14 +31,16 @@ export const AdminDashboard: React.FC = () => {
     try {
       approveUser(userId);
       
-      toast("User Approved", {
-        description: `${userName} has been approved and notified via email.`,
+      toast.success("User Approved", {
+        description: `${userName} has been approved and notified via email. They now have full access to platform features.`,
       });
+      
+      // Log for demonstration purposes
+      console.log(`Admin action: Approved user ${userName} (${userId}). User now has full platform access.`);
     } catch (error) {
       console.error("Error approving user:", error);
-      toast("Error", {
+      toast.error("Error", {
         description: "Failed to approve user. Please try again.",
-        style: { backgroundColor: "hsl(var(--destructive))", color: "hsl(var(--destructive-foreground))" },
       });
     }
   };
@@ -120,7 +121,6 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      {/* Admin header with user counts and actions */}
       <AdminHeader 
         userCounts={userCounts}
         isRefreshing={isRefreshing}
@@ -128,7 +128,6 @@ export const AdminDashboard: React.FC = () => {
         onLogout={handleLogout}
       />
 
-      {/* Toggle button for removed users */}
       <div className="mb-4 flex justify-end">
         <Button 
           onClick={toggleShowRemovedUsers} 
@@ -145,14 +144,12 @@ export const AdminDashboard: React.FC = () => {
 
       {!showRemovedUsers && (
         <>
-          {/* User filtering component - only show for active users */}
           <UserFilters 
             filters={filters}
             setFilters={setFilters}
             className="mb-6"
           />
 
-          {/* User table component */}
           <Card>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">

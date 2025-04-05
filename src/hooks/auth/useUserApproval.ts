@@ -1,4 +1,3 @@
-
 import { User, ApprovalStatus } from "@/types/auth.types";
 import { 
   setAllUsersInStorage,
@@ -6,6 +5,7 @@ import {
   getRemovedUsersFromStorage,
   setRemovedUsersInStorage 
 } from "@/utils/storage.utils";
+import { toast } from "@/lib/sonner";
 
 export const useUserApproval = (
   user: User | null,
@@ -15,6 +15,8 @@ export const useUserApproval = (
 ) => {
   const approveUser = (userId: string) => {
     const approvalDate = Date.now();
+    
+    const userToApprove = allUsers.find(u => u.id === userId);
     
     const updatedUsers = allUsers.map(u => 
       u.id === userId ? { 
@@ -43,8 +45,21 @@ export const useUserApproval = (
     const approvedUser = updatedUsers.find(u => u.id === userId);
     if (approvedUser) {
       console.log(`Welcome email sent to ${approvedUser.email}: Your account has been approved!`);
+      
       if (typeof window !== 'undefined') {
         try {
+          toast.success(`Account Approved`, {
+            description: `${approvedUser.name || approvedUser.email}'s account has been approved. They can now post loads.`,
+            duration: 5000,
+          });
+          
+          if (user && user.id === userId) {
+            toast.success("Account Approved", {
+              description: "Your account has been approved! You now have full access to all platform features.",
+              duration: 5000,
+            });
+          }
+          
           console.log(`NOTIFICATION: ${approvedUser.name}'s account has been approved. 
                       An email notification has been sent to ${approvedUser.email} 
                       informing them they can now post shipments.`);
@@ -125,7 +140,6 @@ export const useUserApproval = (
     }
   };
 
-  // New function to remove a user
   const removeUser = (userId: string) => {
     const userToRemove = allUsers.find(u => u.id === userId);
     
@@ -134,27 +148,21 @@ export const useUserApproval = (
       return;
     }
     
-    // Filter out the user from active users
     const updatedUsers = allUsers.filter(u => u.id !== userId);
     
-    // Add removal date to the user
     const removedUser = {
       ...userToRemove,
       removedDate: Date.now()
     };
     
-    // Get current removed users and add this one
     const removedUsers = getRemovedUsersFromStorage();
     const updatedRemovedUsers = [...removedUsers, removedUser];
     
-    // Update storage
     setAllUsersInStorage(updatedUsers);
     setRemovedUsersInStorage(updatedRemovedUsers);
     
-    // Update state
     setAllUsers(updatedUsers);
     
-    // If the removed user is the current user, log them out
     if (user && user.id === userId) {
       setUser(null);
     }
@@ -162,12 +170,9 @@ export const useUserApproval = (
     console.log(`User ${removedUser.name || removedUser.email} has been removed from active users.`);
   };
 
-  // New function to restore a removed user
   const restoreRemovedUser = (userId: string) => {
-    // Get all removed users
     const removedUsers = getRemovedUsersFromStorage();
     
-    // Find the user to restore
     const userToRestore = removedUsers.find(u => u.id === userId);
     
     if (!userToRestore) {
@@ -175,20 +180,15 @@ export const useUserApproval = (
       return;
     }
     
-    // Remove the removedDate property
     const { removedDate, ...restoredUser } = userToRestore;
     
-    // Add user back to active users
     const updatedUsers = [...allUsers, restoredUser];
     
-    // Remove user from removed users
     const updatedRemovedUsers = removedUsers.filter(u => u.id !== userId);
     
-    // Update storage
     setAllUsersInStorage(updatedUsers);
     setRemovedUsersInStorage(updatedRemovedUsers);
     
-    // Update state
     setAllUsers(updatedUsers);
     
     console.log(`User ${restoredUser.name || restoredUser.email} has been restored to active users.`);
@@ -198,7 +198,7 @@ export const useUserApproval = (
     approveUser,
     rejectUser,
     restoreUser,
-    removeUser, // New function
-    restoreRemovedUser // New function
+    removeUser,
+    restoreRemovedUser
   };
 };

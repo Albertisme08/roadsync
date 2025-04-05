@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -12,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Eye, RefreshCw, AlertTriangle, UserMinus } from "lucide-react";
 import { User, ApprovalStatus } from "@/types/auth.types";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/lib/sonner";
@@ -30,6 +29,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
   const [viewUser, setViewUser] = useState<User | null>(null);
   const [restoreStatus, setRestoreStatus] = useState<ApprovalStatus>("pending");
   const [confirmRemoveUser, setConfirmRemoveUser] = useState<User | null>(null);
+  const [confirmApproveUser, setConfirmApproveUser] = useState<User | null>(null);
 
   useEffect(() => {
     console.log("UserTable received users:", users.length);
@@ -78,7 +78,14 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     }
   };
 
-  // No users message
+  const handleApproveConfirm = () => {
+    if (confirmApproveUser) {
+      onApprove(confirmApproveUser.id, confirmApproveUser.name || confirmApproveUser.email);
+      setConfirmApproveUser(null);
+      setViewUser(null); // Close user details dialog if open
+    }
+  };
+
   if (users.length === 0) {
     return (
       <Alert className="mb-4 bg-blue-50 border-blue-200">
@@ -142,7 +149,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                       <Eye className="mr-1 h-4 w-4" /> View
                     </Button>
                     
-                    {/* New Remove button */}
                     <Button
                       size="sm"
                       variant="outline"
@@ -157,7 +163,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                         <Button
                           size="sm"
                           className="bg-green-600 hover:bg-green-700"
-                          onClick={() => onApprove(user.id, user.name || user.email)}
+                          onClick={() => setConfirmApproveUser(user)}
                         >
                           <CheckCircle className="mr-1 h-4 w-4" /> Approve
                         </Button>
@@ -189,7 +195,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
         </Table>
       </div>
 
-      {/* User details dialog */}
       <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -288,7 +293,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
               </div>
 
               <div className="flex gap-2 justify-end pt-4">
-                {/* Remove button in user profile */}
                 <Button
                   variant="outline"
                   className="text-red-600 border-red-200 hover:bg-red-50 flex items-center"
@@ -357,7 +361,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
         </DialogContent>
       </Dialog>
 
-      {/* Remove User Confirmation Dialog */}
       <Dialog 
         open={!!confirmRemoveUser} 
         onOpenChange={(open) => !open && setConfirmRemoveUser(null)}
@@ -393,6 +396,55 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                   Remove User
                 </Button>
               </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog 
+        open={!!confirmApproveUser} 
+        onOpenChange={(open) => !open && setConfirmApproveUser(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-green-600">Approve User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to approve this user? They will gain full access to platform features.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {confirmApproveUser && (
+            <div className="py-4">
+              <div className="mb-4 p-3 border rounded bg-gray-50">
+                <p><span className="font-medium">Name:</span> {confirmApproveUser.name || "N/A"}</p>
+                <p><span className="font-medium">Email:</span> {confirmApproveUser.email}</p>
+                <p><span className="font-medium">Role:</span> {confirmApproveUser.role}</p>
+                {confirmApproveUser.role === "shipper" && (
+                  <p><span className="font-medium">Business:</span> {confirmApproveUser.businessName || "N/A"}</p>
+                )}
+              </div>
+              
+              <Alert className="mb-4 bg-blue-50 border-blue-200">
+                <AlertTriangle className="h-4 w-4 text-blue-700" />
+                <AlertDescription className="text-blue-700">
+                  This user will be notified via email about the approval and will gain immediate access to post loads.
+                </AlertDescription>
+              </Alert>
+              
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmApproveUser(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handleApproveConfirm}
+                >
+                  Approve User
+                </Button>
+              </DialogFooter>
             </div>
           )}
         </DialogContent>

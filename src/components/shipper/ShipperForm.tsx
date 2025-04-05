@@ -1,10 +1,9 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon, ShieldAlertIcon } from "lucide-react";
+import { CalendarIcon, ShieldAlertIcon, CheckCircle } from "lucide-react";
 import { useLoad } from "@/contexts/LoadContext";
 
 import { cn } from "@/lib/utils";
@@ -78,6 +77,18 @@ const ShipperForm = () => {
     },
   });
 
+  useEffect(() => {
+    if (isApproved && user?.approvalDate) {
+      const recentlyApproved = Date.now() - user.approvalDate < 10000;
+      
+      if (recentlyApproved) {
+        toast.success("Account Approved", {
+          description: "Your account has been approved! You now have full access to all platform features.",
+        });
+      }
+    }
+  }, [isApproved, user]);
+
   const onSubmit = (data: FormValues) => {
     if (!isApproved) {
       toast("Account Pending Approval", {
@@ -93,7 +104,6 @@ const ShipperForm = () => {
       return;
     }
 
-    // Make sure all required fields are included and not optional
     const loadId = addLoad({
       pickupLocation: data.pickupLocation,
       deliveryLocation: data.deliveryLocation,
@@ -131,6 +141,16 @@ const ShipperForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {isApproved && user?.approvalDate && Date.now() - user.approvalDate < 86400000 && (
+          <Alert className="bg-green-50 border-green-200 mb-6">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <AlertTitle className="text-green-800">Account Approved</AlertTitle>
+            <AlertDescription className="text-green-700">
+              Your account has been approved! You now have full access to post loads and use all platform features.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
