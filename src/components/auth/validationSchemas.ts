@@ -38,7 +38,10 @@ const driverSchema = z.object({
   description: z.string().optional(),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
-}).refine(
+});
+
+// Add refinement to driver schema separately to maintain correct types
+const driverSchemaWithRefinement = driverSchema.refine(
   (data) => {
     // Driver validation: At least one of DOT or MC number must be provided
     return !!data.dotNumber || !!data.mcNumber;
@@ -52,7 +55,7 @@ const driverSchema = z.object({
 // Combined schema using discriminated union
 export const registerSchema = z.discriminatedUnion("role", [
   shipperSchema,
-  driverSchema,
+  driverSchemaWithRefinement,
 ]).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
