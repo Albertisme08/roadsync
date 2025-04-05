@@ -10,8 +10,9 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Loader2, Check, AlertTriangle, Mail } from "lucide-react";
+import { Loader2, Check, AlertTriangle, Mail, Info } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface EmailVerificationProps {
   email: string;
@@ -31,6 +32,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const [verificationSuccess, setVerificationSuccess] = useState<boolean | null>(null);
   const [resending, setResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
 
   const handleVerify = () => {
     if (!token) return;
@@ -58,7 +60,8 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     try {
       await onResendVerification();
       setResendSuccess(true);
-      toast.success("Verification email resent! Please check your inbox.");
+      setResendCount(prev => prev + 1);
+      toast.success("Verification email resent! Please check your inbox and spam folder.");
       setTimeout(() => {
         setResendSuccess(false);
       }, 5000);
@@ -80,6 +83,13 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <Alert className="bg-blue-50 border-blue-200 text-blue-700">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            If you don't see the email in your inbox, please check your spam or junk folder.
+          </AlertDescription>
+        </Alert>
+        
         {verificationSuccess === true && (
           <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md text-green-600">
             <Check className="h-5 w-5" />
@@ -113,6 +123,18 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
             disabled={verifying}
           />
         </div>
+        
+        {resendCount >= 2 && (
+          <div className="text-sm text-amber-600">
+            <p>Still not receiving emails? Try these steps:</p>
+            <ul className="list-disc pl-5 mt-2">
+              <li>Check your spam/junk folder</li>
+              <li>Add our email address to your contacts</li>
+              <li>Check if you entered the correct email address</li>
+              <li>Try using a different email provider</li>
+            </ul>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
         <div className="flex gap-2 w-full">

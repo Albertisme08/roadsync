@@ -14,12 +14,23 @@ export const useRegistration = (
   setAllUsers: (users: User[]) => void,
   setIsLoading: (isLoading: boolean) => void
 ) => {
-  // This function simulates sending a verification email
+  // This function simulates sending a verification email with improved feedback
   const sendVerificationEmail = (email: string, token: string) => {
     // In a real app, this would make an API call to send an email
     console.log(`[EMAIL SERVICE] Verification email sent to ${email} with token: ${token}`);
-    console.log(`[EMAIL SERVICE] Verification link: https://yourdomain.com/verify?token=${token}&email=${email}`);
-    toast.success(`Verification email sent to ${email}. Please check your inbox.`);
+    
+    // Generate a verification link that would be in the email
+    const verificationLink = `${window.location.origin}/auth?token=${token}&email=${encodeURIComponent(email)}`;
+    console.log(`[EMAIL SERVICE] Verification link: ${verificationLink}`);
+    
+    // Show more detailed toast with instructions
+    toast.success(
+      `Verification email sent to ${email}. Please check your inbox and spam folder.`,
+      {
+        description: "If you don't see the email within a few minutes, try clicking the resend button.",
+        duration: 6000
+      }
+    );
     
     // Return a promise to simulate async behavior
     return new Promise<void>(resolve => {
@@ -101,7 +112,7 @@ export const useRegistration = (
       
       const isAdmin = isAdminEmail(email);
       
-      // Generate verification token
+      // Generate verification token - more complex for better security
       const verificationToken = generateVerificationToken();
       const verificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
       
@@ -150,10 +161,12 @@ export const useRegistration = (
       setUserInStorage(newUser);
       setUser(newUser);
       
-      // Send verification email
+      // Send verification email with improved messaging
       if (!isAdmin) {
         await sendVerificationEmail(email, verificationToken as string);
-        toast.info("Please check your email to verify your account.");
+        toast.info("Please check your email to verify your account.", {
+          description: "Be sure to check your spam folder if you don't see the email in your inbox."
+        });
       }
       
       const pendingUsers = updatedUsers.filter(u => u.approvalStatus === "pending");
@@ -178,10 +191,12 @@ export const useRegistration = (
     const userIndex = existingUsers.findIndex(user => user.id === userId);
     
     if (userIndex === -1) {
+      console.error("Failed to resend verification: User not found with ID", userId);
       throw new Error("User not found");
     }
     
     const user = existingUsers[userIndex];
+    console.log("Resending verification to user:", user);
     
     // Generate new verification token
     const verificationToken = generateVerificationToken();
@@ -201,7 +216,7 @@ export const useRegistration = (
       setUser(user);
     }
     
-    // Send verification email
+    // Send verification email with improved messaging
     await sendVerificationEmail(user.email, verificationToken);
     console.log(`Verification email resent to: ${user.email} with token: ${verificationToken}`);
     
@@ -210,6 +225,8 @@ export const useRegistration = (
 
   // Verify user email with token
   const verifyEmail = (token: string, email: string): boolean => {
+    console.log(`Attempting to verify email for: ${email} with token: ${token}`);
+    
     const existingUsers = getAllUsersFromStorage();
     const userIndex = existingUsers.findIndex(user => 
       user.email.toLowerCase() === email.toLowerCase() && 

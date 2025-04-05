@@ -12,9 +12,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Check } from "lucide-react";
+import { AlertCircle, Check, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -31,6 +32,7 @@ const AuthPage: React.FC = () => {
   const tokenParam = searchParams.get("token");
   const [verificationResult, setVerificationResult] = useState<{success: boolean, message: string} | null>(null);
   const [loading, setLoading] = useState(false);
+  const [verificationInProgress, setVerificationInProgress] = useState(false);
 
   const {
     flowState,
@@ -42,7 +44,9 @@ const AuthPage: React.FC = () => {
   } = useRegistrationFlow();
 
   useEffect(() => {
-    if (tokenParam && emailParam && !stepParam) {
+    // Process verification link if token and email are in URL params
+    if (tokenParam && emailParam && !verificationInProgress) {
+      setVerificationInProgress(true);
       setLoading(true);
       try {
         const success = verifyEmail(tokenParam, emailParam);
@@ -166,13 +170,21 @@ const AuthPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert variant="default">
-              <AlertCircle className="h-4 w-4" />
+              <Mail className="h-4 w-4" />
               <AlertTitle>Verification Required</AlertTitle>
               <AlertDescription>
                 We've sent a verification link to <strong>{user.email}</strong>. 
                 Please check your inbox and click the link to verify your email address.
               </AlertDescription>
             </Alert>
+            
+            <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-800">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                If you don't see the email in your inbox, please check your spam or junk folder.
+              </AlertDescription>
+            </Alert>
+            
             <div className="flex justify-center mt-4">
               <Button 
                 onClick={handleResendVerification}
@@ -183,6 +195,12 @@ const AuthPage: React.FC = () => {
               </Button>
             </div>
           </CardContent>
+          <CardFooter className="text-sm text-center text-muted-foreground pt-0">
+            <p>
+              You must verify your email address before accessing your account.
+              Please check your inbox for the verification link.
+            </p>
+          </CardFooter>
         </Card>
       );
     }
