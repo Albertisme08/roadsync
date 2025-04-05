@@ -20,13 +20,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout, 
     approveUser, 
     rejectUser,
-    restoreUser, // Add the new restore function
+    restoreUser,
     getPendingUsers,
     loadInitialData 
   } = useAuthActions();
 
   // Load initial data and seed admin users on component mount
   useEffect(() => {
+    console.log("AuthProvider initializing");
     // Seed admin users first
     seedAdminUsers();
     // Then load initial data
@@ -35,6 +36,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Determine if user is an admin (has admin role and email matches allowed admin emails)
   const isAdmin = !!user && user.role === "admin" && isAdminEmail(user.email);
+
+  // Log any changes to allUsers for debugging
+  useEffect(() => {
+    if (allUsers) {
+      console.log("Auth context allUsers updated:", allUsers.length);
+      console.log("Pending users in context:", 
+        allUsers.filter(u => u.approvalStatus === "pending").length);
+    }
+  }, [allUsers]);
 
   // Create the context value object
   const value: AuthContextType = {
@@ -49,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout,
     approveUser,
     rejectUser,
-    restoreUser, // Add the new restore function to the context
+    restoreUser,
     getPendingUsers,
   };
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,6 +44,13 @@ const AdminPage = () => {
   useEffect(() => {
     if (!allUsers) return;
     
+    console.log("All users from auth context:", allUsers);
+    console.log("Current filters:", filters);
+    
+    // Count pending users before filtering
+    const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
+    console.log(`Total pending users before filtering: ${pendingCount}`);
+    
     const filtered = allUsers.filter((user) => {
       // Role filter
       if (filters.role !== "all" && user.role !== filters.role) {
@@ -72,8 +78,19 @@ const AdminPage = () => {
       return true;
     });
     
+    console.log(`Filtered users count: ${filtered.length}`);
+    console.log("Filtered users:", filtered);
+    
     setFilteredUsers(filtered);
   }, [allUsers, filters]);
+  
+  // Reset filters to show all pending users on initial load
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      status: "pending"
+    }));
+  }, []);
   
   const handleApprove = (userId: string, userName: string) => {
     try {
@@ -128,6 +145,11 @@ const AdminPage = () => {
   const handleManualRefresh = () => {
     setIsRefreshing(true);
     
+    // Force refresh of user data
+    // This is a workaround to make sure we're getting the latest data
+    const currentUsers = localStorage.getItem("allUsers");
+    console.log("Current users in localStorage:", currentUsers ? JSON.parse(currentUsers) : "None");
+    
     toast("Refreshed", {
       description: "User list has been refreshed.",
     });
@@ -170,6 +192,14 @@ const AdminPage = () => {
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-gray-600">Manage users and platform access</p>
+          {allUsers && (
+            <p className="text-sm text-gray-500 mt-1">
+              Total users: {allUsers.length} | 
+              Pending: {allUsers.filter(u => u.approvalStatus === "pending").length} | 
+              Approved: {allUsers.filter(u => u.approvalStatus === "approved").length} | 
+              Rejected: {allUsers.filter(u => u.approvalStatus === "rejected").length}
+            </p>
+          )}
         </div>
         <div className="flex gap-2 mt-4 md:mt-0">
           <Button

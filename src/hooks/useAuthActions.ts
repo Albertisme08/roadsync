@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User, UserRole, ApprovalStatus } from "../types/auth.types";
 import { 
@@ -144,13 +145,13 @@ export const useAuthActions = () => {
       // Check for admin email
       const isAdmin = isAdminEmail(email);
       
-      // Mock successful registration
+      // Create new user with pending status (unless admin)
       const newUser: User = {
         id: Math.random().toString(36).substring(2, 9),
         email,
         name,
         role: isAdmin ? "admin" : role,
-        approvalStatus: isAdmin ? "approved" : "pending", // All new users except admin are pending by default
+        approvalStatus: isAdmin ? "approved" : "pending", // Ensure non-admin users are marked as pending
         businessName,
         dotNumber,
         mcNumber,
@@ -162,7 +163,9 @@ export const useAuthActions = () => {
         maxWeight
       };
       
-      // Add to all users
+      console.log("Registering new user with data:", newUser);
+      
+      // Add to all users array
       existingUsers.push(newUser);
       setAllUsersInStorage(existingUsers);
       setAllUsers(existingUsers);
@@ -170,6 +173,11 @@ export const useAuthActions = () => {
       // Set as current user
       setUserInStorage(newUser);
       setUser(newUser);
+      
+      // Log the state of users after registration
+      console.log("All users after registration:", existingUsers);
+      console.log("Pending users after registration:", 
+        existingUsers.filter(u => u.approvalStatus === "pending").length);
       
       // If this is the admin account, automatically approve
       if (isAdmin) {
@@ -328,8 +336,11 @@ export const useAuthActions = () => {
     
     // Load all users from localStorage
     const storedUsers = getAllUsersFromStorage();
-    setAllUsers(storedUsers);
+    console.log("Loading users from storage:", storedUsers);
+    console.log("Pending users in storage:", 
+      storedUsers.filter(u => u.approvalStatus === "pending").length);
     
+    setAllUsers(storedUsers);
     setIsLoading(false);
   };
 
