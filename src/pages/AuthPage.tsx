@@ -14,8 +14,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const AuthPage: React.FC = () => {
   const { isAuthenticated, user, verifyEmail, resendVerification } = useAuth();
@@ -31,6 +32,7 @@ const AuthPage: React.FC = () => {
   const emailParam = searchParams.get("email");
   const tokenParam = searchParams.get("token");
   const [verificationResult, setVerificationResult] = useState<{success: boolean, message: string} | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Initialize registration flow
   const {
@@ -46,6 +48,7 @@ const AuthPage: React.FC = () => {
   useEffect(() => {
     // Handle verification link from email
     if (tokenParam && emailParam && !stepParam) {
+      setLoading(true);
       try {
         const success = verifyEmail(tokenParam, emailParam);
         if (success) {
@@ -53,11 +56,13 @@ const AuthPage: React.FC = () => {
             success: true,
             message: "Your email has been verified successfully! You can now log in."
           });
+          toast.success("Email verified successfully!");
         } else {
           setVerificationResult({
             success: false,
             message: "Invalid or expired verification link. Please request a new one."
           });
+          toast.error("Verification failed. Please request a new verification email.");
         }
       } catch (error) {
         console.error("Verification error:", error);
@@ -65,6 +70,8 @@ const AuthPage: React.FC = () => {
           success: false,
           message: "An error occurred during verification. Please try again later."
         });
+      } finally {
+        setLoading(false);
       }
     }
     // Handle registration flow steps
@@ -87,6 +94,22 @@ const AuthPage: React.FC = () => {
   // If user is registered but not verified, show verification needed message
   const isUnverifiedUser = user && user.verificationStatus === "unverified";
 
+  // Handle resending verification email
+  const handleResendVerification = async () => {
+    if (!user) return;
+    
+    toast.info("Sending verification email...");
+    try {
+      const token = await resendVerification(user.id);
+      toast.success("Verification email sent! Please check your inbox.");
+      return token;
+    } catch (error) {
+      console.error("Failed to resend verification:", error);
+      toast.error("Failed to resend verification email. Please try again.");
+      throw error;
+    }
+  };
+
   // Determine which component to render based on step or admin login
   const renderAuthComponent = () => {
     // Display verification result if we just processed a verification link
@@ -101,9 +124,13 @@ const AuthPage: React.FC = () => {
                 : "Email verification failed"}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Alert variant={verificationResult.success ? "default" : "destructive"}>
-              <AlertCircle className="h-4 w-4" />
+              {verificationResult.success ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <AlertCircle className="h-4 w-4" />
+              )}
               <AlertTitle>
                 {verificationResult.success ? "Success!" : "Verification Failed"}
               </AlertTitle>
@@ -113,17 +140,25 @@ const AuthPage: React.FC = () => {
             </Alert>
             
             {verificationResult.success ? (
-              <p className="mt-4 text-center">
-                <a href="/auth?mode=login" className="text-primary hover:underline">
-                  Click here to log in
-                </a>
-              </p>
+              <div className="mt-4 text-center">
+                <Button asChild className="w-full">
+                  <a href="/auth?mode=login">Log in to your account</a>
+                </Button>
+              </div>
             ) : (
-              <p className="mt-4 text-center">
-                <a href="/auth?mode=login" className="text-primary hover:underline">
-                  Return to login
-                </a>
-              </p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild variant="outline" className="w-full">
+                  <a href="/auth?mode=login">Return to login</a>
+                </Button>
+                {emailParam && (
+                  <Button 
+                    onClick={handleResendVerification}
+                    className="w-full"
+                  >
+                    Request new verification email
+                  </Button>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -150,24 +185,13 @@ const AuthPage: React.FC = () => {
               </AlertDescription>
             </Alert>
             <div className="flex justify-center mt-4">
-              <button 
-                className="text-primary hover:underline"
-                onClick={async () => {
-                  if (user) {
-                    toast.info("Sending verification email...");
-                    try {
-                      // Using resendVerification correctly as an async function
-                      const token = await resendVerification(user.id);
-                      toast.success("Verification email sent! Please check your inbox.");
-                    } catch (error) {
-                      console.error("Failed to resend verification:", error);
-                      toast.error("Failed to resend verification email. Please try again.");
-                    }
-                  }
-                }}
+              <Button 
+                onClick={handleResendVerification}
+                variant="outline"
+                className="w-full"
               >
                 Resend verification email
-              </button>
+              </Button>
             </div>
           </CardContent>
         </Card>

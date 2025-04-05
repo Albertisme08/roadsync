@@ -26,7 +26,7 @@ export const useAuthActions = () => {
   );
 
   // Get registration operations
-  const { register, checkExistingUser, verifyEmail, resendVerification } = useRegistration(
+  const { register, checkExistingUser, verifyEmail, resendVerification, sendVerificationEmail } = useRegistration(
     setUser,
     setAllUsers,
     setIsLoading
@@ -75,7 +75,8 @@ export const useAuthActions = () => {
     loadInitialData,
     checkExistingUser,
     verifyEmail,
-    resendVerification
+    resendVerification,
+    sendVerificationEmail
   };
 };
 

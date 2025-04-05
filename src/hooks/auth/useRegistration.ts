@@ -19,6 +19,7 @@ export const useRegistration = (
     // In a real app, this would make an API call to send an email
     console.log(`[EMAIL SERVICE] Verification email sent to ${email} with token: ${token}`);
     console.log(`[EMAIL SERVICE] Verification link: https://yourdomain.com/verify?token=${token}&email=${email}`);
+    toast.success(`Verification email sent to ${email}. Please check your inbox.`);
     
     // Return a promise to simulate async behavior
     return new Promise<void>(resolve => {
@@ -152,6 +153,7 @@ export const useRegistration = (
       // Send verification email
       if (!isAdmin) {
         await sendVerificationEmail(email, verificationToken as string);
+        toast.info("Please check your email to verify your account.");
       }
       
       const pendingUsers = updatedUsers.filter(u => u.approvalStatus === "pending");
@@ -224,6 +226,7 @@ export const useRegistration = (
     // Check if token has expired
     if (user.verificationExpiry && user.verificationExpiry < Date.now()) {
       console.log("Verification token has expired");
+      toast.error("Verification token has expired. Please request a new one.");
       return false;
     }
     

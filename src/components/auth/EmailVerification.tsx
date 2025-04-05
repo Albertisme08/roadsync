@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -10,12 +10,13 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Loader2, Check, AlertTriangle } from "lucide-react";
+import { Loader2, Check, AlertTriangle, Mail } from "lucide-react";
+import { toast } from "sonner";
 
 interface EmailVerificationProps {
   email: string;
-  onVerify: (token: string) => boolean;
-  onResendVerification: () => void;
+  onVerify: (token: string, email: string) => boolean;
+  onResendVerification: () => Promise<string>;
   onBack: () => void;
 }
 
@@ -29,17 +30,24 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const [verifying, setVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState<boolean | null>(null);
   const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const handleVerify = () => {
     if (!token) return;
     
     setVerifying(true);
     try {
-      const success = onVerify(token);
+      const success = onVerify(token, email);
       setVerificationSuccess(success);
+      if (success) {
+        toast.success("Email verified successfully!");
+      } else {
+        toast.error("Invalid verification code. Please try again.");
+      }
     } catch (error) {
       console.error("Verification error:", error);
       setVerificationSuccess(false);
+      toast.error("Verification failed. Please try again.");
     } finally {
       setVerifying(false);
     }
@@ -49,9 +57,14 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     setResending(true);
     try {
       await onResendVerification();
-      // Show success message
+      setResendSuccess(true);
+      toast.success("Verification email resent! Please check your inbox.");
+      setTimeout(() => {
+        setResendSuccess(false);
+      }, 5000);
     } catch (error) {
       console.error("Failed to resend verification:", error);
+      toast.error("Failed to resend verification email. Please try again.");
     } finally {
       setResending(false);
     }
@@ -78,6 +91,13 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
           <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-600">
             <AlertTriangle className="h-5 w-5" />
             <span>Invalid verification code. Please try again.</span>
+          </div>
+        )}
+        
+        {resendSuccess && (
+          <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-600">
+            <Mail className="h-5 w-5" />
+            <span>Verification email resent successfully!</span>
           </div>
         )}
         
