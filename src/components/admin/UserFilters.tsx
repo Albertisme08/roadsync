@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { ApprovalStatus, UserRole } from "@/types/auth.types";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface FiltersState {
   role: "all" | UserRole;
@@ -78,7 +77,12 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
-            <SelectContent position="popper" className="bg-white z-50" align="end">
+            <SelectContent 
+              className="bg-white border shadow-lg z-[100]" 
+              position="popper" 
+              align="end"
+              sideOffset={5}
+            >
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="shipper">Shippers</SelectItem>
               <SelectItem value="carrier">Carriers</SelectItem>
@@ -96,7 +100,12 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent position="popper" className="bg-white z-50" align="end">
+            <SelectContent 
+              className="bg-white border shadow-lg z-[100]" 
+              position="popper" 
+              align="end"
+              sideOffset={5}
+            >
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
