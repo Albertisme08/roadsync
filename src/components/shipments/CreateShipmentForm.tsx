@@ -14,6 +14,7 @@ import { toast } from "@/lib/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shipment } from "./ShipmentCard";
 import CityAutosuggest from "@/components/common/CityAutosuggest";
+import FreightTypeAutosuggest from "@/components/common/FreightTypeAutosuggest";
 
 const shipmentSchema = z.object({
   origin: z.string().min(3, { message: "Origin must be at least 3 characters" }),
@@ -216,9 +217,11 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Freight Type</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Dry Goods, Refrigerated, Construction" {...field} />
-                  </FormControl>
+                  <FreightTypeAutosuggest
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="e.g. Dry Goods, Refrigerated, Construction"
+                  />
                   <FormMessage />
                 </FormItem>
               )}
