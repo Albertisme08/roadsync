@@ -366,18 +366,18 @@ const RegisterForm: React.FC = () => {
                   </RadioGroup>
                   {idType === "none" && (
                     <FormItem>
-                      <FormLabel>Please provide details about your shipping needs</FormLabel>
+                      <FormLabel>Please provide details about your shipping operations</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="What types of shipments do you need to send? How often do you ship? Any special requirements?"
-                          className="min-h-[80px]"
+                          placeholder="What types of shipments do you need to send? How often do you ship? Do you have loading docks or require special equipment for loading/unloading?"
+                          className="min-h-[120px]"
                           onChange={(e) => {
                             form.setValue("description", e.target.value);
                           }}
                         />
                       </FormControl>
                       <FormDescription>
-                        Without an MC or DOT number, we need additional information to verify your account. Please provide details about your shipping operations.
+                        Without an MC or DOT number, we need additional information to verify your account. Please describe your shipping volumes, frequency, dock facilities, and any special requirements.
                       </FormDescription>
                     </FormItem>
                   )}

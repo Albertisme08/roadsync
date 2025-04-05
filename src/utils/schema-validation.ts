@@ -15,6 +15,7 @@ export const userSchema = z.object({
   address: z.string().optional(),
   equipmentType: z.string().optional(),
   maxWeight: z.string().optional(),
+  // Add dock information fields if needed in the future
 });
 
 // MC and DOT number validation functions
@@ -46,7 +47,7 @@ export const validateUserData = (userData: unknown) => {
 //   businessName: 'ABC Logistics',
 //   dotNumber: '1234567',
 //   mcNumber: '7891234',
-//   description: 'Shipping business',
+//   description: 'Shipping business with 3 docks',
 //   phone: '555-1234',
 // };
 // validateUserData(exampleUser);
