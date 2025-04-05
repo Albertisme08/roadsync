@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useLoad } from "@/contexts/LoadContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,7 +38,7 @@ const ShipperLoads: React.FC = () => {
   
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'approved': return 'success';
+      case 'approved': return 'default';
       case 'rejected': return 'destructive';
       default: return 'outline';
     }
@@ -158,7 +157,6 @@ const ShipperLoads: React.FC = () => {
         </div>
       )}
       
-      {/* Load Details Dialog */}
       <Dialog open={!!viewLoadId} onOpenChange={(open) => !open && setViewLoadId(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

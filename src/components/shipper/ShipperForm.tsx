@@ -61,7 +61,7 @@ const equipmentOptions = [
 ];
 
 const ShipperForm = () => {
-  const { isApproved } = useAuth();
+  const { isApproved, user } = useAuth();
   const { addLoad } = useLoad();
   
   const form = useForm<FormValues>({
@@ -85,9 +85,16 @@ const ShipperForm = () => {
       return;
     }
 
+    if (!user) {
+      toast("Authentication Required", {
+        description: "You must be logged in to post loads.",
+      });
+      return;
+    }
+
     const loadId = addLoad({
       ...data,
-      availableDate: data.availableDate,
+      shipperId: user.id,
     });
 
     if (loadId) {

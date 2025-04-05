@@ -87,7 +87,7 @@ export const LoadApprovalDashboard: React.FC = () => {
             </div>
             <Badge 
               variant={load.approvalStatus === "pending" ? "outline" : 
-                load.approvalStatus === "approved" ? "success" : "destructive"}
+                load.approvalStatus === "approved" ? "default" : "destructive"}
             >
               {load.approvalStatus.charAt(0).toUpperCase() + load.approvalStatus.slice(1)}
             </Badge>
