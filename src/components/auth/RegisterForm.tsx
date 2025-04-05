@@ -365,13 +365,21 @@ const RegisterForm: React.FC = () => {
                     </FormItem>
                   </RadioGroup>
                   {idType === "none" && (
-                    <Alert variant="warning" className="bg-amber-50 border border-amber-200 text-amber-800">
-                      <AlertCircle className="h-4 w-4 text-amber-600" />
-                      <AlertTitle className="text-amber-800">Note: Limited Access</AlertTitle>
-                      <AlertDescription className="text-amber-700">
-                        Without an MC or DOT number, your account will be subject to additional verification and may have limited features until approved by an administrator.
-                      </AlertDescription>
-                    </Alert>
+                    <FormItem>
+                      <FormLabel>Please provide details about your shipping needs</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="What types of shipments do you need to send? How often do you ship? Any special requirements?"
+                          className="min-h-[80px]"
+                          onChange={(e) => {
+                            form.setValue("description", e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Without an MC or DOT number, we need additional information to verify your account. Please provide details about your shipping operations.
+                      </FormDescription>
+                    </FormItem>
                   )}
                 </FormItem>
 
