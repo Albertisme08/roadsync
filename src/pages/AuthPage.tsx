@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 
 const AuthPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -23,6 +23,12 @@ const AuthPage: React.FC = () => {
   
   // If user is already logged in, redirect to requested page or dashboard
   if (isAuthenticated) {
+    // Redirect based on user role
+    if (user?.role === "shipper") {
+      return <Navigate to="/shipments" replace />;
+    } else if (user?.role === "driver") {
+      return <Navigate to="/loads" replace />;
+    }
     return <Navigate to={from} replace />;
   }
 
