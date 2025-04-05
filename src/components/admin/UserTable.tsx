@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -28,13 +27,21 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
   const [viewUser, setViewUser] = useState<User | null>(null);
   const [restoreStatus, setRestoreStatus] = useState<ApprovalStatus>("pending");
 
-  // Helper function to format dates
+  useEffect(() => {
+    console.log("UserTable received users:", users.length);
+    const pendingUsers = users.filter(u => u.approvalStatus === "pending");
+    console.log("Pending users in UserTable:", pendingUsers.length);
+    
+    if (pendingUsers.length > 0) {
+      console.log("Pending users details:", pendingUsers);
+    }
+  }, [users]);
+
   const formatDate = (timestamp: number | undefined) => {
     if (!timestamp) return "N/A";
     return format(new Date(timestamp), "MMM dd, yyyy");
   };
   
-  // Helper function to get badge variant based on approval status
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "approved":
@@ -48,7 +55,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     }
   };
 
-  // Helper function to show restore options
   const showRestoreOptions = (user: User) => {
     setViewUser({ ...user, _showRestoreOptions: true });
   };
@@ -76,7 +82,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.length > 0 ? (
+            {users && users.length > 0 ? (
               users.map((user) => (
                 <TableRow key={user.id} className="group hover:bg-muted/50">
                   <TableCell className="font-mono text-xs">{user.id.substring(0, 8)}</TableCell>

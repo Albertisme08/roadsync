@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,19 +31,22 @@ import { UserFilters } from "@/components/admin/UserFilters";
 import { User, ApprovalStatus, UserRole } from "@/types/auth.types";
 
 const AdminPage = () => {
-  const { user, isAdmin, allUsers, approveUser, rejectUser, restoreUser, logout } = useAuth();
+  const { user, isAdmin, allUsers, approveUser, rejectUser, restoreUser, logout, getPendingUsers } = useAuth();
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState({
     role: "all" as "all" | UserRole,
-    status: "all" as "all" | ApprovalStatus,
+    status: "pending" as "all" | ApprovalStatus, // Default to showing pending users
     searchQuery: "",
   });
   const navigate = useNavigate();
   
   // Apply filters whenever allUsers or filters change
   useEffect(() => {
-    if (!allUsers) return;
+    if (!allUsers) {
+      console.log("No users available in allUsers");
+      return;
+    }
     
     console.log("All users from auth context:", allUsers);
     console.log("Current filters:", filters);
@@ -84,12 +88,17 @@ const AdminPage = () => {
     setFilteredUsers(filtered);
   }, [allUsers, filters]);
   
-  // Reset filters to show all pending users on initial load
+  // Make sure we reset to showing pending users on initial load
+  // Added a separate useEffect with empty dependency array to ensure it only runs once
   useEffect(() => {
+    console.log("AdminPage initial load - Setting default filter to pending");
     setFilters(prev => ({
       ...prev,
       status: "pending"
     }));
+    
+    // Force refresh data on initial load
+    handleManualRefresh();
   }, []);
   
   const handleApprove = (userId: string, userName: string) => {
@@ -146,9 +155,14 @@ const AdminPage = () => {
     setIsRefreshing(true);
     
     // Force refresh of user data
-    // This is a workaround to make sure we're getting the latest data
     const currentUsers = localStorage.getItem("allUsers");
     console.log("Current users in localStorage:", currentUsers ? JSON.parse(currentUsers) : "None");
+    
+    // This will re-trigger the auth context to reload data from localStorage
+    // We can access the context functions to reload data
+    const pendingUsers = getPendingUsers();
+    console.log("Pending users after refresh:", pendingUsers.length);
+    console.log("Pending users details:", pendingUsers);
     
     toast("Refreshed", {
       description: "User list has been refreshed.",

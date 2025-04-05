@@ -166,18 +166,19 @@ export const useAuthActions = () => {
       console.log("Registering new user with data:", newUser);
       
       // Add to all users array
-      existingUsers.push(newUser);
-      setAllUsersInStorage(existingUsers);
-      setAllUsers(existingUsers);
+      const updatedUsers = [...existingUsers, newUser];
+      setAllUsersInStorage(updatedUsers);
+      setAllUsers(updatedUsers);
       
       // Set as current user
       setUserInStorage(newUser);
       setUser(newUser);
       
       // Log the state of users after registration
-      console.log("All users after registration:", existingUsers);
-      console.log("Pending users after registration:", 
-        existingUsers.filter(u => u.approvalStatus === "pending").length);
+      const pendingUsers = updatedUsers.filter(u => u.approvalStatus === "pending");
+      console.log("All users after registration:", updatedUsers.length);
+      console.log("Pending users after registration:", pendingUsers.length);
+      console.log("Pending users details:", pendingUsers);
       
       // If this is the admin account, automatically approve
       if (isAdmin) {
@@ -319,7 +320,11 @@ export const useAuthActions = () => {
   };
   
   const getPendingUsers = () => {
-    return allUsers.filter(u => u.approvalStatus === "pending");
+    // Always get fresh data from storage
+    const allStorageUsers = getAllUsersFromStorage();
+    const pendingUsers = allStorageUsers.filter(u => u.approvalStatus === "pending");
+    console.log(`Getting pending users: found ${pendingUsers.length} pending users`);
+    return pendingUsers;
   };
 
   const loadInitialData = () => {
@@ -336,9 +341,14 @@ export const useAuthActions = () => {
     
     // Load all users from localStorage
     const storedUsers = getAllUsersFromStorage();
-    console.log("Loading users from storage:", storedUsers);
-    console.log("Pending users in storage:", 
-      storedUsers.filter(u => u.approvalStatus === "pending").length);
+    console.log("Loading users from storage:", storedUsers.length);
+    
+    const pendingUsers = storedUsers.filter(u => u.approvalStatus === "pending");
+    console.log("Pending users in storage:", pendingUsers.length);
+    
+    if (pendingUsers.length > 0) {
+      console.log("Pending users details:", pendingUsers);
+    }
     
     setAllUsers(storedUsers);
     setIsLoading(false);

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContextType } from "../types/auth.types";
 import { useAuthActions } from "../hooks/useAuthActions";
 import { isAdminEmail, seedAdminUsers } from "../utils/storage.utils";
@@ -25,6 +25,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loadInitialData 
   } = useAuthActions();
 
+  // Track if we've done the initial data load
+  const [initialized, setInitialized] = useState(false);
+
   // Load initial data and seed admin users on component mount
   useEffect(() => {
     console.log("AuthProvider initializing");
@@ -32,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     seedAdminUsers();
     // Then load initial data
     loadInitialData();
+    setInitialized(true);
   }, []);
 
   // Determine if user is an admin (has admin role and email matches allowed admin emails)
@@ -40,9 +44,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Log any changes to allUsers for debugging
   useEffect(() => {
     if (allUsers) {
+      const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
       console.log("Auth context allUsers updated:", allUsers.length);
-      console.log("Pending users in context:", 
-        allUsers.filter(u => u.approvalStatus === "pending").length);
+      console.log(`Pending users in context: ${pendingCount}`);
+      
+      if (pendingCount > 0) {
+        console.log("Pending users:", allUsers.filter(u => u.approvalStatus === "pending"));
+      }
     }
   }, [allUsers]);
 
