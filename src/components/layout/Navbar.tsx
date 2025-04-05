@@ -3,6 +3,14 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Settings, LogOut, Users, Home } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -39,11 +47,29 @@ const Navbar: React.FC = () => {
               </button>
             </Link>
             {isAdmin && (
-              <Link to="/admin">
-                <button className="hover:underline text-blue-600 font-medium">
-                  Admin Panel
-                </button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-1 text-blue-600 font-medium">
+                    <span>Admin</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>User Management</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <Home className="mr-2 h-4 w-4" />
+                    <span>Back to Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </>
         )}
@@ -53,15 +79,31 @@ const Navbar: React.FC = () => {
       <div className="flex space-x-4">
         {isAuthenticated ? (
           <div className="flex items-center space-x-4">
-            <Link to="/profile" className="hidden md:flex items-center space-x-1 hover:underline">
-              <span>{user?.name}</span>
-              {user?.approvalStatus === "pending" && (
-                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full ml-2">
-                  Pending Approval
-                </span>
-              )}
-            </Link>
-            <Button onClick={handleLogout} className="bg-blue-600 hover:bg-blue-700">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-1 hover:underline">
+                  <span>{user?.name}</span>
+                  {user?.approvalStatus === "pending" && (
+                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full ml-2">
+                      Pending Approval
+                    </span>
+                  )}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button onClick={handleLogout} className="bg-blue-600 hover:bg-blue-700 md:flex hidden">
               Logout
             </Button>
           </div>
