@@ -14,16 +14,15 @@ export const useRegistration = (
   setAllUsers: (users: User[]) => void,
   setIsLoading: (isLoading: boolean) => void
 ) => {
-  // This function simulates sending a verification email with improved feedback
+  // Removed email verification functionality as it's no longer needed
   const sendVerificationEmail = (email: string, token: string) => {
-    // VERIFICATION BYPASS: Email verification is currently disabled
-    console.log(`[EMAIL SERVICE BYPASS] Verification automatically completed for ${email}`);
+    // Simply log that verification is bypassed
+    console.log(`[EMAIL VERIFICATION BYPASSED] User automatically approved: ${email}`);
     
-    // Show toast notification about auto-verification
+    // Show toast notification about account creation
     toast.success(
-      `Account created successfully! Your account is now pending admin approval.`,
+      `Account created successfully! You can now log in to your account.`,
       {
-        description: "An admin will review your account shortly.",
         duration: 6000
       }
     );
@@ -43,7 +42,7 @@ export const useRegistration = (
       name: 'John Doe',
       email: 'john.doe@example.com',
       role: 'shipper',
-      approvalStatus: 'pending',
+      approvalStatus: 'approved', // Auto-approve test users
       businessName: 'Test Shipping Company',
       phone: '(555) 123-4567',
       description: 'A test user for demonstration purposes',
@@ -102,19 +101,19 @@ export const useRegistration = (
       const existingUser = userExists ? existingUsers[existingUserIndex] : null;
       
       // Check if user exists and account is not pending
-      if (userExists && existingUser && existingUser.approvalStatus !== "pending") {
+      if (userExists && existingUser && existingUser.approvalStatus === "approved") {
         throw new Error("User with this email already exists");
       }
       
       const isAdmin = isAdminEmail(email);
       
-      // Create new user with pending status (unless admin) and verified status (bypassing email verification)
+      // Create new user with approved status - no verification needed
       const newUser: User = {
         id: userExists && existingUser ? existingUser.id : Math.random().toString(36).substring(2, 9),
         email,
         name,
         role: isAdmin ? "admin" : role,
-        approvalStatus: isAdmin ? "approved" : "pending",
+        approvalStatus: "approved", // Auto-approve all users
         businessName,
         dotNumber,
         mcNumber,
@@ -124,7 +123,7 @@ export const useRegistration = (
         address,
         equipmentType,
         maxWeight,
-        // VERIFICATION BYPASS: All users are automatically verified
+        // Auto-verify all users
         verificationStatus: "verified",
         registrationDate: Date.now() // Add registration timestamp for tracking
       };
@@ -137,11 +136,11 @@ export const useRegistration = (
         // Update existing user
         updatedUsers = [...existingUsers];
         updatedUsers[existingUserIndex] = newUser;
-        toast.info("Your information has been updated. Your account is pending approval.");
+        toast.success("Your account has been updated and is ready to use.");
       } else {
         // Add new user
         updatedUsers = [...existingUsers, newUser];
-        toast.success("Registration successful! Your account is pending approval.");
+        toast.success("Registration successful! You can now log in to your account.");
       }
       
       // Ensure users are saved to local storage (both ways for redundancy)
@@ -152,85 +151,29 @@ export const useRegistration = (
       setUserInStorage(newUser);
       setUser(newUser);
       
-      const pendingUsers = updatedUsers.filter(u => u.approvalStatus === "pending");
       console.log("All users after registration:", updatedUsers.length);
-      console.log("Pending users after registration:", pendingUsers.length);
-      console.log("Pending users details:", pendingUsers);
+      console.log("User registered and automatically approved:", newUser);
       
       if (isAdmin) {
         console.log(`Welcome email sent to admin: ${email}`);
       } else {
-        console.log(`New user registration: ${name} (${email}) - added with pending status`);
-        console.log(`User added to admin dashboard under pending status`);
+        console.log(`New user registration: ${name} (${email}) - added with approved status`);
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Resend verification email to user - explicitly returns Promise<string>
-  // VERIFICATION BYPASS: This now automatically marks users as verified
+  // Simplified resendVerification - no longer needed but kept for compatibility
   const resendVerification = async (userId: string): Promise<string> => {
-    const existingUsers = getAllUsersFromStorage();
-    const userIndex = existingUsers.findIndex(user => user.id === userId);
-    
-    if (userIndex === -1) {
-      console.error("Failed to resend verification: User not found with ID", userId);
-      throw new Error("User not found");
-    }
-    
-    // Since we're bypassing verification, let's just mark the user as verified
-    const user = existingUsers[userIndex];
-    user.verificationStatus = "verified";
-    
-    // Update storage
-    existingUsers[userIndex] = user;
-    setAllUsersInStorage(existingUsers);
-    setAllUsers(existingUsers);
-    
-    if (user.id === JSON.parse(localStorage.getItem("user") || "{}").id) {
-      setUserInStorage(user);
-      setUser(user);
-    }
-    
-    toast.success("Your account is now verified.");
-    console.log(`User ${user.email} marked as verified`);
-    
-    // Return a dummy token to satisfy the interface
+    // This function is now essentially a no-op since all users are auto-verified
+    console.log("Verification resend requested but not needed - all users are auto-verified");
     return "verified-user";
   };
 
-  // Verify user email with token - now automatically returns true
+  // Simplified verifyEmail - no longer needed but kept for compatibility
   const verifyEmail = (token: string, email: string): boolean => {
-    console.log(`Auto-verifying email for: ${email}`);
-    
-    const existingUsers = getAllUsersFromStorage();
-    const userIndex = existingUsers.findIndex(user => 
-      user.email.toLowerCase() === email.toLowerCase()
-    );
-    
-    if (userIndex === -1) {
-      console.log("User not found");
-      return false;
-    }
-    
-    const user = existingUsers[userIndex];
-    
-    // Mark user as verified
-    user.verificationStatus = "verified";
-    
-    // Update storage
-    existingUsers[userIndex] = user;
-    setAllUsersInStorage(existingUsers);
-    setAllUsers(existingUsers);
-    
-    if (user.id === JSON.parse(localStorage.getItem("user") || "{}").id) {
-      setUserInStorage(user);
-      setUser(user);
-    }
-    
-    console.log(`Email auto-verified for user: ${user.email}`);
-    toast.success("Email verified successfully!");
+    console.log("Verification check bypassed - all users are auto-verified");
     return true;
   };
 

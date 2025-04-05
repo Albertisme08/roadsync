@@ -44,7 +44,8 @@ export const useAuthentication = (
             email: email,
             name: "Admin User",
             role: "admin",
-            approvalStatus: "approved"
+            approvalStatus: "approved",
+            verificationStatus: "verified" // Ensure admin is auto-verified
           };
           
           existingUsers.push(adminUser);
@@ -53,6 +54,7 @@ export const useAuthentication = (
         } else {
           adminUser.role = "admin";
           adminUser.approvalStatus = "approved";
+          adminUser.verificationStatus = "verified"; // Ensure admin is auto-verified
           
           const updatedUsers = existingUsers.map((u) =>
             u.id === adminUser!.id ? adminUser! : u
@@ -74,6 +76,7 @@ export const useAuthentication = (
         if (isAdminEmail(email)) {
           existingUser.role = "admin";
           existingUser.approvalStatus = "approved";
+          existingUser.verificationStatus = "verified"; // Ensure admin is auto-verified
           
           const updatedUsers = existingUsers.map(u => 
             u.id === existingUser.id ? existingUser : u
@@ -86,6 +89,8 @@ export const useAuthentication = (
           throw new Error("Your account has been rejected. Please contact support.");
         }
         
+        // Ensure user is always verified when logging in
+        existingUser.verificationStatus = "verified";
         setUserInStorage(existingUser);
         setUser(existingUser);
       } else {

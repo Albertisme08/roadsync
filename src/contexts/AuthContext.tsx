@@ -47,19 +47,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Determine if user is an admin (has admin role and email matches allowed admin emails)
   const isAdmin = !!user && user.role === "admin" && isAdminEmail(user.email);
 
-  // Check if user is authenticated (verified and has a valid session)
-  const isAuthenticated = !!user && (user.verificationStatus === "verified" || user.role === "admin");
+  // Check if user is authenticated (user exists and is not null - no verification check)
+  const isAuthenticated = !!user;
 
   // Log any changes to allUsers for debugging
   useEffect(() => {
     if (allUsers) {
-      const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
       console.log("Auth context allUsers updated:", allUsers.length);
-      console.log(`Pending users in context: ${pendingCount}`);
-      
-      if (pendingCount > 0) {
-        console.log("Pending users:", allUsers.filter(u => u.approvalStatus === "pending"));
-      }
     }
   }, [allUsers]);
 

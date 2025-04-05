@@ -1,10 +1,9 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import AdminLoginForm from "@/components/auth/AdminLoginForm";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRegistrationFlow, RegistrationStep } from "@/hooks/auth/useRegistrationFlow";
 import {
   Card,
   CardContent,
@@ -21,15 +20,6 @@ const AuthPage: React.FC = () => {
   
   const isAdminLogin = from === "/admin";
 
-  const {
-    flowState,
-    initiateRegistration,
-    setUserInfo,
-    sendVerificationEmail,
-    verifyEmail: verifyEmailInFlow,
-    resetFlow
-  } = useRegistrationFlow();
-
   if (isAuthenticated) {
     // User is authenticated, redirect them based on their role
     if (user?.role === "shipper") {
@@ -39,9 +29,6 @@ const AuthPage: React.FC = () => {
     }
     return <Navigate to={from} replace />;
   }
-
-  // VERIFICATION BYPASS: All users are considered verified now
-  const isUnverifiedUser = false;
 
   const renderAuthComponent = () => {
     if (isAdminLogin) {
