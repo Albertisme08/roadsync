@@ -151,7 +151,6 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
         </Table>
       </div>
 
-      {/* User Profile Dialog */}
       <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -269,7 +268,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                 </div>
               )}
               
-              {viewUser.approvalStatus === "rejected" || viewUser._showRestoreOptions ? (
+              {(viewUser.approvalStatus === "rejected" || viewUser._showRestoreOptions) && (
                 <div className="border rounded-md p-4 bg-amber-50 mt-4">
                   <h3 className="font-medium mb-2">Restore User</h3>
                   <p className="text-sm text-muted-foreground mb-4">
