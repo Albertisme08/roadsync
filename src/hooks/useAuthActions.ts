@@ -58,7 +58,7 @@ export const useAuthActions = () => {
     }
   }, []);
 
-  // Wrap resendVerification to automatically use current user's ID
+  // Simplified resendVerification - no verification needed
   const resendCurrentUserVerification = async (): Promise<string> => {
     // Make sure we have a current user
     if (!user || !user.id) {

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import AdminLoginForm from "@/components/auth/AdminLoginForm";
-import EmailVerification from "@/components/auth/EmailVerification";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRegistrationFlow, RegistrationStep } from "@/hooks/auth/useRegistrationFlow";
 import {
@@ -20,7 +19,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 const AuthPage: React.FC = () => {
-  const { isAuthenticated, user, verifyEmail, resendVerification } = useAuth();
+  const { isAuthenticated, user, verifyEmail } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -49,6 +48,7 @@ const AuthPage: React.FC = () => {
       setVerificationInProgress(true);
       setLoading(true);
       try {
+        // Auto-verify the email
         const success = verifyEmail(tokenParam, emailParam);
         if (success) {
           setVerificationResult({
@@ -57,27 +57,29 @@ const AuthPage: React.FC = () => {
           });
           toast.success("Email verified successfully!");
         } else {
+          // Even if verification fails, we'll show success since we're bypassing verification
           setVerificationResult({
-            success: false,
-            message: "Invalid or expired verification link. Please request a new one."
+            success: true,
+            message: "Your account is ready. You can now log in."
           });
-          toast.error("Verification failed. Please request a new verification email.");
+          toast.success("Your account is ready to use.");
         }
       } catch (error) {
         console.error("Verification error:", error);
+        // Even on error, allow the user to continue
         setVerificationResult({
-          success: false,
-          message: "An error occurred during verification. Please try again later."
+          success: true,
+          message: "Your account is ready. You can now log in."
         });
+        toast.success("Your account is ready to use.");
       } finally {
         setLoading(false);
       }
-    } else if (stepParam === "email-verification" && emailParam) {
-      setUserInfo(emailParam, "", "");
     }
   }, [stepParam, emailParam, tokenParam, verifyEmail]);
 
   if (isAuthenticated) {
+    // User is authenticated, redirect them based on their role
     if (user?.role === "shipper") {
       return <Navigate to="/shipments" replace />;
     } else if (user?.role === "carrier") {
@@ -86,123 +88,43 @@ const AuthPage: React.FC = () => {
     return <Navigate to={from} replace />;
   }
 
-  const isUnverifiedUser = user && user.verificationStatus === "unverified";
-
-  const handleResendVerification = async (): Promise<string> => {
-    if (!user) {
-      return Promise.reject("No user found");
-    }
-    
-    toast.info("Sending verification email...");
-    try {
-      // Pass user.id to resendVerification since it requires an argument
-      const token = await resendVerification(user.id);
-      toast.success("Verification email sent! Please check your inbox.");
-      return token;
-    } catch (error) {
-      console.error("Failed to resend verification:", error);
-      toast.error("Failed to resend verification email. Please try again.");
-      throw error;
-    }
-  };
+  // All users are considered verified now
+  const isUnverifiedUser = false;
 
   const renderAuthComponent = () => {
     if (verificationResult !== null) {
       return (
         <Card className="w-full max-w-md mx-auto">
           <CardHeader>
-            <CardTitle>Email Verification</CardTitle>
+            <CardTitle>Account Ready</CardTitle>
             <CardDescription>
-              {verificationResult.success 
-                ? "Your email has been successfully verified" 
-                : "Email verification failed"}
+              Your account is now ready to use
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert variant={verificationResult.success ? "default" : "destructive"}>
-              {verificationResult.success ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <AlertCircle className="h-4 w-4" />
-              )}
+            <Alert variant="default">
+              <Check className="h-4 w-4" />
               <AlertTitle>
-                {verificationResult.success ? "Success!" : "Verification Failed"}
+                Success!
               </AlertTitle>
               <AlertDescription>
                 {verificationResult.message}
               </AlertDescription>
             </Alert>
             
-            {verificationResult.success ? (
-              <div className="mt-4 text-center">
-                <Button asChild className="w-full">
-                  <a href="/auth?mode=login">Log in to your account</a>
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-4 flex flex-col gap-2">
-                <Button asChild variant="outline" className="w-full">
-                  <a href="/auth?mode=login">Return to login</a>
-                </Button>
-                {emailParam && (
-                  <Button 
-                    onClick={handleResendVerification}
-                    className="w-full"
-                  >
-                    Request new verification email
-                  </Button>
-                )}
-              </div>
-            )}
+            <div className="mt-4 text-center">
+              <Button asChild className="w-full">
+                <a href="/auth?mode=login">Log in to your account</a>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       );
     }
 
     if (isUnverifiedUser) {
-      return (
-        <Card className="w-full max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle>Email Verification Required</CardTitle>
-            <CardDescription>
-              Please verify your email address to continue
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert variant="default">
-              <Mail className="h-4 w-4" />
-              <AlertTitle>Verification Required</AlertTitle>
-              <AlertDescription>
-                We've sent a verification link to <strong>{user.email}</strong>. 
-                Please check your inbox and click the link to verify your email address.
-              </AlertDescription>
-            </Alert>
-            
-            <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-800">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                If you don't see the email in your inbox, please check your spam or junk folder.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="flex justify-center mt-4">
-              <Button 
-                onClick={handleResendVerification}
-                variant="outline"
-                className="w-full"
-              >
-                Resend verification email
-              </Button>
-            </div>
-          </CardContent>
-          <CardFooter className="text-sm text-center text-muted-foreground pt-0">
-            <p>
-              You must verify your email address before accessing your account.
-              Please check your inbox for the verification link.
-            </p>
-          </CardFooter>
-        </Card>
-      );
+      // This block should never execute now since isUnverifiedUser is always false
+      return null;
     }
 
     if (isAdminLogin) {
@@ -221,20 +143,8 @@ const AuthPage: React.FC = () => {
       );
     }
 
-    switch (flowState.step) {
-      case "email-verification":
-        return (
-          <EmailVerification 
-            email={flowState.email}
-            onVerify={verifyEmailInFlow}
-            onResendVerification={handleResendVerification}
-            onBack={resetFlow}
-          />
-        );
-        
-      default:
-        return <AuthForm />;
-    }
+    // Default case - show the auth form
+    return <AuthForm />;
   };
 
   return (

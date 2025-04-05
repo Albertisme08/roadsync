@@ -112,11 +112,7 @@ export const useRegistration = (
       
       const isAdmin = isAdminEmail(email);
       
-      // Generate verification token - more complex for better security
-      const verificationToken = generateVerificationToken();
-      const verificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
-      
-      // Create new user with pending status (unless admin) and unverified status
+      // Create new user with pending status (unless admin) and verified status (bypassing email verification)
       const newUser: User = {
         id: userExists && existingUser ? existingUser.id : Math.random().toString(36).substring(2, 9),
         email,
@@ -132,10 +128,8 @@ export const useRegistration = (
         address,
         equipmentType,
         maxWeight,
-        // Set verification status - admin users are automatically verified
-        verificationStatus: isAdmin ? "verified" : "unverified",
-        verificationToken: isAdmin ? undefined : verificationToken,
-        verificationExpiry: isAdmin ? undefined : verificationExpiry
+        // Set verification status as verified for everyone - bypassing email verification
+        verificationStatus: "verified"
       };
       
       console.log("Registering new user with data:", newUser);
@@ -146,7 +140,7 @@ export const useRegistration = (
         // Update existing user
         updatedUsers = [...existingUsers];
         updatedUsers[existingUserIndex] = newUser;
-        toast.info("Your information has been updated. Please check your email to verify your account.");
+        toast.info("Your information has been updated. Your account is pending approval.");
       } else {
         // Add new user
         updatedUsers = [...existingUsers, newUser];
@@ -161,14 +155,6 @@ export const useRegistration = (
       setUserInStorage(newUser);
       setUser(newUser);
       
-      // Send verification email with improved messaging
-      if (!isAdmin) {
-        await sendVerificationEmail(email, verificationToken as string);
-        toast.info("Please check your email to verify your account.", {
-          description: "Be sure to check your spam folder if you don't see the email in your inbox."
-        });
-      }
-      
       const pendingUsers = updatedUsers.filter(u => u.approvalStatus === "pending");
       console.log("All users after registration:", updatedUsers.length);
       console.log("Pending users after registration:", pendingUsers.length);
@@ -177,8 +163,8 @@ export const useRegistration = (
       if (isAdmin) {
         console.log(`Welcome email sent to admin: ${email}`);
       } else {
-        console.log(`New user registration: ${name} (${email}) - needs verification and approval`);
-        console.log(`Verification email sent to: ${email} with token: ${verificationToken}`);
+        console.log(`New user registration: ${name} (${email}) - added with pending status`);
+        console.log(`User added to admin dashboard under pending status`);
       }
     } finally {
       setIsLoading(false);
@@ -195,16 +181,9 @@ export const useRegistration = (
       throw new Error("User not found");
     }
     
+    // Since we're bypassing verification, let's just mark the user as verified
     const user = existingUsers[userIndex];
-    console.log("Resending verification to user:", user);
-    
-    // Generate new verification token
-    const verificationToken = generateVerificationToken();
-    const verificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
-    
-    // Update user with new token
-    user.verificationToken = verificationToken;
-    user.verificationExpiry = verificationExpiry;
+    user.verificationStatus = "verified";
     
     // Update storage
     existingUsers[userIndex] = user;
@@ -216,41 +195,31 @@ export const useRegistration = (
       setUser(user);
     }
     
-    // Send verification email with improved messaging
-    await sendVerificationEmail(user.email, verificationToken);
-    console.log(`Verification email resent to: ${user.email} with token: ${verificationToken}`);
+    toast.success("Your account is now verified.");
+    console.log(`User ${user.email} marked as verified`);
     
-    return verificationToken;
+    // Return a dummy token to satisfy the interface
+    return "verified-user";
   };
 
-  // Verify user email with token
+  // Verify user email with token - now automatically returns true
   const verifyEmail = (token: string, email: string): boolean => {
-    console.log(`Attempting to verify email for: ${email} with token: ${token}`);
+    console.log(`Auto-verifying email for: ${email}`);
     
     const existingUsers = getAllUsersFromStorage();
     const userIndex = existingUsers.findIndex(user => 
-      user.email.toLowerCase() === email.toLowerCase() && 
-      user.verificationToken === token
+      user.email.toLowerCase() === email.toLowerCase()
     );
     
     if (userIndex === -1) {
-      console.log("Invalid verification token or email");
+      console.log("User not found");
       return false;
     }
     
     const user = existingUsers[userIndex];
     
-    // Check if token has expired
-    if (user.verificationExpiry && user.verificationExpiry < Date.now()) {
-      console.log("Verification token has expired");
-      toast.error("Verification token has expired. Please request a new one.");
-      return false;
-    }
-    
     // Mark user as verified
     user.verificationStatus = "verified";
-    user.verificationToken = undefined;
-    user.verificationExpiry = undefined;
     
     // Update storage
     existingUsers[userIndex] = user;
@@ -262,7 +231,7 @@ export const useRegistration = (
       setUser(user);
     }
     
-    console.log(`Email verified for user: ${user.email}`);
+    console.log(`Email auto-verified for user: ${user.email}`);
     toast.success("Email verified successfully!");
     return true;
   };
