@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { registerSchema, RegisterFormValues } from "./validationSchemas";
 import { Textarea } from "@/components/ui/textarea";
+import { UserRole } from "@/types/auth.types";
 
 const RegisterForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -57,12 +58,12 @@ const RegisterForm: React.FC = () => {
         values.name, 
         values.email, 
         values.password, 
-        values.role,
-        values.businessName,
-        values.dotNumber,
-        values.mcNumber,
+        values.role as UserRole,
+        values.businessName || "",
+        values.dotNumber || "",
+        values.mcNumber || "",
         values.phone,
-        values.description
+        values.description || ""
       );
       toast.success("Registration successful");
       navigate("/dashboard");
