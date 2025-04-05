@@ -22,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/lib/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { registerSchema, RegisterFormValues } from "./validationSchemas";
+import { registerSchema, RegisterFormValues, validateDriverData } from "./validationSchemas";
 import { Textarea } from "@/components/ui/textarea";
 import { UserRole } from "@/types/auth.types";
 
@@ -53,6 +53,20 @@ const RegisterForm: React.FC = () => {
   const handleRegister = async (values: RegisterFormValues) => {
     setSubmitting(true);
     try {
+      // Validate driver data manually
+      if (values.role === "driver") {
+        try {
+          validateDriverData(values);
+        } catch (error) {
+          if (error instanceof Error) {
+            form.setError("dotNumber", { message: error.message });
+            form.setError("mcNumber", { message: error.message });
+            setSubmitting(false);
+            return;
+          }
+        }
+      }
+      
       await register(
         values.name, 
         values.email, 

@@ -30,7 +30,7 @@ const shipperSchema = z.object({
   mcNumber: z.string().optional(),
 });
 
-// Schema for driver role
+// Schema for driver role - without refinement first
 const driverSchema = z.object({
   ...baseFields,
   role: z.literal("driver"),
@@ -40,26 +40,22 @@ const driverSchema = z.object({
   mcNumber: z.string().optional(),
 });
 
-// Add refinement to driver schema separately to maintain correct types
-const driverSchemaWithRefinement = driverSchema.refine(
-  (data) => {
-    // Driver validation: At least one of DOT or MC number must be provided
-    return !!data.dotNumber || !!data.mcNumber;
-  },
-  {
-    message: "Please provide a valid MC or DOT number",
-    path: ["dotNumber"],
-  }
-);
-
-// Combined schema using discriminated union
+// First create the combined schema
 export const registerSchema = z.discriminatedUnion("role", [
   shipperSchema,
-  driverSchemaWithRefinement,
+  driverSchema,
 ]).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
+
+// Add separate driver validation
+export const validateDriverData = (data: z.infer<typeof registerSchema>) => {
+  if (data.role === "driver" && !data.dotNumber && !data.mcNumber) {
+    throw new Error("Please provide a valid MC or DOT number");
+  }
+  return data;
+};
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
