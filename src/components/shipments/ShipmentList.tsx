@@ -4,17 +4,20 @@ import ShipmentCard from "./ShipmentCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext"; 
+import { Package } from "lucide-react";
 
 export interface ShipmentListProps {
   shipments: any[];
   onShipmentUpdate: (updatedShipment: any) => void;
   disableActions?: boolean;
+  emptyStateMessage?: string;
 }
 
 const ShipmentList: React.FC<ShipmentListProps> = ({ 
   shipments, 
   onShipmentUpdate,
-  disableActions = false 
+  disableActions = false,
+  emptyStateMessage = "No shipments found matching your criteria." 
 }) => {
   const { user, isApproved } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,33 +53,39 @@ const ShipmentList: React.FC<ShipmentListProps> = ({
     return true;
   });
 
+  // Show search/filter controls only if we have shipments initially
+  const showControls = shipments.length > 0;
+
   // If no shipments after filtering, show a message
   if (filteredShipments.length === 0) {
     return (
       <div>
-        <div className="mb-4 flex flex-col gap-4">
-          <Input
-            placeholder="Search by origin, destination, or freight type..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-          <Select value={statusFilter || ''} onValueChange={value => setStatusFilter(value || null)}>
-            <SelectTrigger className="max-w-sm">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="accepted">Accepted</SelectItem>
-              <SelectItem value="in_transit">In Transit</SelectItem>
-              <SelectItem value="delivered">Delivered</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="text-center py-12">
-          <p className="text-gray-500">No shipments found matching your criteria.</p>
+        {showControls && (
+          <div className="mb-4 flex flex-col gap-4">
+            <Input
+              placeholder="Search by origin, destination, or freight type..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            <Select value={statusFilter || ''} onValueChange={value => setStatusFilter(value || null)}>
+              <SelectTrigger className="max-w-sm">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="accepted">Accepted</SelectItem>
+                <SelectItem value="in_transit">In Transit</SelectItem>
+                <SelectItem value="delivered">Delivered</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        <div className="text-center py-12 bg-gray-50/50 rounded-lg border border-dashed border-gray-200">
+          <Package className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">{emptyStateMessage}</p>
         </div>
       </div>
     );

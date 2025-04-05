@@ -7,6 +7,7 @@ import { Shipment } from "@/components/shipments/ShipmentCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldAlert } from "lucide-react";
+import { useLoad } from "@/contexts/LoadContext";
 
 // Sample shipment data (same as in Dashboard)
 const sampleShipments: Shipment[] = [
@@ -69,30 +70,49 @@ const sampleShipments: Shipment[] = [
 
 const Shipments: React.FC = () => {
   const { user, isAuthenticated, isApproved } = useAuth();
-  const [shipments, setShipments] = useState<Shipment[]>(sampleShipments);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
   const isShipper = user?.role === "shipper";
+  const { loadInitialData } = useLoad();
+
+  // Determine if this is a new user (has no shipments)
+  const isNewUser = user && user.isFirstVisit;
 
   // In a real app, you would fetch data from your API
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      // If user is a carrier, randomly assign some shipments to this carrier
-      if (user?.role === "carrier" && user?.id) {
-        const updatedShipments = shipments.map(shipment => {
-          // Randomly assign some shipments to this carrier (for demo purposes)
-          if (["accepted", "in_transit", "delivered"].includes(shipment.status) && Math.random() > 0.5) {
-            return { ...shipment, driverId: user.id };
-          }
-          return shipment;
-        });
-        setShipments(updatedShipments);
-      }
-    }, 500);
+    // If this is a new user, we show an empty state
+    // otherwise, we show sample data for demonstration
+    if (isNewUser) {
+      setShipments([]);
+    } else {
+      // Simulate loading data with sample shipments
+      const timer = setTimeout(() => {
+        // If user is a carrier, randomly assign some shipments to this carrier
+        if (user?.role === "carrier" && user?.id) {
+          const updatedShipments = sampleShipments.map(shipment => {
+            // Randomly assign some shipments to this carrier (for demo purposes)
+            if (["accepted", "in_transit", "delivered"].includes(shipment.status) && Math.random() > 0.5) {
+              return { ...shipment, driverId: user.id };
+            }
+            return shipment;
+          });
+          setShipments(updatedShipments);
+        } else {
+          setShipments(sampleShipments);
+        }
+        
+        // After first successful data load, update user's first visit flag
+        if (user && user.isFirstVisit) {
+          // In a real app, you would update this in the database
+          console.log("User completed first visit to shipments page");
+        }
+      }, 500);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, [user]);
 
   const handleShipmentCreated = (newShipment: Shipment) => {
+    // Reset first visit flag when a user creates their first shipment
     setShipments(prev => [newShipment, ...prev]);
   };
 
@@ -144,6 +164,7 @@ const Shipments: React.FC = () => {
               shipments={shipments} 
               onShipmentUpdate={handleShipmentUpdate} 
               disableActions={!isApproved}
+              emptyStateMessage="You have no shipments yet. Create your first shipment to get started."
             />
           </TabsContent>
           <TabsContent value="create">
@@ -156,6 +177,7 @@ const Shipments: React.FC = () => {
             shipments={shipments} 
             onShipmentUpdate={handleShipmentUpdate} 
             disableActions={!isApproved}
+            emptyStateMessage={isNewUser ? "No available loads found. Check back soon for new opportunities." : "No loads match your current filters."}
           />
         </>
       )}
