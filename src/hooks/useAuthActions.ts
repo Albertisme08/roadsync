@@ -58,13 +58,15 @@ export const useAuthActions = () => {
     }
   }, []);
 
-  // Simplified resendVerification - no verification needed
+  // Simplified resendVerification - auto-verifies users
   const resendCurrentUserVerification = async (): Promise<string> => {
     // Make sure we have a current user
     if (!user || !user.id) {
       return Promise.reject("No user logged in or user ID not available");
     }
     
+    // VERIFICATION BYPASS: This now automatically verifies users
+    console.log("Auto-verifying user:", user.id);
     return resendVerification(user.id);
   };
 

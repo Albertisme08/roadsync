@@ -16,18 +16,14 @@ export const useRegistration = (
 ) => {
   // This function simulates sending a verification email with improved feedback
   const sendVerificationEmail = (email: string, token: string) => {
-    // In a real app, this would make an API call to send an email
-    console.log(`[EMAIL SERVICE] Verification email sent to ${email} with token: ${token}`);
+    // VERIFICATION BYPASS: Email verification is currently disabled
+    console.log(`[EMAIL SERVICE BYPASS] Verification automatically completed for ${email}`);
     
-    // Generate a verification link that would be in the email
-    const verificationLink = `${window.location.origin}/auth?token=${token}&email=${encodeURIComponent(email)}`;
-    console.log(`[EMAIL SERVICE] Verification link: ${verificationLink}`);
-    
-    // Show more detailed toast with instructions
+    // Show toast notification about auto-verification
     toast.success(
-      `Verification email sent to ${email}. Please check your inbox and spam folder.`,
+      `Account created successfully! Your account is now pending admin approval.`,
       {
-        description: "If you don't see the email within a few minutes, try clicking the resend button.",
+        description: "An admin will review your account shortly.",
         duration: 6000
       }
     );
@@ -36,7 +32,7 @@ export const useRegistration = (
     return new Promise<void>(resolve => {
       setTimeout(() => {
         resolve();
-      }, 1000);
+      }, 500);
     });
   };
 
@@ -53,7 +49,7 @@ export const useRegistration = (
       description: 'A test user for demonstration purposes',
       city: 'San Francisco',
       address: '123 Test Street',
-      verificationStatus: 'verified' // Make test user verified by default
+      verificationStatus: 'verified' // All users are auto-verified
     };
 
     const existingUsers = getAllUsersFromStorage();
@@ -128,8 +124,9 @@ export const useRegistration = (
         address,
         equipmentType,
         maxWeight,
-        // Set verification status as verified for everyone - bypassing email verification
-        verificationStatus: "verified"
+        // VERIFICATION BYPASS: All users are automatically verified
+        verificationStatus: "verified",
+        registrationDate: Date.now() // Add registration timestamp for tracking
       };
       
       console.log("Registering new user with data:", newUser);
@@ -172,6 +169,7 @@ export const useRegistration = (
   };
 
   // Resend verification email to user - explicitly returns Promise<string>
+  // VERIFICATION BYPASS: This now automatically marks users as verified
   const resendVerification = async (userId: string): Promise<string> => {
     const existingUsers = getAllUsersFromStorage();
     const userIndex = existingUsers.findIndex(user => user.id === userId);
