@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -108,7 +107,7 @@ const LoginForm: React.FC = () => {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="shipper">Shipper</SelectItem>
-                  <SelectItem value="driver">Driver</SelectItem>
+                  <SelectItem value="carrier">Carrier</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

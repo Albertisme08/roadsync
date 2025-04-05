@@ -26,7 +26,7 @@ const AuthPage: React.FC = () => {
     // Redirect based on user role
     if (user?.role === "shipper") {
       return <Navigate to="/shipments" replace />;
-    } else if (user?.role === "driver") {
+    } else if (user?.role === "carrier") {
       return <Navigate to="/loads" replace />;
     }
     return <Navigate to={from} replace />;

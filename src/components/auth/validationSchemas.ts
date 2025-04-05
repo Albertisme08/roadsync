@@ -6,7 +6,7 @@ export const loginSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters",
   }),
-  role: z.enum(["shipper", "carrier"]), // Changed from "driver" to "carrier"
+  role: z.enum(["shipper", "carrier"]), 
 });
 
 // Base schema with common fields
@@ -30,10 +30,10 @@ export const shipperSchema = z.object({
   mcNumber: z.string().optional(),
 });
 
-// Schema for carrier role (previously driver)
+// Schema for carrier role
 export const carrierSchema = z.object({
   ...baseFields,
-  role: z.literal("carrier"), // Changed from "driver" to "carrier"
+  role: z.literal("carrier"),
   businessName: z.string().optional(),
   description: z.string().optional(),
   dotNumber: z.string().optional(),
@@ -43,7 +43,7 @@ export const carrierSchema = z.object({
 // First create the combined schema
 export const registerSchema = z.discriminatedUnion("role", [
   shipperSchema,
-  carrierSchema, // Changed from driverSchema to carrierSchema
+  carrierSchema,
 ]).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -51,7 +51,7 @@ export const registerSchema = z.discriminatedUnion("role", [
 
 // Add separate carrier validation that doesn't break TypeScript's discriminated union
 export const validateCarrierData = (data: z.infer<typeof registerSchema>) => {
-  if (data.role === "carrier" && !data.dotNumber && !data.mcNumber) { // Changed from "driver" to "carrier"
+  if (data.role === "carrier" && !data.dotNumber && !data.mcNumber) {
     throw new Error("Please provide a valid MC or DOT number");
   }
   return data;
