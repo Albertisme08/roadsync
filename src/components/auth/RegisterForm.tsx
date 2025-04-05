@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -23,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/lib/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { registerSchema, RegisterFormValues, validateCarrierData } from "./validationSchemas";
+import { registerSchema, RegisterFormValues } from "./validationSchemas";
 import { Textarea } from "@/components/ui/textarea";
 import { UserRole } from "@/types/auth.types";
 
@@ -77,53 +76,48 @@ const RegisterForm: React.FC = () => {
   const handleRegister = async (values: RegisterFormValues) => {
     setSubmitting(true);
     try {
-      // Validate carrier data manually
-      const validatedData = validateCarrierData(values);
-      
       // Extract common fields
       const commonData = {
-        name: validatedData.name, 
-        email: validatedData.email, 
-        password: validatedData.password, 
-        role: validatedData.role as UserRole,
-        businessName: validatedData.businessName,
-        phone: validatedData.phone,
-        description: validatedData.description || ""
+        name: values.name, 
+        email: values.email, 
+        password: values.password, 
+        role: values.role as UserRole,
+        businessName: values.businessName,
+        phone: values.phone,
+        description: values.description || ""
       };
       
       // Add role-specific data
-      if (validatedData.role === "carrier") {
-        const carrierData = validatedData as typeof carrierSchema._type;
+      if (values.role === "carrier") {
         await register(
           commonData.name,
           commonData.email,
           commonData.password,
           commonData.role,
           commonData.businessName,
-          carrierData.dotNumber || "",
-          carrierData.mcNumber || "",
+          values.dotNumber || "",
+          values.mcNumber || "",
           commonData.phone,
           commonData.description,
           undefined,
           undefined,
-          carrierData.equipmentType,
-          carrierData.maxWeight
+          values.equipmentType || "",
+          values.maxWeight || ""
         );
       } else {
         // Shipper data
-        const shipperData = validatedData as typeof shipperSchema._type;
         await register(
           commonData.name,
           commonData.email,
           commonData.password,
           commonData.role,
           commonData.businessName,
-          shipperData.dotNumber || "",
-          shipperData.mcNumber || "",
+          values.dotNumber || "",
+          values.mcNumber || "",
           commonData.phone,
           commonData.description,
-          shipperData.city,
-          shipperData.address
+          values.city || "",
+          values.address || ""
         );
       }
       

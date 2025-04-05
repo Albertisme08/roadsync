@@ -49,24 +49,33 @@ export const carrierSchema = z.object({
   mcNumber: z.string().optional(),
   equipmentType: z.string().min(1, { message: "Equipment type is required" }),
   maxWeight: z.string().min(1, { message: "Maximum weight is required" }),
-}).refine(data => data.dotNumber || data.mcNumber, {
-  message: "Please enter either an MC number or a DOT number",
-  path: ["dotNumber"], // This adds the error to the dotNumber field
 });
 
 // Create the combined schema
 export const registerSchema = z.discriminatedUnion("role", [
   shipperSchema,
   carrierSchema,
-]).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-// Add separate carrier validation that doesn't break TypeScript's discriminated union
-export const validateCarrierData = (data: z.infer<typeof registerSchema>) => {
-  return data;
-};
+])
+.refine(
+  (data) => {
+    // Make sure carrier has either MC or DOT number
+    if (data.role === "carrier") {
+      return Boolean(data.dotNumber || data.mcNumber);
+    }
+    return true;
+  },
+  {
+    message: "Please enter either an MC number or a DOT number",
+    path: ["dotNumber"],
+  }
+)
+.refine(
+  (data) => data.password === data.confirmPassword,
+  {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  }
+);
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;

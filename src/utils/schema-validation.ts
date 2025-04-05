@@ -1,5 +1,6 @@
 
 import { z } from 'zod';
+import { UserRole } from '@/types/auth.types';
 
 // User schema matching the types in auth.types.ts
 export const userSchema = z.object({
@@ -9,6 +10,11 @@ export const userSchema = z.object({
   mcNumber: z.string().optional(),
   description: z.string().optional(),
   phone: z.string(),
+  // Add new fields
+  city: z.string().optional(),
+  address: z.string().optional(),
+  equipmentType: z.string().optional(),
+  maxWeight: z.string().optional(),
 });
 
 // Function to validate user data
