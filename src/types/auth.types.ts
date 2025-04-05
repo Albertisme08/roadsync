@@ -60,4 +60,5 @@ export interface AuthContextType {
   restoreUser: (userId: string, approvalStatus: ApprovalStatus) => void; // New function to restore rejected users
   getPendingUsers: () => User[];
   loadInitialData: () => void; // Added this missing function to the interface
+  checkExistingUser?: (email: string) => { exists: boolean; status?: string; user?: User }; // New function to check existing users
 }

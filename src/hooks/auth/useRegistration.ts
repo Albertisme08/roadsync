@@ -6,6 +6,7 @@ import {
   setUserInStorage,
   isAdminEmail
 } from "@/utils/storage.utils";
+import { toast } from "sonner";
 
 export const useRegistration = (
   setUser: (user: User | null) => void,
@@ -81,11 +82,15 @@ export const useRegistration = (
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
       const existingUsers = getAllUsersFromStorage();
-      const userExists = existingUsers.some(
+      const existingUserIndex = existingUsers.findIndex(
         (user) => user.email.toLowerCase() === email.toLowerCase()
       );
       
-      if (userExists) {
+      const userExists = existingUserIndex !== -1;
+      const existingUser = userExists ? existingUsers[existingUserIndex] : null;
+      
+      // Check if user exists and account is not pending
+      if (userExists && existingUser && existingUser.approvalStatus !== "pending") {
         throw new Error("User with this email already exists");
       }
       
@@ -93,7 +98,7 @@ export const useRegistration = (
       
       // Create new user with pending status (unless admin)
       const newUser: User = {
-        id: Math.random().toString(36).substring(2, 9),
+        id: userExists && existingUser ? existingUser.id : Math.random().toString(36).substring(2, 9),
         email,
         name,
         role: isAdmin ? "admin" : role,
@@ -111,7 +116,18 @@ export const useRegistration = (
       
       console.log("Registering new user with data:", newUser);
       
-      const updatedUsers = [...existingUsers, newUser];
+      let updatedUsers: User[];
+      
+      if (userExists) {
+        // Update existing user
+        updatedUsers = [...existingUsers];
+        updatedUsers[existingUserIndex] = newUser;
+        toast.info("Your information has been updated. Your account is still pending approval.");
+      } else {
+        // Add new user
+        updatedUsers = [...existingUsers, newUser];
+        toast.info("Registration successful. Your account is pending approval.");
+      }
       
       setAllUsersInStorage(updatedUsers);
       
@@ -136,9 +152,28 @@ export const useRegistration = (
     }
   };
 
+  // This function checks if a user already exists and returns their status
+  const checkExistingUser = (email: string): { exists: boolean; status?: string; user?: User } => {
+    const existingUsers = getAllUsersFromStorage();
+    const existingUser = existingUsers.find(
+      (user) => user.email.toLowerCase() === email.toLowerCase()
+    );
+    
+    if (existingUser) {
+      return { 
+        exists: true, 
+        status: existingUser.approvalStatus,
+        user: existingUser
+      };
+    }
+    
+    return { exists: false };
+  };
+
   return {
     register,
     sendVerificationEmail,
-    addTestUser
+    addTestUser,
+    checkExistingUser
   };
 };

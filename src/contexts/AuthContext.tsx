@@ -25,7 +25,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     rejectUser,
     restoreUser,
     getPendingUsers,
-    loadInitialData 
+    loadInitialData,
+    checkExistingUser
   } = useAuthActions();
 
   // Track if we've done the initial data load
@@ -75,7 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     rejectUser,
     restoreUser,
     getPendingUsers,
-    loadInitialData, // Make sure we're exposing the loadInitialData function in the context
+    loadInitialData,
+    checkExistingUser
   };
 
   return (

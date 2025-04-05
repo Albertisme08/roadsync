@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,11 @@ const isValidDOTNumber = (value: string): boolean => {
 const RegisterForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [idType, setIdType] = useState<"mc" | "dot" | "none">("none");
-  const { register } = useAuth();
+  const [existingUserAlert, setExistingUserAlert] = useState<{ show: boolean; status: string }>({ 
+    show: false, 
+    status: '' 
+  });
+  const { register, allUsers } = useAuth();
   const navigate = useNavigate();
 
   const form = useForm<RegisterFormValues>({
@@ -81,8 +84,53 @@ const RegisterForm: React.FC = () => {
   });
 
   const selectedRole = form.watch("role");
+  const watchedEmail = form.watch("email");
   const watchedMcNumber = form.watch("mcNumber");
   const watchedDotNumber = form.watch("dotNumber");
+  
+  useEffect(() => {
+    if (!watchedEmail || watchedEmail.trim() === '') {
+      setExistingUserAlert({ show: false, status: '' });
+      return;
+    }
+    
+    const existingUser = allUsers.find(
+      (user) => user.email.toLowerCase() === watchedEmail.toLowerCase()
+    );
+    
+    if (existingUser) {
+      if (existingUser.approvalStatus === "pending") {
+        setExistingUserAlert({ 
+          show: true, 
+          status: 'pending' 
+        });
+        
+        form.setValue("name", existingUser.name || "");
+        form.setValue("role", existingUser.role as "shipper" | "carrier");
+        form.setValue("businessName", existingUser.businessName || "");
+        form.setValue("phone", existingUser.phone || "");
+        form.setValue("description", existingUser.description || "");
+        form.setValue("city", existingUser.city || "");
+        form.setValue("address", existingUser.address || "");
+        form.setValue("dotNumber", existingUser.dotNumber || "");
+        form.setValue("mcNumber", existingUser.mcNumber || "");
+        form.setValue("equipmentType", existingUser.equipmentType || "");
+        form.setValue("maxWeight", existingUser.maxWeight || "");
+      } else if (existingUser.approvalStatus === "approved") {
+        setExistingUserAlert({ 
+          show: true, 
+          status: 'approved' 
+        });
+      } else if (existingUser.approvalStatus === "rejected") {
+        setExistingUserAlert({ 
+          show: true, 
+          status: 'rejected' 
+        });
+      }
+    } else {
+      setExistingUserAlert({ show: false, status: '' });
+    }
+  }, [watchedEmail, allUsers]);
 
   const handleIdTypeChange = (value: "mc" | "dot" | "none") => {
     setIdType(value);
@@ -159,7 +207,6 @@ const RegisterForm: React.FC = () => {
         );
       }
       
-      toast.success("Registration successful. Your account is pending approval.");
       navigate("/dashboard");
     } catch (error) {
       console.error("Register error:", error);
@@ -180,6 +227,26 @@ const RegisterForm: React.FC = () => {
         onSubmit={form.handleSubmit(handleRegister)}
         className="space-y-4"
       >
+        {existingUserAlert.show && (
+          <Alert variant={existingUserAlert.status === "approved" ? "destructive" : "default"} className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>
+              {existingUserAlert.status === "pending" 
+                ? "Account Pending Approval" 
+                : existingUserAlert.status === "approved" 
+                  ? "Account Already Exists" 
+                  : "Account Previously Rejected"}
+            </AlertTitle>
+            <AlertDescription>
+              {existingUserAlert.status === "pending" 
+                ? "Your account is still pending approval. You can update your information and resubmit if needed."
+                : existingUserAlert.status === "approved" 
+                  ? "An account with this email already exists. Please log in instead."
+                  : "Your account was previously rejected. Please contact support or try with a different email."}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Personal Information</h3>
           
