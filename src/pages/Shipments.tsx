@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -75,7 +76,7 @@ const Shipments: React.FC = () => {
   const { loadInitialData } = useLoad();
 
   // Determine if this is a new user (has no shipments)
-  const isNewUser = user && user.isFirstVisit;
+  const isNewUser = user?.isFirstVisit === true;
 
   // In a real app, you would fetch data from your API
   useEffect(() => {
@@ -101,7 +102,7 @@ const Shipments: React.FC = () => {
         }
         
         // After first successful data load, update user's first visit flag
-        if (user && user.isFirstVisit) {
+        if (user?.isFirstVisit === true) {
           // In a real app, you would update this in the database
           console.log("User completed first visit to shipments page");
         }
