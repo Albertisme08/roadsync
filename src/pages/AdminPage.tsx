@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useRegistration } from "@/hooks/auth/useRegistration";
+import { toast } from "@/lib/sonner";
 
 const AdminPage = () => {
   const { user, isAdmin, loadInitialData, allUsers, setAllUsers, setUser, setIsLoading } = useAuth();
@@ -19,19 +20,32 @@ const AdminPage = () => {
     if (added) {
       loadInitialData(); // Reload data to show the new user
       console.log("Test pending user added and data reloaded");
+      toast.success("Test pending user added successfully");
+    } else {
+      toast.info("Test user already exists");
     }
   };
   
   // Force load data when admin page mounts
   useEffect(() => {
     console.log("AdminPage mounted - forcing data load");
+    // Ensure localStorage is initialized
+    if (!localStorage.getItem("allUsers")) {
+      localStorage.setItem("allUsers", JSON.stringify([]));
+    }
+    
+    // Load data from storage
     loadInitialData();
     
-    // Set up a periodic refresh every 30 seconds as a backup
+    // Check if we have pending users
+    const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
+    console.log(`Current pending users: ${pendingCount}`);
+    
+    // Set up a periodic refresh every 10 seconds for better reactivity
     const intervalId = setInterval(() => {
       console.log("AdminPage periodic refresh");
       loadInitialData();
-    }, 30000);
+    }, 10000); // Changed from 30s to 10s for better responsiveness
     
     return () => clearInterval(intervalId);
   }, []);

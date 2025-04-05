@@ -13,6 +13,7 @@ export const useUserData = (
   setIsLoading: (isLoading: boolean) => void
 ) => {
   const getPendingUsers = () => {
+    // Ensure we're getting the latest data from localStorage
     const allStorageUsers = getAllUsersFromStorage();
     const pendingUsers = allStorageUsers.filter(u => u.approvalStatus === "pending");
     console.log(`Getting pending users: found ${pendingUsers.length} pending users`);
@@ -20,6 +21,11 @@ export const useUserData = (
   };
 
   const loadInitialData = () => {
+    // Ensure localStorage has allUsers initialized
+    if (!localStorage.getItem("allUsers")) {
+      localStorage.setItem("allUsers", JSON.stringify([]));
+    }
+    
     const storedUsers = getAllUsersFromStorage();
     console.log("Loading users from storage:", storedUsers.length);
     

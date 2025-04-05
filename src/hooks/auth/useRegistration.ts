@@ -1,4 +1,5 @@
-import { User, UserRole, VerificationStatus } from "@/types/auth.types";
+
+import { User, UserRole, VerificationStatus, ApprovalStatus } from "@/types/auth.types";
 import { 
   getAllUsersFromStorage,
   setAllUsersInStorage,
@@ -82,7 +83,9 @@ export const useRegistration = (
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      const existingUsers = getAllUsersFromStorage();
+      const existingUsers = getAllUsersFromStorage() || [];
+      console.log("Existing users before registration:", existingUsers.length);
+      
       const existingUserIndex = existingUsers.findIndex(
         (user) => user.email.toLowerCase() === email.toLowerCase()
       );
@@ -137,6 +140,9 @@ export const useRegistration = (
         updatedUsers = [...existingUsers, newUser];
         toast.info("Registration started. Please check your email to verify your account.");
       }
+      
+      // Ensure users are saved to local storage
+      localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
       
       setAllUsersInStorage(updatedUsers);
       setAllUsers(updatedUsers);

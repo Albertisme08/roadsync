@@ -156,7 +156,7 @@ const AuthPage: React.FC = () => {
                   if (user) {
                     toast.info("Sending verification email...");
                     try {
-                      // Resend verification - now with async/await since it returns a Promise
+                      // Using resendVerification correctly as an async function
                       const token = await resendVerification(user.id);
                       toast.success("Verification email sent! Please check your inbox.");
                     } catch (error) {
