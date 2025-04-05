@@ -28,10 +28,10 @@ export interface User {
   rejectionDate?: number; // Timestamp for when user was rejected
   restorationDate?: number; // Timestamp for when user was restored
   _showRestoreOptions?: boolean; // UI state flag for showing restore options
-  verificationStatus?: VerificationStatus; // New field for email verification status
-  verificationToken?: string; // Token for email verification
-  verificationExpiry?: number; // Expiry timestamp for verification token
-  registrationDate?: number; // Added timestamp for when user registered
+  verificationStatus?: VerificationStatus; // All users are auto-verified now
+  verificationToken?: string; // Token for email verification (kept for backwards compatibility)
+  verificationExpiry?: number; // Expiry timestamp for verification token (kept for backwards compatibility)
+  registrationDate?: number; // Timestamp for when user registered
 }
 
 // Authentication context type
@@ -64,10 +64,10 @@ export interface AuthContextType {
   logout: () => void;
   approveUser: (userId: string) => void;
   rejectUser: (userId: string) => void;
-  restoreUser: (userId: string, approvalStatus: ApprovalStatus) => void; // New function to restore rejected users
+  restoreUser: (userId: string, approvalStatus: ApprovalStatus) => void; // Function to restore rejected users
   getPendingUsers: () => User[];
   loadInitialData: () => void; // Added this missing function to the interface
-  checkExistingUser?: (email: string) => { exists: boolean; status?: string; user?: User }; // New function to check existing users
-  verifyEmail: (token: string, email: string) => boolean; // New function to verify email
+  checkExistingUser?: (email: string) => { exists: boolean; status?: string; user?: User }; // Function to check existing users
+  verifyEmail: (token: string, email: string) => boolean; // Function for email verification (kept for backwards compatibility)
   resendVerification: (userId: string) => Promise<string>; // Updated to return Promise<string>
 }

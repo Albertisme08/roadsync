@@ -111,8 +111,8 @@ const Dashboard: React.FC = () => {
                 <span>Expected approval time: 24-48 hours</span>
               </div>
               <p>
-                You will receive an email notification once your account has been approved. If you have any questions,
-                please contact our support team at support@roadsync.com
+                You will receive a notification once your account has been approved. While your account is pending, 
+                certain features will be restricted.
               </p>
             </div>
           </AlertDescription>

@@ -128,6 +128,7 @@ const Shipments: React.FC = () => {
           <AlertDescription className="text-yellow-700">
             Your account is currently pending review by an administrator. 
             You will be able to {isShipper ? "create shipments" : "accept loads"} once your account has been approved.
+            In the meantime, you can view available shipments but cannot interact with them.
           </AlertDescription>
         </Alert>
       )}
@@ -142,20 +143,11 @@ const Shipments: React.FC = () => {
             <ShipmentList 
               shipments={shipments} 
               onShipmentUpdate={handleShipmentUpdate} 
+              disableActions={!isApproved}
             />
           </TabsContent>
           <TabsContent value="create">
-            {isApproved ? (
-              <CreateShipmentForm onShipmentCreated={handleShipmentCreated} />
-            ) : (
-              <Alert className="bg-yellow-50 border-yellow-200">
-                <ShieldAlert className="h-5 w-5 text-yellow-600" />
-                <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
-                <AlertDescription className="text-yellow-700">
-                  Your account is currently pending approval. You will be able to create shipments once an administrator approves your account.
-                </AlertDescription>
-              </Alert>
-            )}
+            <CreateShipmentForm onShipmentCreated={handleShipmentCreated} />
           </TabsContent>
         </Tabs>
       ) : (

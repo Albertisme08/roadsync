@@ -100,7 +100,8 @@ const CreateShipmentForm: React.FC<CreateShipmentFormProps> = ({ onShipmentCreat
         <ShieldAlert className="h-5 w-5 text-yellow-600" />
         <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
         <AlertDescription className="text-yellow-700">
-          Your account is currently pending approval. You will be able to create shipments once an administrator approves your account.
+          Your account is currently pending administrator approval. You will be able to create shipments once an administrator reviews and approves your account.
+          This typically takes 24-48 hours. You'll be notified when your account is approved.
         </AlertDescription>
       </Alert>
     );

@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useUser } from "./auth/useUser";
 import { useAuthentication } from "./auth/useAuthentication";
@@ -58,14 +57,12 @@ export const useAuthActions = () => {
     }
   }, []);
 
-  // Simplified resendVerification - auto-verifies users
+  // Keep for compatibility - now all users are auto-verified but not auto-approved
   const resendCurrentUserVerification = async (): Promise<string> => {
-    // Make sure we have a current user
     if (!user || !user.id) {
       return Promise.reject("No user logged in or user ID not available");
     }
     
-    // VERIFICATION BYPASS: This now automatically verifies users
     console.log("Auto-verifying user:", user.id);
     return resendVerification(user.id);
   };

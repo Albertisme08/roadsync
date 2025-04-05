@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/lib/sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface UserTableProps {
   users: User[];
@@ -66,6 +67,17 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     toast.success(`User ${userName} has been restored with status: ${restoreStatus}`);
   };
 
+  // No pending users message
+  if (users.filter(u => u.approvalStatus === "pending").length === 0) {
+    return (
+      <Alert className="mb-4 bg-blue-50 border-blue-200">
+        <AlertDescription className="text-blue-700">
+          There are currently no pending users that need approval.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -78,14 +90,14 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Business/Info</TableHead>
-              <TableHead>Approval Date</TableHead>
+              <TableHead>Registration Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users && users.length > 0 ? (
               users.map((user) => (
-                <TableRow key={user.id} className="group hover:bg-muted/50">
+                <TableRow key={user.id} className={`group hover:bg-muted/50 ${user.approvalStatus === "pending" ? "bg-yellow-50" : ""}`}>
                   <TableCell className="font-mono text-xs">{user.id.substring(0, 8)}</TableCell>
                   <TableCell className="font-medium">{user.name || "N/A"}</TableCell>
                   <TableCell>{user.email}</TableCell>
@@ -106,7 +118,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                     )}
                   </TableCell>
                   <TableCell>
-                    {user.approvalDate ? formatDate(user.approvalDate) : "N/A"}
+                    {user.registrationDate ? formatDate(user.registrationDate) : "N/A"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
@@ -242,6 +254,9 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                     <span className="font-medium">Approval Status:</span> {getStatusBadge(viewUser.approvalStatus)}
                   </div>
                   <div>
+                    <span className="font-medium">Registration Date:</span> {viewUser.registrationDate ? formatDate(viewUser.registrationDate) : "N/A"}
+                  </div>
+                  <div>
                     <span className="font-medium">Approval Date:</span> {viewUser.approvalDate ? formatDate(viewUser.approvalDate) : "Not yet approved"}
                   </div>
                   {viewUser.rejectionDate && (
@@ -271,7 +286,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      onReject(viewUser.id, viewUser.name || viewUser.email);
+                      onReject(viewUser.id, user.name || viewUser.email);
                       setViewUser(null);
                     }}
                   >

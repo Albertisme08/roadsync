@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Calendar, Package, Lock, ShieldAlert } from "lucide-react";
 import CreateAccountModal from "@/components/carrier/CreateAccountModal";
 import { useAuth } from "@/contexts/AuthContext";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "@/lib/sonner";
 
 interface HomeLoadBoardProps {
   isAuthenticated: boolean;
@@ -66,7 +67,9 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
       setShowAuthModal(true);
     } else if (!isApproved) {
       // Show a toast or alert that approval is required
-      console.log("You need admin approval to view full load details");
+      toast.info("Your account is pending approval. You'll be able to view and interact with loads once approved.", {
+        duration: 5000
+      });
     } else {
       // Handle authenticated and approved user view
       console.log(`Authenticated and approved user viewing load: ${loadId}`);
@@ -88,8 +91,10 @@ const HomeLoadBoard: React.FC<HomeLoadBoardProps> = ({ isAuthenticated }) => {
       {isAuthenticated && !isApproved && (
         <Alert className="mb-6 bg-yellow-50 border-yellow-200">
           <ShieldAlert className="h-5 w-5 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
           <AlertDescription className="text-yellow-700">
-            Your account is pending approval. Some features are limited until an administrator approves your account.
+            Your account is pending administrator review. Some features are limited until an administrator approves your account.
+            You can browse available loads but cannot interact with them until approved.
           </AlertDescription>
         </Alert>
       )}

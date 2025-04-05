@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -77,6 +77,15 @@ const ShipperForm = () => {
   });
 
   const onSubmit = (data: FormValues) => {
+    if (!isApproved) {
+      toast({
+        title: "Account Pending Approval",
+        description: "Your account must be approved before you can post loads.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     console.log(data);
     toast({
       title: "Load posted successfully!",
@@ -89,10 +98,11 @@ const ShipperForm = () => {
     return (
       <Alert className="bg-yellow-50 border-yellow-200">
         <ShieldAlertIcon className="h-5 w-5 text-yellow-600" />
-        <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+        <AlertTitle className="text-yellow-800">Account Pending Administrator Approval</AlertTitle>
         <AlertDescription className="text-yellow-700">
-          Your account is currently pending approval by an administrator. 
+          Your account is currently pending review by an administrator. 
           You will be able to post loads once your account has been approved.
+          This process typically takes 1-2 business days.
         </AlertDescription>
       </Alert>
     );
