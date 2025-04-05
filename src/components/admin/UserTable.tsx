@@ -54,6 +54,11 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     toast.success(`User ${userName} has been restored with status: ${restoreStatus}`);
   };
 
+  // Helper to show restore options
+  const showRestoreOptions = (user: User) => {
+    setViewUser({ ...user, _showRestoreOptions: true });
+  };
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -131,7 +136,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                           size="sm"
                           variant="outline"
                           className="flex items-center border-amber-500 text-amber-600 hover:bg-amber-50"
-                          onClick={() => setViewUser({...user, _showRestoreOptions: true})}
+                          onClick={() => showRestoreOptions(user)}
                         >
                           <RefreshCw className="mr-1 h-4 w-4" /> Restore
                         </Button>

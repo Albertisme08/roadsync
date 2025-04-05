@@ -1,4 +1,3 @@
-
 // User roles
 export type UserRole = "shipper" | "carrier" | "admin";
 
@@ -24,6 +23,7 @@ export interface User {
   maxWeight?: string;
   rejectionDate?: number; // Timestamp for when user was rejected
   restorationDate?: number; // Timestamp for when user was restored
+  _showRestoreOptions?: boolean; // UI state flag for showing restore options
 }
 
 // Authentication context type
