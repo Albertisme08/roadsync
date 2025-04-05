@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -26,6 +27,25 @@ import { registerSchema, RegisterFormValues, validateCarrierData } from "./valid
 import { Textarea } from "@/components/ui/textarea";
 import { UserRole } from "@/types/auth.types";
 
+// Format phone number as (XXX) XXX-XXXX
+const formatPhoneNumber = (value: string): string => {
+  if (!value) return value;
+  
+  // Remove all non-digit characters
+  const phoneNumber = value.replace(/\D/g, '');
+  
+  // Limit to 10 digits
+  const truncated = phoneNumber.substring(0, 10);
+  
+  // Format the phone number
+  if (truncated.length < 4) {
+    return truncated;
+  } else if (truncated.length < 7) {
+    return `(${truncated.substring(0, 3)}) ${truncated.substring(3)}`;
+  }
+  return `(${truncated.substring(0, 3)}) ${truncated.substring(3, 6)}-${truncated.substring(6)}`;
+};
+
 const RegisterForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const { register } = useAuth();
@@ -38,7 +58,7 @@ const RegisterForm: React.FC = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "shipper" as const,
+      role: undefined as unknown as "shipper" | "carrier", // Start with no role selected
       businessName: "",
       description: "",
       phone: "",
@@ -54,29 +74,18 @@ const RegisterForm: React.FC = () => {
     setSubmitting(true);
     try {
       // Validate carrier data manually
-      if (values.role === "carrier") {
-        try {
-          validateCarrierData(values);
-        } catch (error) {
-          if (error instanceof Error) {
-            form.setError("dotNumber", { message: error.message });
-            form.setError("mcNumber", { message: error.message });
-            setSubmitting(false);
-            return;
-          }
-        }
-      }
+      const validatedData = validateCarrierData(values);
       
       await register(
-        values.name, 
-        values.email, 
-        values.password, 
-        values.role as UserRole,
-        values.businessName || "",
-        values.dotNumber || "",
-        values.mcNumber || "",
-        values.phone,
-        values.description || ""
+        validatedData.name, 
+        validatedData.email, 
+        validatedData.password, 
+        validatedData.role as UserRole,
+        validatedData.businessName || "",
+        validatedData.dotNumber || "",
+        validatedData.mcNumber || "",
+        validatedData.phone,
+        validatedData.description || ""
       );
       toast.success("Registration successful");
       navigate("/dashboard");
@@ -86,6 +95,12 @@ const RegisterForm: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Phone number input change handler
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
+    const formattedValue = formatPhoneNumber(e.target.value);
+    onChange(formattedValue);
   };
 
   return (
@@ -163,9 +178,14 @@ const RegisterForm: React.FC = () => {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>Phone Number<span className="text-red-500 ml-1">*</span></FormLabel>
                 <FormControl>
-                  <Input placeholder="(555) 123-4567" {...field} />
+                  <Input 
+                    placeholder="(555) 123-4567" 
+                    {...field}
+                    onChange={(e) => handlePhoneChange(e, field.onChange)}
+                    inputMode="numeric"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -182,10 +202,9 @@ const RegisterForm: React.FC = () => {
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>I am a</FormLabel>
+                <FormLabel>I am a<span className="text-red-500 ml-1">*</span></FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
                   value={field.value}
                 >
                   <FormControl>
@@ -208,10 +227,7 @@ const RegisterForm: React.FC = () => {
             name="businessName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Business Name
-                  {selectedRole === "shipper" && <span className="text-red-500 ml-1">*</span>}
-                </FormLabel>
+                <FormLabel>Business Name<span className="text-red-500 ml-1">*</span></FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Your company name"
@@ -229,10 +245,7 @@ const RegisterForm: React.FC = () => {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Business Description
-                  {selectedRole === "shipper" && <span className="text-red-500 ml-1">*</span>}
-                </FormLabel>
+                <FormLabel>Business Description</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Tell us about your business"
@@ -253,7 +266,7 @@ const RegisterForm: React.FC = () => {
                 name="mcNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>MC Number<span className="text-gray-500 ml-1">(required if no DOT number)</span></FormLabel>
+                    <FormLabel>MC Number (Optional)</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="MC-12345678" 
@@ -271,7 +284,7 @@ const RegisterForm: React.FC = () => {
                 name="dotNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>DOT Number<span className="text-gray-500 ml-1">(required if no MC number)</span></FormLabel>
+                    <FormLabel>DOT Number (Optional)</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="12345678" 

@@ -9,6 +9,13 @@ export const loginSchema = z.object({
   role: z.enum(["shipper", "carrier"]), 
 });
 
+// Phone number validation function for US format
+const validatePhoneNumber = (value: string) => {
+  // Remove all non-digit characters for validation
+  const digitsOnly = value.replace(/\D/g, '');
+  return digitsOnly.length === 10;
+};
+
 // Base schema with common fields
 const baseFields = {
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -17,15 +24,17 @@ const baseFields = {
     message: "Password must be at least 6 characters",
   }),
   confirmPassword: z.string().min(6),
-  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  phone: z.string().refine(validatePhoneNumber, { 
+    message: "Please enter a valid U.S. phone number" 
+  }),
 };
 
 // Schema for shipper role
 export const shipperSchema = z.object({
   ...baseFields,
   role: z.literal("shipper"),
-  businessName: z.string().min(1, { message: "Business name is required for shippers" }),
-  description: z.string().min(1, { message: "Business description is required for shippers" }),
+  businessName: z.string().min(1, { message: "Business name is required" }),
+  description: z.string().optional(),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
 });
@@ -34,7 +43,7 @@ export const shipperSchema = z.object({
 export const carrierSchema = z.object({
   ...baseFields,
   role: z.literal("carrier"),
-  businessName: z.string().optional(),
+  businessName: z.string().min(1, { message: "Business name is required" }),
   description: z.string().optional(),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
@@ -50,10 +59,8 @@ export const registerSchema = z.discriminatedUnion("role", [
 });
 
 // Add separate carrier validation that doesn't break TypeScript's discriminated union
+// Note: We're making DOT and MC numbers optional as requested
 export const validateCarrierData = (data: z.infer<typeof registerSchema>) => {
-  if (data.role === "carrier" && !data.dotNumber && !data.mcNumber) {
-    throw new Error("Please provide a valid MC or DOT number");
-  }
   return data;
 };
 
