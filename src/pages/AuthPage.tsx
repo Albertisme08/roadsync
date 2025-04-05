@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
@@ -24,17 +23,14 @@ const AuthPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
   
-  // Check if the user is trying to access the admin page
   const isAdminLogin = from === "/admin";
 
-  // Get registration flow step from query params if available
   const stepParam = searchParams.get("step") as RegistrationStep | null;
   const emailParam = searchParams.get("email");
   const tokenParam = searchParams.get("token");
   const [verificationResult, setVerificationResult] = useState<{success: boolean, message: string} | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Initialize registration flow
   const {
     flowState,
     initiateRegistration,
@@ -44,9 +40,7 @@ const AuthPage: React.FC = () => {
     resetFlow
   } = useRegistrationFlow();
 
-  // Check URL for verification request
   useEffect(() => {
-    // Handle verification link from email
     if (tokenParam && emailParam && !stepParam) {
       setLoading(true);
       try {
@@ -73,16 +67,12 @@ const AuthPage: React.FC = () => {
       } finally {
         setLoading(false);
       }
-    }
-    // Handle registration flow steps
-    else if (stepParam === "email-verification" && emailParam) {
+    } else if (stepParam === "email-verification" && emailParam) {
       setUserInfo(emailParam, "", "");
     }
   }, [stepParam, emailParam, tokenParam, verifyEmail]);
-  
-  // If user is already logged in, redirect to requested page or dashboard
+
   if (isAuthenticated) {
-    // Redirect based on user role
     if (user?.role === "shipper") {
       return <Navigate to="/shipments" replace />;
     } else if (user?.role === "carrier") {
@@ -91,18 +81,16 @@ const AuthPage: React.FC = () => {
     return <Navigate to={from} replace />;
   }
 
-  // If user is registered but not verified, show verification needed message
   const isUnverifiedUser = user && user.verificationStatus === "unverified";
 
-  // Handle resending verification email
   const handleResendVerification = async () => {
-    if (!user) return;
+    if (!user) return Promise.reject("No user found");
     
     toast.info("Sending verification email...");
     try {
-      const token = await resendVerification(user.id);
+      const token = await resendVerification();
       toast.success("Verification email sent! Please check your inbox.");
-      return token;
+      return Promise.resolve(token);
     } catch (error) {
       console.error("Failed to resend verification:", error);
       toast.error("Failed to resend verification email. Please try again.");
@@ -110,9 +98,7 @@ const AuthPage: React.FC = () => {
     }
   };
 
-  // Determine which component to render based on step or admin login
   const renderAuthComponent = () => {
-    // Display verification result if we just processed a verification link
     if (verificationResult !== null) {
       return (
         <Card className="w-full max-w-md mx-auto">
@@ -165,7 +151,6 @@ const AuthPage: React.FC = () => {
       );
     }
 
-    // Show verification notice for unverified users
     if (isUnverifiedUser) {
       return (
         <Card className="w-full max-w-md mx-auto">
@@ -214,7 +199,6 @@ const AuthPage: React.FC = () => {
       );
     }
 
-    // Check if we're in a specific step of the registration flow
     switch (flowState.step) {
       case "email-verification":
         return (
@@ -226,7 +210,6 @@ const AuthPage: React.FC = () => {
           />
         );
         
-      // We'll implement the rest of the steps in future iterations
       default:
         return <AuthForm />;
     }
