@@ -21,7 +21,7 @@ const baseFields = {
 };
 
 // Schema for shipper role
-const shipperSchema = z.object({
+export const shipperSchema = z.object({
   ...baseFields,
   role: z.literal("shipper"),
   businessName: z.string().min(1, { message: "Business name is required for shippers" }),
@@ -30,8 +30,8 @@ const shipperSchema = z.object({
   mcNumber: z.string().optional(),
 });
 
-// Schema for driver role - without refinement first
-const driverSchema = z.object({
+// Schema for driver role
+export const driverSchema = z.object({
   ...baseFields,
   role: z.literal("driver"),
   businessName: z.string().optional(),
@@ -49,7 +49,7 @@ export const registerSchema = z.discriminatedUnion("role", [
   path: ["confirmPassword"],
 });
 
-// Add separate driver validation
+// Add separate driver validation that doesn't break TypeScript's discriminated union
 export const validateDriverData = (data: z.infer<typeof registerSchema>) => {
   if (data.role === "driver" && !data.dotNumber && !data.mcNumber) {
     throw new Error("Please provide a valid MC or DOT number");

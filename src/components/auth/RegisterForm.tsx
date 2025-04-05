@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -216,6 +217,7 @@ const RegisterForm: React.FC = () => {
                   <Input
                     placeholder="Your company name"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -237,6 +239,7 @@ const RegisterForm: React.FC = () => {
                     placeholder="Tell us about your business"
                     className="min-h-[100px]"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -253,7 +256,11 @@ const RegisterForm: React.FC = () => {
                   <FormItem>
                     <FormLabel>MC Number<span className="text-gray-500 ml-1">(required if no DOT number)</span></FormLabel>
                     <FormControl>
-                      <Input placeholder="MC-12345678" {...field} />
+                      <Input 
+                        placeholder="MC-12345678" 
+                        {...field} 
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -267,7 +274,11 @@ const RegisterForm: React.FC = () => {
                   <FormItem>
                     <FormLabel>DOT Number<span className="text-gray-500 ml-1">(required if no MC number)</span></FormLabel>
                     <FormControl>
-                      <Input placeholder="12345678" {...field} />
+                      <Input 
+                        placeholder="12345678" 
+                        {...field} 
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
