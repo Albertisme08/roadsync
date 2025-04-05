@@ -1,12 +1,12 @@
-
-// This is a comprehensive dataset of major US cities including those within 100 miles of common cities
-// In a production app, you'd want a more comprehensive dataset or API
+// This is a comprehensive dataset of US cities
+// In a production app, you'd want to use an API for more comprehensive and updated data
 export type CityData = {
   city: string;
   state: string;
   display: string;
 };
 
+// Expanded list of cities
 export const cities: CityData[] = [
   // Original cities
   { city: "New York", state: "NY", display: "New York, NY" },
@@ -126,14 +126,110 @@ export const cities: CityData[] = [
   { city: "Omaha", state: "NE", display: "Omaha, NE" },
   { city: "Aurora", state: "CO", display: "Aurora, CO" },
   { city: "Lexington", state: "KY", display: "Lexington, KY" },
-  { city: "Tulsa", state: "OK", display: "Tulsa, OK" }
+  { city: "Tulsa", state: "OK", display: "Tulsa, OK" },
+
+  // Additional major cities 
+  { city: "Fontana", state: "CA", display: "Fontana, CA" },
+  { city: "Irvine", state: "CA", display: "Irvine, CA" },
+  { city: "Modesto", state: "CA", display: "Modesto, CA" },
+  { city: "Bakersfield", state: "CA", display: "Bakersfield, CA" },
+  { city: "San Bernardino", state: "CA", display: "San Bernardino, CA" },
+  { city: "Stockton", state: "CA", display: "Stockton, CA" },
+  { city: "Fremont", state: "CA", display: "Fremont, CA" },
+  { city: "Glendale", state: "CA", display: "Glendale, CA" },
+  { city: "Santa Clarita", state: "CA", display: "Santa Clarita, CA" },
+  { city: "Huntington Beach", state: "CA", display: "Huntington Beach, CA" },
+  { city: "Moreno Valley", state: "CA", display: "Moreno Valley, CA" },
+  { city: "Aurora", state: "IL", display: "Aurora, IL" },
+  { city: "Naperville", state: "IL", display: "Naperville, IL" },
+  { city: "Joliet", state: "IL", display: "Joliet, IL" },
+  { city: "Springfield", state: "IL", display: "Springfield, IL" },
+  { city: "Peoria", state: "IL", display: "Peoria, IL" },
+  { city: "Elgin", state: "IL", display: "Elgin, IL" },
+  { city: "Arlington Heights", state: "IL", display: "Arlington Heights, IL" },
+  { city: "Evanston", state: "IL", display: "Evanston, IL" },
+  { city: "Schaumburg", state: "IL", display: "Schaumburg, IL" },
+  { city: "Buffalo", state: "NY", display: "Buffalo, NY" },
+  { city: "Rochester", state: "NY", display: "Rochester, NY" },
+  { city: "Yonkers", state: "NY", display: "Yonkers, NY" },
+  { city: "Syracuse", state: "NY", display: "Syracuse, NY" },
+  { city: "Albany", state: "NY", display: "Albany, NY" },
+  { city: "New Rochelle", state: "NY", display: "New Rochelle, NY" },
+  { city: "Mount Vernon", state: "NY", display: "Mount Vernon, NY" },
+  { city: "Schenectady", state: "NY", display: "Schenectady, NY" },
+  { city: "Utica", state: "NY", display: "Utica, NY" },
+  { city: "Baton Rouge", state: "LA", display: "Baton Rouge, LA" },
+  { city: "New Orleans", state: "LA", display: "New Orleans, LA" },
+  { city: "Shreveport", state: "LA", display: "Shreveport, LA" },
+  { city: "Lafayette", state: "LA", display: "Lafayette, LA" },
+  { city: "Lake Charles", state: "LA", display: "Lake Charles, LA" },
+  { city: "Kenner", state: "LA", display: "Kenner, LA" },
+  { city: "Bossier City", state: "LA", display: "Bossier City, LA" },
+  { city: "Monroe", state: "LA", display: "Monroe, LA" },
+  { city: "Alexandria", state: "LA", display: "Alexandria, LA" },
+  { city: "Fort Lauderdale", state: "FL", display: "Fort Lauderdale, FL" },
+  { city: "Orlando", state: "FL", display: "Orlando, FL" },
+  { city: "Tallahassee", state: "FL", display: "Tallahassee, FL" },
+  { city: "Gainesville", state: "FL", display: "Gainesville, FL" },
+  { city: "Clearwater", state: "FL", display: "Clearwater, FL" },
+  { city: "Palm Bay", state: "FL", display: "Palm Bay, FL" },
+  { city: "Coral Springs", state: "FL", display: "Coral Springs, FL" },
+  { city: "Cape Coral", state: "FL", display: "Cape Coral, FL" },
+  { city: "Pembroke Pines", state: "FL", display: "Pembroke Pines, FL" },
+  { city: "Hollywood", state: "FL", display: "Hollywood, FL" },
+  { city: "Miramar", state: "FL", display: "Miramar, FL" },
+  { city: "Gainesville", state: "FL", display: "Gainesville, FL" },
+  { city: "Newark", state: "NJ", display: "Newark, NJ" },
+  { city: "Jersey City", state: "NJ", display: "Jersey City, NJ" },
+  { city: "Paterson", state: "NJ", display: "Paterson, NJ" },
+  { city: "Elizabeth", state: "NJ", display: "Elizabeth, NJ" },
+  { city: "Edison", state: "NJ", display: "Edison, NJ" },
+  { city: "Woodbridge", state: "NJ", display: "Woodbridge, NJ" },
+  { city: "Lakewood", state: "NJ", display: "Lakewood, NJ" },
+  { city: "Toms River", state: "NJ", display: "Toms River, NJ" },
+  { city: "Hamilton Township", state: "NJ", display: "Hamilton Township, NJ" },
+  { city: "Clifton", state: "NJ", display: "Clifton, NJ" },
+  { city: "Trenton", state: "NJ", display: "Trenton, NJ" },
+  { city: "Camden", state: "NJ", display: "Camden, NJ" },
+  { city: "Arlington", state: "TX", display: "Arlington, TX" },
+  { city: "Plano", state: "TX", display: "Plano, TX" },
+  { city: "Corpus Christi", state: "TX", display: "Corpus Christi, TX" },
+  { city: "Laredo", state: "TX", display: "Laredo, TX" },
+  { city: "Lubbock", state: "TX", display: "Lubbock, TX" },
+  { city: "Garland", state: "TX", display: "Garland, TX" },
+  { city: "Irving", state: "TX", display: "Irving, TX" },
+  { city: "Amarillo", state: "TX", display: "Amarillo, TX" },
+  { city: "Grand Prairie", state: "TX", display: "Grand Prairie, TX" },
+  { city: "Brownsville", state: "TX", display: "Brownsville, TX" },
+  { city: "McKinney", state: "TX", display: "McKinney, TX" },
+  { city: "Frisco", state: "TX", display: "Frisco, TX" },
+  { city: "Mesquite", state: "TX", display: "Mesquite, TX" },
+  { city: "McAllen", state: "TX", display: "McAllen, TX" },
+  { city: "Killeen", state: "TX", display: "Killeen, TX" }
 ];
 
 export const filterCities = (query: string): CityData[] => {
   if (!query || query.length < 2) return [];
   
   const lowercaseQuery = query.toLowerCase();
-  return cities.filter((city) => 
+  
+  // First try to find exact match at beginning of city name or state
+  const exactMatches = cities.filter((city) => 
+    city.display.toLowerCase().startsWith(lowercaseQuery) ||
+    city.city.toLowerCase().startsWith(lowercaseQuery)
+  );
+  
+  // If we have enough exact matches, return those first
+  if (exactMatches.length >= 10) {
+    return exactMatches.slice(0, 10);
+  }
+  
+  // Otherwise, include partial matches
+  const partialMatches = cities.filter((city) => 
+    !exactMatches.includes(city) && 
     city.display.toLowerCase().includes(lowercaseQuery)
-  ).slice(0, 7); // Increased from 5 to 7 suggestions for better coverage
+  );
+  
+  // Combine matches (exact matches first)
+  return [...exactMatches, ...partialMatches].slice(0, 10);
 };
