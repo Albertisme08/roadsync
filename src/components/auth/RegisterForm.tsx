@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -97,19 +98,20 @@ const RegisterForm: React.FC = () => {
   };
 
   const handleRegister = async (values: RegisterFormValues) => {
-    if (values.role === "shipper") {
-      if (idType === "mc" && values.mcNumber) {
-        if (!isValidMCNumber(values.mcNumber)) {
-          toast.error("Please enter a valid MC number (e.g., MC-12345678 or 12345678)");
-          return;
-        }
-      } else if (idType === "dot" && values.dotNumber) {
-        if (!isValidDOTNumber(values.dotNumber)) {
-          toast.error("Please enter a valid DOT number (5-8 digits)");
-          return;
-        }
-      } else if (idType === "none") {
-        toast.warning("You are registering without an MC/DOT number. Some features may be limited until approved by an admin.");
+    if (values.role === "carrier") {
+      if (!values.mcNumber && !values.dotNumber) {
+        toast.error("Carriers must provide either an MC number or a DOT number");
+        return;
+      }
+      
+      if (values.mcNumber && !isValidMCNumber(values.mcNumber)) {
+        toast.error("Please enter a valid MC number (e.g., MC-12345678 or 12345678)");
+        return;
+      }
+      
+      if (values.dotNumber && !isValidDOTNumber(values.dotNumber)) {
+        toast.error("Please enter a valid DOT number (5-8 digits)");
+        return;
       }
     }
     
@@ -311,9 +313,9 @@ const RegisterForm: React.FC = () => {
             <>
               <div className="space-y-4 border p-4 rounded-md bg-slate-50">
                 <FormItem className="space-y-3">
-                  <FormLabel>Identification Type<span className="text-red-500 ml-1">*</span></FormLabel>
+                  <FormLabel>Identification Type</FormLabel>
                   <FormDescription>
-                    Please select your identification type. This is required for verification.
+                    MC/DOT numbers are optional for shippers. You may provide one if available.
                   </FormDescription>
                   <RadioGroup 
                     defaultValue={idType} 
@@ -347,10 +349,9 @@ const RegisterForm: React.FC = () => {
                   </RadioGroup>
                   {idType === "none" && (
                     <FormItem>
-                      <FormLabel>Please provide details about your shipping operations</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="What types of shipments do you need to send? How often do you ship? Do you have loading docks or require special equipment for loading/unloading?"
+                          placeholder="Please describe your shipping volumes, frequency, dock facilities, and any special requirements."
                           className="min-h-[120px]"
                           onChange={(e) => {
                             form.setValue("description", e.target.value);
@@ -366,7 +367,7 @@ const RegisterForm: React.FC = () => {
                   name="mcNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>MC Number<span className="text-red-500 ml-1">*</span></FormLabel>
+                      <FormLabel>MC Number</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="MC-12345678 or 12345678" 
@@ -392,7 +393,7 @@ const RegisterForm: React.FC = () => {
                   name="dotNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>DOT Number<span className="text-red-500 ml-1">*</span></FormLabel>
+                      <FormLabel>DOT Number</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter DOT Number" 

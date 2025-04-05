@@ -71,7 +71,7 @@ export const registerSchema = z.discriminatedUnion("role", [
 ])
 .refine(
   (data) => {
-    // Make sure carrier has either MC or DOT number
+    // Make MC or DOT number required only for carriers
     if (data.role === "carrier") {
       return Boolean(data.dotNumber || data.mcNumber);
     }
