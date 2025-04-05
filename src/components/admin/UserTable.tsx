@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Eye, RefreshCw } from "lucide-react";
+import { CheckCircle, XCircle, Eye, RefreshCw, AlertTriangle } from "lucide-react";
 import { User, ApprovalStatus } from "@/types/auth.types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
@@ -32,7 +31,9 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
   useEffect(() => {
     console.log("UserTable received users:", users.length);
     const pendingUsers = users.filter(u => u.approvalStatus === "pending");
-    console.log("Pending users in UserTable:", pendingUsers.length);
+    const approvedUsers = users.filter(u => u.approvalStatus === "approved");
+    const rejectedUsers = users.filter(u => u.approvalStatus === "rejected");
+    console.log(`UserTable users by status: pending=${pendingUsers.length}, approved=${approvedUsers.length}, rejected=${rejectedUsers.length}`);
     
     if (pendingUsers.length > 0) {
       console.log("Pending users details:", pendingUsers);
@@ -67,12 +68,13 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     toast.success(`User ${userName} has been restored with status: ${restoreStatus}`);
   };
 
-  // No pending users message
-  if (users.filter(u => u.approvalStatus === "pending").length === 0) {
+  // No users message
+  if (users.length === 0) {
     return (
       <Alert className="mb-4 bg-blue-50 border-blue-200">
+        <AlertTriangle className="h-4 w-4 text-blue-700" />
         <AlertDescription className="text-blue-700">
-          There are currently no pending users that need approval.
+          No users found matching the current filters. Try adjusting your filters or adding new users.
         </AlertDescription>
       </Alert>
     );
@@ -95,82 +97,74 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users && users.length > 0 ? (
-              users.map((user) => (
-                <TableRow key={user.id} className={`group hover:bg-muted/50 ${user.approvalStatus === "pending" ? "bg-yellow-50" : ""}`}>
-                  <TableCell className="font-mono text-xs">{user.id.substring(0, 8)}</TableCell>
-                  <TableCell className="font-medium">{user.name || "N/A"}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant={user.role === "shipper" ? "secondary" : "default"}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(user.approvalStatus)}</TableCell>
-                  <TableCell className="max-w-xs truncate">
-                    {user.role === "carrier" ? (
+            {users.map((user) => (
+              <TableRow key={user.id} className={`group hover:bg-muted/50 ${user.approvalStatus === "pending" ? "bg-yellow-50" : ""}`}>
+                <TableCell className="font-mono text-xs">{user.id.substring(0, 8)}</TableCell>
+                <TableCell className="font-medium">{user.name || "N/A"}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <Badge variant={user.role === "shipper" ? "secondary" : "default"}>
+                    {user.role}
+                  </Badge>
+                </TableCell>
+                <TableCell>{getStatusBadge(user.approvalStatus)}</TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {user.role === "carrier" ? (
+                    <>
+                      {user.dotNumber && <span className="mr-2">DOT: {user.dotNumber}</span>}
+                      {user.mcNumber && <span>MC: {user.mcNumber}</span>}
+                    </>
+                  ) : (
+                    <>{user.businessName || "N/A"}</>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {user.registrationDate ? formatDate(user.registrationDate) : "N/A"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setViewUser(user)}
+                      className="flex items-center"
+                    >
+                      <Eye className="mr-1 h-4 w-4" /> View
+                    </Button>
+                    
+                    {user.approvalStatus === "pending" && (
                       <>
-                        {user.dotNumber && <span className="mr-2">DOT: {user.dotNumber}</span>}
-                        {user.mcNumber && <span>MC: {user.mcNumber}</span>}
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => onApprove(user.id, user.name || user.email)}
+                        >
+                          <CheckCircle className="mr-1 h-4 w-4" /> Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => onReject(user.id, user.name || user.email)}
+                        >
+                          <XCircle className="mr-1 h-4 w-4" /> Reject
+                        </Button>
                       </>
-                    ) : (
-                      <>{user.businessName || "N/A"}</>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    {user.registrationDate ? formatDate(user.registrationDate) : "N/A"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
+                    
+                    {user.approvalStatus === "rejected" && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setViewUser(user)}
-                        className="flex items-center"
+                        className="flex items-center border-amber-500 text-amber-600 hover:bg-amber-50"
+                        onClick={() => showRestoreOptions(user)}
                       >
-                        <Eye className="mr-1 h-4 w-4" /> View
+                        <RefreshCw className="mr-1 h-4 w-4" /> Restore
                       </Button>
-                      
-                      {user.approvalStatus === "pending" && (
-                        <>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => onApprove(user.id, user.name || user.email)}
-                          >
-                            <CheckCircle className="mr-1 h-4 w-4" /> Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => onReject(user.id, user.name || user.email)}
-                          >
-                            <XCircle className="mr-1 h-4 w-4" /> Reject
-                          </Button>
-                        </>
-                      )}
-                      
-                      {user.approvalStatus === "rejected" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex items-center border-amber-500 text-amber-600 hover:bg-amber-50"
-                          onClick={() => showRestoreOptions(user)}
-                        >
-                          <RefreshCw className="mr-1 h-4 w-4" /> Restore
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
-                  No users found matching the current filters.
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>

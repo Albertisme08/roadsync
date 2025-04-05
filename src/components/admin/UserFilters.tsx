@@ -74,12 +74,11 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
           <Select 
             value={filters.role} 
             onValueChange={handleRoleChange}
-            defaultValue="all"
           >
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
-            <SelectContent position="popper" className="bg-white z-50">
+            <SelectContent position="popper" className="bg-white z-50" align="end">
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="shipper">Shippers</SelectItem>
               <SelectItem value="carrier">Carriers</SelectItem>
@@ -93,12 +92,11 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
           <Select 
             value={filters.status} 
             onValueChange={handleStatusChange}
-            defaultValue="pending"
           >
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent position="popper" className="bg-white z-50">
+            <SelectContent position="popper" className="bg-white z-50" align="end">
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
@@ -120,4 +118,3 @@ export const UserFilters: React.FC<UserFiltersProps> = ({ filters, setFilters, c
     </Card>
   );
 };
-

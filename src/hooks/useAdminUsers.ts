@@ -15,7 +15,7 @@ export const useAdminUsers = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState<UserFilters>({
     role: "all",
-    status: "pending", // Default to showing pending users
+    status: "all", // Start with all users shown
     searchQuery: "",
   });
 
@@ -40,15 +40,14 @@ export const useAdminUsers = () => {
     console.log("All users from auth context:", allUsers);
     console.log("Current filters:", filters);
     
-    // Count pending users before filtering
+    // Count users by approval status for debugging
     const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
-    console.log(`Total pending users before filtering: ${pendingCount}`);
+    const approvedCount = allUsers.filter(u => u.approvalStatus === "approved").length;
+    const rejectedCount = allUsers.filter(u => u.approvalStatus === "rejected").length;
     
-    if (pendingCount > 0) {
-      console.log("Pending users before filtering:", 
-        allUsers.filter(u => u.approvalStatus === "pending"));
-    }
+    console.log(`Users by status before filtering: pending=${pendingCount}, approved=${approvedCount}, rejected=${rejectedCount}`);
     
+    // Apply filters
     const filtered = allUsers.filter((user) => {
       // Role filter
       if (filters.role !== "all" && user.role !== filters.role) {
@@ -64,11 +63,11 @@ export const useAdminUsers = () => {
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase();
         const matchesQuery = 
-          user.name?.toLowerCase().includes(query) ||
+          (user.name || "").toLowerCase().includes(query) ||
           user.email.toLowerCase().includes(query) ||
-          user.businessName?.toLowerCase().includes(query) ||
-          user.dotNumber?.includes(query) ||
-          user.mcNumber?.includes(query);
+          (user.businessName || "").toLowerCase().includes(query) ||
+          (user.dotNumber || "").includes(query) ||
+          (user.mcNumber || "").includes(query);
           
         if (!matchesQuery) return false;
       }
@@ -105,14 +104,9 @@ export const useAdminUsers = () => {
     return showToast; // Return this so the parent can decide whether to show toast
   };
 
-  // Reset to showing pending users
+  // Modified to ensure we're seeing all users by default
   useEffect(() => {
-    console.log("AdminUsers hook initial load - Setting default filter to pending");
-    // Ensure the status filter is set to pending by default
-    setFilters(prev => ({
-      ...prev,
-      status: "pending"
-    }));
+    console.log("AdminUsers hook initial load - Setting default filter");
     
     // Force refresh data on initial load
     handleManualRefresh(false);
@@ -140,4 +134,3 @@ export const useAdminUsers = () => {
     } : { total: 0, pending: 0, approved: 0, rejected: 0 }
   };
 };
-
