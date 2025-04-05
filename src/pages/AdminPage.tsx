@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,21 @@ import { AlertTriangle } from "lucide-react";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 
 const AdminPage = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loadInitialData } = useAuth();
+  
+  // Force load data when admin page mounts
+  useEffect(() => {
+    console.log("AdminPage mounted - forcing data load");
+    loadInitialData();
+    
+    // Set up a periodic refresh every 30 seconds as a backup
+    const intervalId = setInterval(() => {
+      console.log("AdminPage periodic refresh");
+      loadInitialData();
+    }, 30000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
   
   if (!user) {
     // Redirect to login if not logged in

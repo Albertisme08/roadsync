@@ -24,6 +24,10 @@ export const useAdminUsers = () => {
     console.log("Admin users hook mounted - Loading initial data");
     // Force refresh all user data from localStorage
     loadInitialData();
+    
+    // Also do an immediate check for pending users specifically
+    const pendingUsers = getPendingUsers();
+    console.log(`Initial pending users check: ${pendingUsers.length} pending users found`);
   }, []);
 
   // Apply filters whenever allUsers or filters change
@@ -39,6 +43,11 @@ export const useAdminUsers = () => {
     // Count pending users before filtering
     const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
     console.log(`Total pending users before filtering: ${pendingCount}`);
+    
+    if (pendingCount > 0) {
+      console.log("Pending users before filtering:", 
+        allUsers.filter(u => u.approvalStatus === "pending"));
+    }
     
     const filtered = allUsers.filter((user) => {
       // Role filter
@@ -86,7 +95,10 @@ export const useAdminUsers = () => {
     // Get pending users specifically to ensure they're loaded
     const pendingUsers = getPendingUsers();
     console.log("Pending users after refresh:", pendingUsers.length);
-    console.log("Pending users details:", pendingUsers);
+    
+    if (pendingUsers.length > 0) {
+      console.log("Pending users details:", pendingUsers);
+    }
     
     setTimeout(() => setIsRefreshing(false), 500);
     
@@ -104,11 +116,11 @@ export const useAdminUsers = () => {
     // Force refresh data on initial load
     handleManualRefresh(false);
     
-    // Set up an interval to refresh data automatically every 30 seconds
+    // Set up an interval to refresh data automatically every 15 seconds (more frequent)
     const refreshInterval = setInterval(() => {
       console.log("Auto-refreshing user data");
       handleManualRefresh(false); // Silent refresh without toast
-    }, 30000);
+    }, 15000); // Changed from 30s to 15s
     
     return () => clearInterval(refreshInterval); // Clean up the interval on unmount
   }, []);
