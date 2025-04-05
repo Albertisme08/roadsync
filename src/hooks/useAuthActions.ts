@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, UserRole, ApprovalStatus } from "../types/auth.types";
 import { 
@@ -208,7 +207,20 @@ export const useAuthActions = () => {
     // Send welcome email (simulated)
     const approvedUser = updatedUsers.find(u => u.id === userId);
     if (approvedUser) {
-      console.log(`Welcome email sent to ${approvedUser.email}: Your RoadSync account has been approved!`);
+      console.log(`Welcome email sent to ${approvedUser.email}: Your account has been approved!`);
+      // In a real app, this would trigger an email API call
+      
+      // Display user friendly notification
+      if (typeof window !== 'undefined') {
+        try {
+          // This is just a simulation for the email notification
+          console.log(`NOTIFICATION: ${approvedUser.name}'s account has been approved. 
+                      An email notification has been sent to ${approvedUser.email} 
+                      informing them they can now post shipments.`);
+        } catch (error) {
+          console.error("Error showing notification:", error);
+        }
+      }
     }
   };
   

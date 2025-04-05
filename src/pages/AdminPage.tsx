@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,7 +45,7 @@ const AdminPage = () => {
       setPendingUsers(getPendingUsers());
       
       toast("User Approved", {
-        description: `${userName} has been approved and notified.`,
+        description: `${userName} has been approved and notified via email.`,
       });
     } catch (error) {
       console.error("Error approving user:", error);
@@ -148,7 +147,9 @@ const AdminPage = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Pending Approvals</CardTitle>
-            <Badge variant="secondary">{pendingUsers.length} Pending</Badge>
+            <Badge variant={pendingUsers.length > 0 ? "destructive" : "secondary"}>
+              {pendingUsers.length} Pending
+            </Badge>
           </div>
         </CardHeader>
         <CardContent>
@@ -167,7 +168,7 @@ const AdminPage = () => {
                 </TableHeader>
                 <TableBody>
                   {pendingUsers.map((user) => (
-                    <TableRow key={user.id} className="group">
+                    <TableRow key={user.id} className="group hover:bg-muted/50">
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell className="capitalize">
@@ -202,7 +203,7 @@ const AdminPage = () => {
                         <div className="flex gap-2 justify-end">
                           <Button
                             size="sm"
-                            className="bg-green-600 hover:bg-green-700 invisible group-hover:visible md:visible transition-all"
+                            className="bg-green-600 hover:bg-green-700 md:visible"
                             onClick={() => handleApprove(user.id, user.name)}
                           >
                             <CheckCircle className="mr-1 h-4 w-4" /> Approve
@@ -210,7 +211,7 @@ const AdminPage = () => {
                           <Button
                             size="sm"
                             variant="destructive"
-                            className="invisible group-hover:visible md:visible transition-all"
+                            className="md:visible"
                             onClick={() => handleReject(user.id, user.name)}
                           >
                             <XCircle className="mr-1 h-4 w-4" /> Reject

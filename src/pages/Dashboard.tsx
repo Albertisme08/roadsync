@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ShipperDashboard from "@/components/dashboard/ShipperDashboard";
 import DriverDashboard from "@/components/dashboard/DriverDashboard";
 import { Shipment } from "@/components/shipments/ShipmentCard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ShieldAlert } from "lucide-react";
 
 // Sample shipment data
 const sampleShipments: Shipment[] = [
@@ -65,7 +68,7 @@ const sampleShipments: Shipment[] = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isApproved } = useAuth();
   const [shipments, setShipments] = useState<Shipment[]>(sampleShipments);
 
   // In a real app, you would fetch data from your API
@@ -94,6 +97,17 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      {!isApproved && user?.role !== "admin" && (
+        <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+          <ShieldAlert className="h-5 w-5 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
+          <AlertDescription className="text-yellow-700">
+            Your account is pending approval. Please wait for admin confirmation. 
+            You will be notified once your account has been approved.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       {user?.role === "shipper" ? (
         <ShipperDashboard shipments={shipments} />
       ) : (

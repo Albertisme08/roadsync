@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import { Package, Truck, Clock, CheckCircle, DollarSign, BarChart3, Calendar } from "lucide-react";
+import { Package, Truck, Clock, CheckCircle, DollarSign, BarChart3, Calendar, AlertCircle } from "lucide-react";
 import { Shipment } from "@/components/shipments/ShipmentCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ShipperDashboardProps {
   shipments: Shipment[];
@@ -13,6 +14,7 @@ interface ShipperDashboardProps {
 
 const ShipperDashboard: React.FC<ShipperDashboardProps> = ({ shipments }) => {
   const navigate = useNavigate();
+  const { isApproved } = useAuth();
 
   // Calculate shipment statistics
   const pendingShipments = shipments.filter(s => s.status === "pending").length;
@@ -38,11 +40,21 @@ const ShipperDashboard: React.FC<ShipperDashboardProps> = ({ shipments }) => {
             Manage your shipments and track cargo in real-time
           </p>
         </div>
-        <Button onClick={() => navigate("/shipments")}>
-          Create New Shipment
-        </Button>
+        {isApproved ? (
+          <Button onClick={() => navigate("/shipments")}>
+            Create New Shipment
+          </Button>
+        ) : (
+          <Button onClick={() => navigate("/shipments")} disabled 
+            title="Your account is pending approval"
+            className="cursor-not-allowed opacity-60">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            Create New Shipment
+          </Button>
+        )}
       </div>
 
+      {/* Stats cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
