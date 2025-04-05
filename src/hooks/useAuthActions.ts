@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useUser } from "./auth/useUser";
 import { useAuthentication } from "./auth/useAuthentication";
@@ -32,7 +33,7 @@ export const useAuthActions = () => {
   );
 
   // Get user approval operations
-  const { approveUser, rejectUser, restoreUser } = useUserApproval(
+  const { approveUser, rejectUser, restoreUser, removeUser, restoreRemovedUser } = useUserApproval(
     user,
     allUsers,
     setUser,
@@ -80,6 +81,8 @@ export const useAuthActions = () => {
     approveUser,
     rejectUser,
     restoreUser,
+    removeUser,
+    restoreRemovedUser,
     getPendingUsers,
     loadInitialData,
     checkExistingUser,

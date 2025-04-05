@@ -2,7 +2,9 @@
 import { User, ApprovalStatus } from "@/types/auth.types";
 import { 
   setAllUsersInStorage,
-  setUserInStorage 
+  setUserInStorage,
+  getRemovedUsersFromStorage,
+  setRemovedUsersInStorage 
 } from "@/utils/storage.utils";
 
 export const useUserApproval = (
@@ -123,9 +125,80 @@ export const useUserApproval = (
     }
   };
 
+  // New function to remove a user
+  const removeUser = (userId: string) => {
+    const userToRemove = allUsers.find(u => u.id === userId);
+    
+    if (!userToRemove) {
+      console.error(`User with ID ${userId} not found`);
+      return;
+    }
+    
+    // Filter out the user from active users
+    const updatedUsers = allUsers.filter(u => u.id !== userId);
+    
+    // Add removal date to the user
+    const removedUser = {
+      ...userToRemove,
+      removedDate: Date.now()
+    };
+    
+    // Get current removed users and add this one
+    const removedUsers = getRemovedUsersFromStorage();
+    const updatedRemovedUsers = [...removedUsers, removedUser];
+    
+    // Update storage
+    setAllUsersInStorage(updatedUsers);
+    setRemovedUsersInStorage(updatedRemovedUsers);
+    
+    // Update state
+    setAllUsers(updatedUsers);
+    
+    // If the removed user is the current user, log them out
+    if (user && user.id === userId) {
+      setUser(null);
+    }
+    
+    console.log(`User ${removedUser.name || removedUser.email} has been removed from active users.`);
+  };
+
+  // New function to restore a removed user
+  const restoreRemovedUser = (userId: string) => {
+    // Get all removed users
+    const removedUsers = getRemovedUsersFromStorage();
+    
+    // Find the user to restore
+    const userToRestore = removedUsers.find(u => u.id === userId);
+    
+    if (!userToRestore) {
+      console.error(`Removed user with ID ${userId} not found`);
+      return;
+    }
+    
+    // Remove the removedDate property
+    const { removedDate, ...restoredUser } = userToRestore;
+    
+    // Add user back to active users
+    const updatedUsers = [...allUsers, restoredUser];
+    
+    // Remove user from removed users
+    const updatedRemovedUsers = removedUsers.filter(u => u.id !== userId);
+    
+    // Update storage
+    setAllUsersInStorage(updatedUsers);
+    setRemovedUsersInStorage(updatedRemovedUsers);
+    
+    // Update state
+    setAllUsers(updatedUsers);
+    
+    console.log(`User ${restoredUser.name || restoredUser.email} has been restored to active users.`);
+  };
+
   return {
     approveUser,
     rejectUser,
-    restoreUser
+    restoreUser,
+    removeUser, // New function
+    restoreRemovedUser // New function
   };
 };

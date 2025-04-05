@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Eye, RefreshCw, AlertTriangle } from "lucide-react";
+import { CheckCircle, XCircle, Eye, RefreshCw, AlertTriangle, UserMinus } from "lucide-react";
 import { User, ApprovalStatus } from "@/types/auth.types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { format } from "date-fns";
@@ -22,11 +23,13 @@ interface UserTableProps {
   onApprove: (userId: string, userName: string) => void;
   onReject: (userId: string, userName: string) => void;
   onRestore: (userId: string, userName: string, newStatus: ApprovalStatus) => void;
+  onRemove: (userId: string, userName: string) => void;
 }
 
-export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject, onRestore }) => {
+export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject, onRestore, onRemove }) => {
   const [viewUser, setViewUser] = useState<User | null>(null);
   const [restoreStatus, setRestoreStatus] = useState<ApprovalStatus>("pending");
+  const [confirmRemoveUser, setConfirmRemoveUser] = useState<User | null>(null);
 
   useEffect(() => {
     console.log("UserTable received users:", users.length);
@@ -66,6 +69,13 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
     onRestore(userId, userName, restoreStatus);
     setViewUser(null); // Close dialog after restore
     toast.success(`User ${userName} has been restored with status: ${restoreStatus}`);
+  };
+  
+  const handleRemoveConfirm = () => {
+    if (confirmRemoveUser) {
+      onRemove(confirmRemoveUser.id, confirmRemoveUser.name || confirmRemoveUser.email);
+      setConfirmRemoveUser(null); // Close confirmation dialog
+    }
   };
 
   // No users message
@@ -132,6 +142,16 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                       <Eye className="mr-1 h-4 w-4" /> View
                     </Button>
                     
+                    {/* New Remove button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex items-center"
+                      onClick={() => setConfirmRemoveUser(user)}
+                    >
+                      <UserMinus className="mr-1 h-4 w-4" /> Remove
+                    </Button>
+                    
                     {user.approvalStatus === "pending" && (
                       <>
                         <Button
@@ -169,6 +189,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
         </Table>
       </div>
 
+      {/* User details dialog */}
       <Dialog open={!!viewUser} onOpenChange={() => setViewUser(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -266,28 +287,42 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                 </div>
               </div>
 
-              {viewUser.approvalStatus === "pending" && (
-                <div className="flex gap-2 justify-end pt-4">
-                  <Button
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={() => {
-                      onApprove(viewUser.id, viewUser.name || viewUser.email);
-                      setViewUser(null);
-                    }}
-                  >
-                    <CheckCircle className="mr-1 h-4 w-4" /> Approve User
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      onReject(viewUser.id, viewUser.name || viewUser.email);
-                      setViewUser(null);
-                    }}
-                  >
-                    <XCircle className="mr-1 h-4 w-4" /> Reject User
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2 justify-end pt-4">
+                {/* Remove button in user profile */}
+                <Button
+                  variant="outline"
+                  className="text-red-600 border-red-200 hover:bg-red-50 flex items-center"
+                  onClick={() => {
+                    setViewUser(null);
+                    setConfirmRemoveUser(viewUser);
+                  }}
+                >
+                  <UserMinus className="mr-1 h-4 w-4" /> Remove User
+                </Button>
+                
+                {viewUser.approvalStatus === "pending" && (
+                  <>
+                    <Button
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => {
+                        onApprove(viewUser.id, viewUser.name || viewUser.email);
+                        setViewUser(null);
+                      }}
+                    >
+                      <CheckCircle className="mr-1 h-4 w-4" /> Approve User
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        onReject(viewUser.id, viewUser.name || viewUser.email);
+                        setViewUser(null);
+                      }}
+                    >
+                      <XCircle className="mr-1 h-4 w-4" /> Reject User
+                    </Button>
+                  </>
+                )}
+              </div>
               
               {(viewUser.approvalStatus === "rejected" || viewUser._showRestoreOptions) && (
                 <div className="border rounded-md p-4 bg-amber-50 mt-4">
@@ -317,6 +352,47 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onApprove, onReject
                   </div>
                 </div>
               )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove User Confirmation Dialog */}
+      <Dialog 
+        open={!!confirmRemoveUser} 
+        onOpenChange={(open) => !open && setConfirmRemoveUser(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-red-600">Remove User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this user? They will be stored and can be restored later.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {confirmRemoveUser && (
+            <div className="py-4">
+              <div className="mb-4 p-3 border rounded bg-gray-50">
+                <p><span className="font-medium">Name:</span> {confirmRemoveUser.name || "N/A"}</p>
+                <p><span className="font-medium">Email:</span> {confirmRemoveUser.email}</p>
+                <p><span className="font-medium">Role:</span> {confirmRemoveUser.role}</p>
+                <p><span className="font-medium">Status:</span> {confirmRemoveUser.approvalStatus}</p>
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmRemoveUser(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleRemoveConfirm}
+                >
+                  Remove User
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>

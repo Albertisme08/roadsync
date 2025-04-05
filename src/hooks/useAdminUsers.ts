@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, ApprovalStatus, UserRole } from "@/types/auth.types";
+import { getRemovedUsersFromStorage } from "@/utils/storage.utils";
 
 interface UserFilters {
   role: "all" | UserRole;
@@ -12,18 +13,30 @@ interface UserFilters {
 export const useAdminUsers = () => {
   const { allUsers, loadInitialData, getPendingUsers } = useAuth();
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [removedUsers, setRemovedUsers] = useState<User[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showRemovedUsers, setShowRemovedUsers] = useState(false);
   const [filters, setFilters] = useState<UserFilters>({
     role: "all",
     status: "all", // Start with all users shown
     searchQuery: "",
   });
 
+  // Load removed users
+  const loadRemovedUsers = () => {
+    const removed = getRemovedUsersFromStorage();
+    console.log("Removed users loaded:", removed.length);
+    setRemovedUsers(removed);
+  };
+
   // Force a full data reload on mount
   useEffect(() => {
     console.log("Admin users hook mounted - Loading initial data");
     // Force refresh all user data from localStorage
     loadInitialData();
+    
+    // Load removed users
+    loadRemovedUsers();
     
     // Also do an immediate check for pending users specifically
     const pendingUsers = getPendingUsers();
@@ -32,30 +45,32 @@ export const useAdminUsers = () => {
 
   // Apply filters whenever allUsers or filters change
   useEffect(() => {
-    if (!allUsers) {
-      console.log("No users available in allUsers");
+    const usersToFilter = showRemovedUsers ? removedUsers : allUsers;
+    
+    if (!usersToFilter) {
+      console.log("No users available to filter");
       return;
     }
     
-    console.log("All users from auth context:", allUsers);
+    console.log(`Filtering ${showRemovedUsers ? 'removed' : 'active'} users:`, usersToFilter.length);
     console.log("Current filters:", filters);
     
     // Count users by approval status for debugging
-    const pendingCount = allUsers.filter(u => u.approvalStatus === "pending").length;
-    const approvedCount = allUsers.filter(u => u.approvalStatus === "approved").length;
-    const rejectedCount = allUsers.filter(u => u.approvalStatus === "rejected").length;
+    const pendingCount = usersToFilter.filter(u => u.approvalStatus === "pending").length;
+    const approvedCount = usersToFilter.filter(u => u.approvalStatus === "approved").length;
+    const rejectedCount = usersToFilter.filter(u => u.approvalStatus === "rejected").length;
     
     console.log(`Users by status before filtering: pending=${pendingCount}, approved=${approvedCount}, rejected=${rejectedCount}`);
     
     // Apply filters
-    const filtered = allUsers.filter((user) => {
+    const filtered = usersToFilter.filter((user) => {
       // Role filter
       if (filters.role !== "all" && user.role !== filters.role) {
         return false;
       }
       
-      // Status filter
-      if (filters.status !== "all" && user.approvalStatus !== filters.status) {
+      // Status filter (only for active users)
+      if (!showRemovedUsers && filters.status !== "all" && user.approvalStatus !== filters.status) {
         return false;
       }
       
@@ -76,10 +91,9 @@ export const useAdminUsers = () => {
     });
     
     console.log(`Filtered users count: ${filtered.length}`);
-    console.log("Filtered users:", filtered);
     
     setFilteredUsers(filtered);
-  }, [allUsers, filters]);
+  }, [allUsers, removedUsers, filters, showRemovedUsers]);
 
   const handleManualRefresh = (showToast = true) => {
     setIsRefreshing(true);
@@ -90,6 +104,9 @@ export const useAdminUsers = () => {
     
     // This will re-trigger the auth context to reload data from localStorage
     loadInitialData();
+    
+    // Reload removed users
+    loadRemovedUsers();
     
     // Get pending users specifically to ensure they're loaded
     const pendingUsers = getPendingUsers();
@@ -102,6 +119,11 @@ export const useAdminUsers = () => {
     setTimeout(() => setIsRefreshing(false), 500);
     
     return showToast; // Return this so the parent can decide whether to show toast
+  };
+
+  // Toggle between showing active and removed users
+  const toggleShowRemovedUsers = () => {
+    setShowRemovedUsers(prev => !prev);
   };
 
   // Modified to ensure we're seeing all users by default
@@ -126,11 +148,14 @@ export const useAdminUsers = () => {
     setFilters,
     isRefreshing,
     handleManualRefresh,
+    showRemovedUsers,
+    toggleShowRemovedUsers,
     userCounts: allUsers ? {
       total: allUsers.length,
       pending: allUsers.filter(u => u.approvalStatus === "pending").length,
       approved: allUsers.filter(u => u.approvalStatus === "approved").length,
-      rejected: allUsers.filter(u => u.approvalStatus === "rejected").length
-    } : { total: 0, pending: 0, approved: 0, rejected: 0 }
+      rejected: allUsers.filter(u => u.approvalStatus === "rejected").length,
+      removed: removedUsers.length
+    } : { total: 0, pending: 0, approved: 0, rejected: 0, removed: 0 }
   };
 };

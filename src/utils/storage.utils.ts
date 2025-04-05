@@ -23,6 +23,16 @@ export const setAllUsersInStorage = (users: User[]): void => {
   localStorage.setItem("allUsers", JSON.stringify(users));
 };
 
+// New functions for removed users
+export const getRemovedUsersFromStorage = (): User[] => {
+  const storedRemovedUsers = localStorage.getItem("removedUsers");
+  return storedRemovedUsers ? JSON.parse(storedRemovedUsers) : [];
+};
+
+export const setRemovedUsersInStorage = (users: User[]): void => {
+  localStorage.setItem("removedUsers", JSON.stringify(users));
+};
+
 export const isAdminEmail = (email: string): boolean => {
   const adminEmails = ["alopezcargo@outlook.com", "fwdfwdit@gmail.com"];
   return adminEmails.includes(email.toLowerCase());

@@ -27,6 +27,7 @@ export interface User {
   maxWeight?: string;
   rejectionDate?: number; // Timestamp for when user was rejected
   restorationDate?: number; // Timestamp for when user was restored
+  removedDate?: number; // Timestamp for when user was removed
   _showRestoreOptions?: boolean; // UI state flag for showing restore options
   verificationStatus?: VerificationStatus; // All users are auto-verified now
   verificationToken?: string; // Token for email verification (kept for backwards compatibility)
@@ -65,6 +66,8 @@ export interface AuthContextType {
   approveUser: (userId: string) => void;
   rejectUser: (userId: string) => void;
   restoreUser: (userId: string, approvalStatus: ApprovalStatus) => void; // Function to restore rejected users
+  removeUser: (userId: string) => void; // Function to remove users
+  restoreRemovedUser: (userId: string) => void; // Function to restore removed users
   getPendingUsers: () => User[];
   loadInitialData: () => void; // Added this missing function to the interface
   checkExistingUser?: (email: string) => { exists: boolean; status?: string; user?: User }; // Function to check existing users
