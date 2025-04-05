@@ -24,16 +24,24 @@ const baseRegisterSchema = z.object({
   description: z.string().optional(),
 });
 
-const shipperSchema = baseRegisterSchema.extend({
+// Schema for shipper role
+const shipperSchema = z.object({
+  role: z.literal("shipper"),
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters",
+  }),
+  confirmPassword: z.string().min(6),
+  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  businessName: z.string().min(1, { message: "Business name is required for shippers" }),
+  description: z.string().min(1, { message: "Business description is required for shippers" }),
   dotNumber: z.string().optional(),
   mcNumber: z.string().optional(),
 }).refine(
   (data) => {
-    if (data.role === "shipper") {
-      // Shipper validation: DOT and MC numbers should be empty
-      return !data.dotNumber && !data.mcNumber;
-    }
-    return true;
+    // Shipper validation: DOT and MC numbers should be empty
+    return !data.dotNumber && !data.mcNumber;
   },
   {
     message: "Shippers should not provide MC or DOT numbers",
@@ -41,16 +49,24 @@ const shipperSchema = baseRegisterSchema.extend({
   }
 );
 
-const driverSchema = baseRegisterSchema.extend({
-  dotNumber: z.string().min(1, { message: "DOT Number is required for carriers" }).optional(),
-  mcNumber: z.string().min(1, { message: "MC Number is required for carriers" }).optional(),
+// Schema for driver role
+const driverSchema = z.object({
+  role: z.literal("driver"),
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters",
+  }),
+  confirmPassword: z.string().min(6),
+  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  businessName: z.string().optional(),
+  description: z.string().optional(),
+  dotNumber: z.string().optional(),
+  mcNumber: z.string().optional(),
 }).refine(
   (data) => {
-    if (data.role === "driver") {
-      // Driver validation: At least one of DOT or MC number must be provided
-      return !!data.dotNumber || !!data.mcNumber;
-    }
-    return true;
+    // Driver validation: At least one of DOT or MC number must be provided
+    return !!data.dotNumber || !!data.mcNumber;
   },
   {
     message: "Please provide a valid MC or DOT number",
@@ -58,9 +74,10 @@ const driverSchema = baseRegisterSchema.extend({
   }
 );
 
+// Combined schema using discriminated union
 export const registerSchema = z.discriminatedUnion("role", [
-  shipperSchema.extend({ role: z.literal("shipper") }),
-  driverSchema.extend({ role: z.literal("driver") }),
+  shipperSchema,
+  driverSchema,
 ]).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
