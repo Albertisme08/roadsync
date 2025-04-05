@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, UserRole, ApprovalStatus } from "../types/auth.types";
 import { 
   getUserFromStorage, 
@@ -14,6 +14,18 @@ export const useAuthActions = () => {
   const [user, setUser] = useState<User | null>(getUserFromStorage());
   const [allUsers, setAllUsers] = useState<User[]>(getAllUsersFromStorage());
   const [isLoading, setIsLoading] = useState(true);
+
+  // Ensure we have the latest data from localStorage whenever the component using this hook mounts
+  useEffect(() => {
+    const storedUsers = getAllUsersFromStorage();
+    setAllUsers(storedUsers);
+    
+    const pendingUsers = storedUsers.filter(u => u.approvalStatus === "pending");
+    console.log("Pending users on useAuthActions init:", pendingUsers.length);
+    if (pendingUsers.length > 0) {
+      console.log("Pending users details from useAuthActions:", pendingUsers);
+    }
+  }, []);
 
   const login = async (
     email: string,
@@ -167,7 +179,11 @@ export const useAuthActions = () => {
       
       // Add to all users array
       const updatedUsers = [...existingUsers, newUser];
+      
+      // Make sure to persist to localStorage immediately
       setAllUsersInStorage(updatedUsers);
+      
+      // Update state after localStorage is updated
       setAllUsers(updatedUsers);
       
       // Set as current user
@@ -210,8 +226,11 @@ export const useAuthActions = () => {
       } : u
     );
     
-    setAllUsers(updatedUsers);
+    // Update localStorage first
     setAllUsersInStorage(updatedUsers);
+    
+    // Then update state
+    setAllUsers(updatedUsers);
     
     // If the approved user is the current user, update their status
     if (user && user.id === userId) {
@@ -256,8 +275,11 @@ export const useAuthActions = () => {
       } : u
     );
     
-    setAllUsers(updatedUsers);
+    // Update localStorage first
     setAllUsersInStorage(updatedUsers);
+    
+    // Then update state
+    setAllUsers(updatedUsers);
     
     // If the rejected user is the current user, update their status
     if (user && user.id === userId) {
@@ -291,8 +313,11 @@ export const useAuthActions = () => {
       } : u
     );
     
-    setAllUsers(updatedUsers);
+    // Update localStorage first
     setAllUsersInStorage(updatedUsers);
+    
+    // Then update state
+    setAllUsers(updatedUsers);
     
     // If the restored user is the current user, update their status
     if (user && user.id === userId) {
@@ -328,6 +353,21 @@ export const useAuthActions = () => {
   };
 
   const loadInitialData = () => {
+    // Get fresh data from localStorage
+    const storedUsers = getAllUsersFromStorage();
+    console.log("Loading users from storage:", storedUsers.length);
+    
+    const pendingUsers = storedUsers.filter(u => u.approvalStatus === "pending");
+    console.log("Pending users in storage:", pendingUsers.length);
+    
+    if (pendingUsers.length > 0) {
+      console.log("Pending users details:", pendingUsers);
+    }
+    
+    // Update state with the fresh data
+    setAllUsers(storedUsers);
+    
+    // Get current user from storage
     const storedUser = getUserFromStorage();
     if (storedUser) {
       // Ensure admin users always have admin role
@@ -339,18 +379,6 @@ export const useAuthActions = () => {
       setUser(storedUser);
     }
     
-    // Load all users from localStorage
-    const storedUsers = getAllUsersFromStorage();
-    console.log("Loading users from storage:", storedUsers.length);
-    
-    const pendingUsers = storedUsers.filter(u => u.approvalStatus === "pending");
-    console.log("Pending users in storage:", pendingUsers.length);
-    
-    if (pendingUsers.length > 0) {
-      console.log("Pending users details:", pendingUsers);
-    }
-    
-    setAllUsers(storedUsers);
     setIsLoading(false);
   };
 

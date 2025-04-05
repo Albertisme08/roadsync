@@ -31,7 +31,7 @@ import { UserFilters } from "@/components/admin/UserFilters";
 import { User, ApprovalStatus, UserRole } from "@/types/auth.types";
 
 const AdminPage = () => {
-  const { user, isAdmin, allUsers, approveUser, rejectUser, restoreUser, logout, getPendingUsers } = useAuth();
+  const { user, isAdmin, allUsers, approveUser, rejectUser, restoreUser, logout, getPendingUsers, loadInitialData } = useAuth();
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState({
@@ -40,6 +40,13 @@ const AdminPage = () => {
     searchQuery: "",
   });
   const navigate = useNavigate();
+  
+  // Force a full data reload on mount
+  useEffect(() => {
+    console.log("AdminPage mounted - Loading initial data");
+    // Force refresh all user data from localStorage
+    loadInitialData();
+  }, []);
   
   // Apply filters whenever allUsers or filters change
   useEffect(() => {
@@ -89,7 +96,6 @@ const AdminPage = () => {
   }, [allUsers, filters]);
   
   // Make sure we reset to showing pending users on initial load
-  // Added a separate useEffect with empty dependency array to ensure it only runs once
   useEffect(() => {
     console.log("AdminPage initial load - Setting default filter to pending");
     setFilters(prev => ({
@@ -99,6 +105,14 @@ const AdminPage = () => {
     
     // Force refresh data on initial load
     handleManualRefresh();
+    
+    // Set up an interval to refresh data automatically every 30 seconds
+    const refreshInterval = setInterval(() => {
+      console.log("Auto-refreshing user data");
+      handleManualRefresh(false); // Silent refresh without toast
+    }, 30000);
+    
+    return () => clearInterval(refreshInterval); // Clean up the interval on unmount
   }, []);
   
   const handleApprove = (userId: string, userName: string) => {
@@ -151,7 +165,7 @@ const AdminPage = () => {
     }
   };
 
-  const handleManualRefresh = () => {
+  const handleManualRefresh = (showToast = true) => {
     setIsRefreshing(true);
     
     // Force refresh of user data
@@ -159,14 +173,18 @@ const AdminPage = () => {
     console.log("Current users in localStorage:", currentUsers ? JSON.parse(currentUsers) : "None");
     
     // This will re-trigger the auth context to reload data from localStorage
-    // We can access the context functions to reload data
+    loadInitialData();
+    
+    // Get pending users specifically to ensure they're loaded
     const pendingUsers = getPendingUsers();
     console.log("Pending users after refresh:", pendingUsers.length);
     console.log("Pending users details:", pendingUsers);
     
-    toast("Refreshed", {
-      description: "User list has been refreshed.",
-    });
+    if (showToast) {
+      toast("Refreshed", {
+        description: "User list has been refreshed.",
+      });
+    }
     
     setTimeout(() => setIsRefreshing(false), 500);
   };
@@ -219,7 +237,7 @@ const AdminPage = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleManualRefresh}
+            onClick={() => handleManualRefresh(true)}
             disabled={isRefreshing}
             className="flex items-center gap-1"
           >
