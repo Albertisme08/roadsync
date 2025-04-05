@@ -6,7 +6,7 @@ import ShipperDashboard from "@/components/dashboard/ShipperDashboard";
 import DriverDashboard from "@/components/dashboard/DriverDashboard";
 import { Shipment } from "@/components/shipments/ShipmentCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, Clock } from "lucide-react";
 
 // Sample shipment data
 const sampleShipments: Shipment[] = [
@@ -102,8 +102,19 @@ const Dashboard: React.FC = () => {
           <ShieldAlert className="h-5 w-5 text-yellow-600" />
           <AlertTitle className="text-yellow-800">Account Pending Approval</AlertTitle>
           <AlertDescription className="text-yellow-700">
-            Your account is pending approval. Please wait for admin confirmation. 
-            You will be notified once your account has been approved.
+            <div className="space-y-2">
+              <p>
+                Your account is pending approval by our administrators. This process typically takes 1-2 business days.
+              </p>
+              <div className="flex items-center text-sm">
+                <Clock className="h-4 w-4 mr-1 text-yellow-600" />
+                <span>Expected approval time: 24-48 hours</span>
+              </div>
+              <p>
+                You will receive an email notification once your account has been approved. If you have any questions,
+                please contact our support team at support@roadsync.com
+              </p>
+            </div>
           </AlertDescription>
         </Alert>
       )}
