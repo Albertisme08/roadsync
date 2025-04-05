@@ -17,6 +17,17 @@ export const userSchema = z.object({
   maxWeight: z.string().optional(),
 });
 
+// MC and DOT number validation functions
+export const isValidMCNumber = (value: string | undefined): boolean => {
+  if (!value) return true;
+  return /^MC-\d{5,8}$/.test(value) || /^\d{5,8}$/.test(value);
+};
+
+export const isValidDOTNumber = (value: string | undefined): boolean => {
+  if (!value) return true;
+  return /^\d{5,8}$/.test(value);
+};
+
 // Function to validate user data
 export const validateUserData = (userData: unknown) => {
   try {

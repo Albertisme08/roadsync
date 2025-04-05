@@ -16,6 +16,17 @@ const validatePhoneNumber = (value: string) => {
   return digitsOnly.length === 10;
 };
 
+// MC and DOT number validation
+const validateMCNumber = (value: string | undefined) => {
+  if (!value) return true;
+  return /^MC-\d{5,8}$/.test(value) || /^\d{5,8}$/.test(value);
+};
+
+const validateDOTNumber = (value: string | undefined) => {
+  if (!value) return true;
+  return /^\d{5,8}$/.test(value);
+};
+
 // Base schema with common fields
 const baseFields = {
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -37,8 +48,10 @@ export const shipperSchema = z.object({
   role: z.literal("shipper"),
   city: z.string().min(1, { message: "City is required" }),
   address: z.string().optional(),
-  dotNumber: z.string().optional(),
-  mcNumber: z.string().optional(),
+  dotNumber: z.string().optional()
+    .refine(validateDOTNumber, { message: "Invalid DOT number format" }),
+  mcNumber: z.string().optional()
+    .refine(validateMCNumber, { message: "Invalid MC number format" }),
 });
 
 // Schema for carrier role with MC/DOT number requirement
