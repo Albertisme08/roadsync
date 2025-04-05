@@ -362,57 +362,61 @@ const RegisterForm: React.FC = () => {
                   )}
                 </FormItem>
 
-                <FormField
-                  control={form.control}
-                  name="mcNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>MC Number</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="MC-12345678 or 12345678" 
-                          {...field} 
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Enter your MC number with or without the "MC-" prefix
-                      </FormDescription>
-                      <FormMessage />
-                      {watchedMcNumber && !isValidMCNumber(watchedMcNumber) && (
-                        <p className="text-sm font-medium text-destructive">
-                          Please enter a valid MC number (e.g., MC-12345678 or 12345678)
-                        </p>
-                      )}
-                    </FormItem>
-                  )}
-                />
+                {idType === "mc" && (
+                  <FormField
+                    control={form.control}
+                    name="mcNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>MC Number</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="MC-12345678 or 12345678" 
+                            {...field} 
+                            value={field.value || ""}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter your MC number with or without the "MC-" prefix
+                        </FormDescription>
+                        <FormMessage />
+                        {watchedMcNumber && !isValidMCNumber(watchedMcNumber) && (
+                          <p className="text-sm font-medium text-destructive">
+                            Please enter a valid MC number (e.g., MC-12345678 or 12345678)
+                          </p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="dotNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>DOT Number</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Enter DOT Number" 
-                          {...field} 
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Enter your DOT number (typically 5-8 digits)
-                      </FormDescription>
-                      <FormMessage />
-                      {watchedDotNumber && !isValidDOTNumber(watchedDotNumber) && (
-                        <p className="text-sm font-medium text-destructive">
-                          Please enter a valid DOT number (5-8 digits)
-                        </p>
-                      )}
-                    </FormItem>
-                  )}
-                />
+                {idType === "dot" && (
+                  <FormField
+                    control={form.control}
+                    name="dotNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>DOT Number</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Enter DOT Number" 
+                            {...field} 
+                            value={field.value || ""}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter your DOT number (typically 5-8 digits)
+                        </FormDescription>
+                        <FormMessage />
+                        {watchedDotNumber && !isValidDOTNumber(watchedDotNumber) && (
+                          <p className="text-sm font-medium text-destructive">
+                            Please enter a valid DOT number (5-8 digits)
+                          </p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
 
               <FormField
