@@ -103,6 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     equipmentType?: string,
     maxWeight?: string
   ) => {
+    console.log('Starting user registration with:', { email, role, name });
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -123,13 +125,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     });
-    if (error) throw error;
+    
+    if (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
 
+    console.log('Signup successful, attempting to notify admin');
+    
     // Notify admin about new registration (non-blocking)
     try {
       await supabase.functions.invoke('notify-admin', {
         body: { email, name, role }
       });
+      console.log('Admin notification sent successfully');
     } catch (e) {
       console.warn('Failed to notify admin of signup', e);
     }
