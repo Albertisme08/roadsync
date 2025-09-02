@@ -157,7 +157,7 @@ const RegisterForm: React.FC = () => {
         );
       }
       
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (error) {
       console.error("Register error:", error);
       toast.error("Failed to register. Please try again.");
