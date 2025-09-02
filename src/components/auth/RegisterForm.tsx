@@ -157,6 +157,7 @@ const RegisterForm: React.FC = () => {
         );
       }
       
+      toast.success("Thanks! We will reach out soon.");
       navigate("/admin");
     } catch (error) {
       console.error("Register error:", error);
