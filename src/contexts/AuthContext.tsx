@@ -30,34 +30,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         if (session?.user) {
-          // Fetch user profile from our profiles table
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-          
-          if (profile) {
-            setUser({
-              id: profile.id,
-              email: profile.email,
-              name: profile.name || '',
-              role: profile.role as User['role'],
-              approvalStatus: profile.approval_status as User['approvalStatus'],
-              verificationStatus: profile.verification_status as User['verificationStatus'],
-              businessName: profile.business_name || '',
-              dotNumber: profile.dot_number || '',
-              mcNumber: profile.mc_number || '',
-              phone: profile.phone || '',
-            });
-          }
+          // Defer any Supabase calls to avoid deadlocks in the auth callback
+          setTimeout(() => {
+            supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', session.user!.id)
+              .single()
+              .then(({ data: profile }) => {
+                if (profile) {
+                  setUser({
+                    id: profile.id,
+                    email: profile.email,
+                    name: profile.name || '',
+                    role: profile.role as User['role'],
+                    approvalStatus: profile.approval_status as User['approvalStatus'],
+                    verificationStatus: profile.verification_status as User['verificationStatus'],
+                    businessName: profile.business_name || '',
+                    dotNumber: profile.dot_number || '',
+                    mcNumber: profile.mc_number || '',
+                    phone: profile.phone || '',
+                  });
+                }
+                setIsLoading(false);
+              });
+          }, 0);
         } else {
           setUser(null);
+          setIsLoading(false);
         }
-        setIsLoading(false);
       }
     );
 
@@ -98,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/admin`,
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           name,
           business_name: businessName,
