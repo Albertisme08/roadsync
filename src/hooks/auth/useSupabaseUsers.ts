@@ -9,6 +9,29 @@ export const useSupabaseUsers = () => {
 
   const fetchUsers = async () => {
     try {
+      setIsLoading(true);
+      
+      // Check if user is authenticated and admin
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        console.log('No authenticated user, skipping user fetch');
+        setUsers([]);
+        return;
+      }
+
+      // Check if current user is admin
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (profile?.role !== 'admin') {
+        console.log('User is not admin, skipping user fetch');
+        setUsers([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
