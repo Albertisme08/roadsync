@@ -16,18 +16,13 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
-          address: string | null
           approval_date: string | null
           approval_status: string
           business_name: string | null
-          city: string | null
           created_at: string
-          description: string | null
           dot_number: string | null
           email: string
-          equipment_type: string | null
           id: string
-          max_weight: string | null
           mc_number: string | null
           name: string | null
           phone: string | null
@@ -39,18 +34,13 @@ export type Database = {
           verification_status: string
         }
         Insert: {
-          address?: string | null
           approval_date?: string | null
           approval_status?: string
           business_name?: string | null
-          city?: string | null
           created_at?: string
-          description?: string | null
           dot_number?: string | null
           email: string
-          equipment_type?: string | null
           id?: string
-          max_weight?: string | null
           mc_number?: string | null
           name?: string | null
           phone?: string | null
@@ -62,18 +52,13 @@ export type Database = {
           verification_status?: string
         }
         Update: {
-          address?: string | null
           approval_date?: string | null
           approval_status?: string
           business_name?: string | null
-          city?: string | null
           created_at?: string
-          description?: string | null
           dot_number?: string | null
           email?: string
-          equipment_type?: string | null
           id?: string
-          max_weight?: string | null
           mc_number?: string | null
           name?: string | null
           phone?: string | null
@@ -94,10 +79,6 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
-      }
-      promote_user_to_admin: {
-        Args: { target_user_id: string }
-        Returns: undefined
       }
     }
     Enums: {

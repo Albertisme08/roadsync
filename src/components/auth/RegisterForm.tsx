@@ -115,24 +115,50 @@ const RegisterForm: React.FC = () => {
     
     setSubmitting(true);
     try {
-      await register(
-        values.name,
-        values.email,
-        values.password,
-        values.role,
-        values.businessName,
-        values.dotNumber || "",
-        values.mcNumber || "",
-        values.phone,
-        values.description || "",
-        (values as any).city || "",
-        (values as any).address || "",
-        (values as any).equipmentType || "",
-        (values as any).maxWeight || ""
-      );
+      const commonData = {
+        name: values.name, 
+        email: values.email, 
+        password: values.password, 
+        role: values.role as UserRole,
+        businessName: values.businessName,
+        phone: values.phone,
+        description: values.description || ""
+      };
+      
+      if (values.role === "carrier") {
+        await register(
+          commonData.name,
+          commonData.email,
+          commonData.password,
+          commonData.role,
+          commonData.businessName,
+          values.dotNumber || "",
+          values.mcNumber || "",
+          commonData.phone,
+          commonData.description,
+          undefined,
+          undefined,
+          values.equipmentType || "",
+          values.maxWeight || ""
+        );
+      } else {
+        await register(
+          commonData.name,
+          commonData.email,
+          commonData.password,
+          commonData.role,
+          commonData.businessName,
+          values.dotNumber || "",
+          values.mcNumber || "",
+          commonData.phone,
+          commonData.description,
+          values.city || "",
+          values.address || ""
+        );
+      }
       
       toast.success("Thanks! We will reach out soon.");
-      window.location.href = "/";
+      navigate("/admin");
     } catch (error) {
       console.error("Register error:", error);
       toast.error("Failed to register. Please try again.");

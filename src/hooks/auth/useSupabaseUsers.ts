@@ -12,7 +12,6 @@ export const useSupabaseUsers = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .neq('approval_status', 'rejected') // Filter out rejected users from active user list
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -25,28 +24,18 @@ export const useSupabaseUsers = () => {
         id: profile.id,
         email: profile.email,
         name: profile.name || '',
-        role: profile.role === 'admin' ? 'admin' : profile.role === 'carrier' ? 'carrier' : 'shipper', // Map roles correctly
+        role: profile.role as User['role'],
         approvalStatus: profile.approval_status as User['approvalStatus'],
         verificationStatus: profile.verification_status as User['verificationStatus'],
         businessName: profile.business_name || '',
         dotNumber: profile.dot_number || '',
         mcNumber: profile.mc_number || '',
         phone: profile.phone || '',
-        city: profile.city || '',
-        address: profile.address || '',
-        equipmentType: profile.equipment_type || '',
-        maxWeight: profile.max_weight || '',
-        description: profile.description || '',
         approvalDate: profile.approval_date ? new Date(profile.approval_date).getTime() : undefined,
         rejectionDate: profile.rejection_date ? new Date(profile.rejection_date).getTime() : undefined,
         restorationDate: profile.restoration_date ? new Date(profile.restoration_date).getTime() : undefined,
-        registrationDate: profile.created_at ? new Date(profile.created_at).getTime() : undefined,
       }));
 
-      console.log(`Fetched ${mappedUsers.length} active users (excluding rejected)`);
-      const pendingCount = mappedUsers.filter(u => u.approvalStatus === "pending").length;
-      console.log(`Pending users count: ${pendingCount}`);
-      
       setUsers(mappedUsers);
     } catch (error) {
       console.error('Error in fetchUsers:', error);
@@ -136,26 +125,7 @@ export const useSupabaseUsers = () => {
   };
 
   useEffect(() => {
-    // Fetch only after session is available to satisfy RLS
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        fetchUsers();
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    // Re-fetch on auth changes (e.g., after login)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-        fetchUsers();
-      }
-      if (event === 'SIGNED_OUT') {
-        setUsers([]);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    fetchUsers();
   }, []);
 
   return {

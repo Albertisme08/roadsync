@@ -30,43 +30,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         if (session?.user) {
-          // Defer any Supabase calls to avoid deadlocks in the auth callback
-          setTimeout(() => {
-            supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user!.id)
-              .maybeSingle()
-              .then(({ data: profile }) => {
-                if (profile) {
-                  setUser({
-                    id: profile.id,
-                    email: profile.email,
-                    name: profile.name || '',
-                    role: profile.role === 'admin' ? 'admin' : profile.role === 'carrier' ? 'carrier' : 'shipper',
-                    approvalStatus: profile.approval_status as User['approvalStatus'],
-                    verificationStatus: profile.verification_status as User['verificationStatus'],
-                    businessName: profile.business_name || '',
-                    dotNumber: profile.dot_number || '',
-                    mcNumber: profile.mc_number || '',
-                    phone: profile.phone || '',
-                    city: profile.city || '',
-                    address: profile.address || '',
-                    equipmentType: profile.equipment_type || '',
-                    maxWeight: profile.max_weight || '',
-                    description: profile.description || '',
-                  });
-                }
-                setIsLoading(false);
-              });
-          }, 0);
+          // Fetch user profile from our profiles table
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (profile) {
+            setUser({
+              id: profile.id,
+              email: profile.email,
+              name: profile.name || '',
+              role: profile.role as User['role'],
+              approvalStatus: profile.approval_status as User['approvalStatus'],
+              verificationStatus: profile.verification_status as User['verificationStatus'],
+              businessName: profile.business_name || '',
+              dotNumber: profile.dot_number || '',
+              mcNumber: profile.mc_number || '',
+              phone: profile.phone || '',
+            });
+          }
         } else {
           setUser(null);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       }
     );
 
@@ -103,16 +94,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     equipmentType?: string,
     maxWeight?: string
   ) => {
-    console.log('Starting user registration with:', { email, role, name });
-    
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}/admin`,
         data: {
           name,
-          role, // Include role in metadata
           business_name: businessName,
           dot_number: dotNumber,
           mc_number: mcNumber,
@@ -125,53 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     });
-    
-    if (error) {
-      console.error('Signup error:', error);
-      throw error;
-    }
-
-    // Create profile row immediately to make the user visible in Admin portal (no auth trigger required)
-    try {
-      if (data?.user) {
-        await supabase.functions.invoke('create-profile', {
-          body: {
-            user: { id: data.user.id, email },
-            profile: {
-              name,
-              role,
-              business_name: businessName,
-              dot_number: dotNumber,
-              mc_number: mcNumber,
-              phone,
-              description,
-              city,
-              address,
-              equipment_type: equipmentType,
-              max_weight: maxWeight,
-              verification_status: 'unverified'
-            }
-          }
-        });
-        console.log('Profile created via edge function for', email);
-      } else {
-        console.warn('No user returned from signUp; profile creation skipped');
-      }
-    } catch (e) {
-      console.warn('Failed to create profile via edge function', e);
-    }
-
-    console.log('Signup successful, attempting to notify admin');
-    
-    // Notify admin about new registration (non-blocking)
-    try {
-      await supabase.functions.invoke('notify-admin', {
-        body: { email, name, role }
-      });
-      console.log('Admin notification sent successfully');
-    } catch (e) {
-      console.warn('Failed to notify admin of signup', e);
-    }
+    if (error) throw error;
   };
 
   const logout = async () => {
