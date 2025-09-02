@@ -158,7 +158,7 @@ const RegisterForm: React.FC = () => {
       }
       
       toast.success("Thanks! We will reach out soon.");
-      navigate("/load-board");
+      window.location.href = "/";
     } catch (error) {
       console.error("Register error:", error);
       toast.error("Failed to register. Please try again.");
