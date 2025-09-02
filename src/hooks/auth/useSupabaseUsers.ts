@@ -24,7 +24,8 @@ export const useSupabaseUsers = () => {
         .from('profiles')
         .select('role')
         .eq('user_id', session.user.id)
-        .single();
+        .maybeSingle();
+
 
       if (profile?.role !== 'admin') {
         console.log('User is not admin, skipping user fetch');
@@ -57,6 +58,7 @@ export const useSupabaseUsers = () => {
         approvalDate: profile.approval_date ? new Date(profile.approval_date).getTime() : undefined,
         rejectionDate: profile.rejection_date ? new Date(profile.rejection_date).getTime() : undefined,
         restorationDate: profile.restoration_date ? new Date(profile.restoration_date).getTime() : undefined,
+        registrationDate: profile.created_at ? new Date(profile.created_at).getTime() : undefined,
       }));
 
       setUsers(mappedUsers);

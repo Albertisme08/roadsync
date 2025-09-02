@@ -126,6 +126,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.warn('Auth email resend failed:', e);
     }
 
+    // Ensure or upsert a profile row (and set to pending)
+    try {
+      await supabase.functions.invoke('ensure-profile', {
+        body: {
+          email,
+          name,
+          role,
+          business_name: businessName,
+          dot_number: dotNumber,
+          mc_number: mcNumber,
+          phone,
+          description,
+          city,
+          address,
+          equipment_type: equipmentType,
+          max_weight: maxWeight,
+        }
+      });
+    } catch (e) {
+      console.warn('Edge function ensure-profile failed:', e);
+    }
+
     // Fallback: send a magic link via Edge Function (uses Resend)
     try {
       await supabase.functions.invoke('send-confirmation', {
