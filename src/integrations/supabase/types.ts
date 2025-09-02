@@ -16,13 +16,17 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          address: string | null
           approval_date: string | null
           approval_status: string
           business_name: string | null
+          city: string | null
           created_at: string
           dot_number: string | null
           email: string
+          equipment_type: string | null
           id: string
+          max_weight: string | null
           mc_number: string | null
           name: string | null
           phone: string | null
@@ -34,13 +38,17 @@ export type Database = {
           verification_status: string
         }
         Insert: {
+          address?: string | null
           approval_date?: string | null
           approval_status?: string
           business_name?: string | null
+          city?: string | null
           created_at?: string
           dot_number?: string | null
           email: string
+          equipment_type?: string | null
           id?: string
+          max_weight?: string | null
           mc_number?: string | null
           name?: string | null
           phone?: string | null
@@ -52,13 +60,17 @@ export type Database = {
           verification_status?: string
         }
         Update: {
+          address?: string | null
           approval_date?: string | null
           approval_status?: string
           business_name?: string | null
+          city?: string | null
           created_at?: string
           dot_number?: string | null
           email?: string
+          equipment_type?: string | null
           id?: string
+          max_weight?: string | null
           mc_number?: string | null
           name?: string | null
           phone?: string | null
