@@ -114,6 +114,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     });
     if (error) throw error;
+
+    // Ensure the auth email is sent (resend as a safeguard)
+    try {
+      await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/admin` }
+      });
+    } catch (e) {
+      console.warn('Auth email resend failed:', e);
+    }
   };
 
   const logout = async () => {
