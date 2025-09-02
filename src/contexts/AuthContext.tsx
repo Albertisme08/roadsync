@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     console.log('Starting user registration with:', { email, role, name });
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -129,6 +129,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (error) {
       console.error('Signup error:', error);
       throw error;
+    }
+
+    // Create profile row immediately to make the user visible in Admin portal (no auth trigger required)
+    try {
+      if (data?.user) {
+        await supabase.functions.invoke('create-profile', {
+          body: {
+            user: { id: data.user.id, email },
+            profile: {
+              name,
+              role,
+              business_name: businessName,
+              dot_number: dotNumber,
+              mc_number: mcNumber,
+              phone,
+              description,
+              city,
+              address,
+              equipment_type: equipmentType,
+              max_weight: maxWeight,
+              verification_status: 'unverified'
+            }
+          }
+        });
+        console.log('Profile created via edge function for', email);
+      } else {
+        console.warn('No user returned from signUp; profile creation skipped');
+      }
+    } catch (e) {
+      console.warn('Failed to create profile via edge function', e);
     }
 
     console.log('Signup successful, attempting to notify admin');

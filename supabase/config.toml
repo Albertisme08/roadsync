@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.notify-admin]
 verify_jwt = false
+
+[functions.create-profile]
+verify_jwt = false
