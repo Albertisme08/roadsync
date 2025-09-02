@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          approval_date: string | null
+          approval_status: string
+          business_name: string | null
+          created_at: string
+          dot_number: string | null
+          email: string
+          id: string
+          mc_number: string | null
+          name: string | null
+          phone: string | null
+          rejection_date: string | null
+          restoration_date: string | null
+          role: string
+          updated_at: string
+          user_id: string
+          verification_status: string
+        }
+        Insert: {
+          approval_date?: string | null
+          approval_status?: string
+          business_name?: string | null
+          created_at?: string
+          dot_number?: string | null
+          email: string
+          id?: string
+          mc_number?: string | null
+          name?: string | null
+          phone?: string | null
+          rejection_date?: string | null
+          restoration_date?: string | null
+          role?: string
+          updated_at?: string
+          user_id: string
+          verification_status?: string
+        }
+        Update: {
+          approval_date?: string | null
+          approval_status?: string
+          business_name?: string | null
+          created_at?: string
+          dot_number?: string | null
+          email?: string
+          id?: string
+          mc_number?: string | null
+          name?: string | null
+          phone?: string | null
+          rejection_date?: string | null
+          restoration_date?: string | null
+          role?: string
+          updated_at?: string
+          user_id?: string
+          verification_status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,8 +1,10 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthContextType } from "../types/auth.types";
-import { useAuthActions } from "../hooks/useAuthActions";
-import { isAdminEmail, seedAdminUsers } from "../utils/storage.utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Session, User as SupabaseUser } from "@supabase/supabase-js";
+import { User } from "@/types/auth.types";
+import { useSupabaseUsers } from "@/hooks/auth/useSupabaseUsers";
 
 // Create the context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -11,53 +13,118 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const { 
-    user, 
-    allUsers,
-    isLoading,
-    setUser,
-    setAllUsers,
-    setIsLoading,
-    login, 
-    register, 
-    logout, 
-    approveUser, 
+    users: allUsers,
+    isLoading: usersLoading,
+    fetchUsers: loadInitialData,
+    approveUser,
     rejectUser,
     restoreUser,
-    removeUser, // Include this function
-    restoreRemovedUser, // Include this function
-    getPendingUsers,
-    loadInitialData,
-    checkExistingUser,
-    verifyEmail,
-    resendVerification
-  } = useAuthActions();
+    getPendingUsers
+  } = useSupabaseUsers();
 
-  // Track if we've done the initial data load
-  const [initialized, setInitialized] = useState(false);
-
-  // Load initial data and seed admin users on component mount
   useEffect(() => {
-    console.log("AuthProvider initializing");
-    // Seed admin users first
-    seedAdminUsers();
-    // Then load initial data
-    loadInitialData();
-    setInitialized(true);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        if (session?.user) {
+          // Fetch user profile from our profiles table
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (profile) {
+            setUser({
+              id: profile.id,
+              email: profile.email,
+              name: profile.name || '',
+              role: profile.role as User['role'],
+              approvalStatus: profile.approval_status as User['approvalStatus'],
+              verificationStatus: profile.verification_status as User['verificationStatus'],
+              businessName: profile.business_name || '',
+              dotNumber: profile.dot_number || '',
+              mcNumber: profile.mc_number || '',
+              phone: profile.phone || '',
+            });
+          }
+        } else {
+          setUser(null);
+        }
+        setIsLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        // This will trigger the auth state change listener above
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Determine if user is an admin (has admin role and email matches allowed admin emails)
-  const isAdmin = !!user && user.role === "admin" && isAdminEmail(user.email);
+  // Auth functions
+  const login = async (email: string, password: string, role: any) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  };
 
-  // Check if user is authenticated (user exists and is not null - no verification check)
+  const register = async (
+    name: string,
+    email: string, 
+    password: string,
+    role: any,
+    businessName: string,
+    dotNumber: string,
+    mcNumber: string,
+    phone: string,
+    description: string,
+    city?: string,
+    address?: string,
+    equipmentType?: string,
+    maxWeight?: string
+  ) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+        data: {
+          name,
+          business_name: businessName,
+          dot_number: dotNumber,
+          mc_number: mcNumber,
+          phone,
+          description,
+          city,
+          address,
+          equipment_type: equipmentType,
+          max_weight: maxWeight
+        }
+      }
+    });
+    if (error) throw error;
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  // Determine if user is an admin
+  const isAdmin = !!user && user.role === "admin";
+  
+  // Check if user is authenticated
   const isAuthenticated = !!user;
-
-  // Log any changes to allUsers for debugging
-  useEffect(() => {
-    if (allUsers) {
-      console.log("Auth context allUsers updated:", allUsers.length);
-    }
-  }, [allUsers]);
 
   // Create the context value object
   const value: AuthContextType = {
@@ -66,9 +133,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     isAuthenticated,
     isApproved: !!user && user.approvalStatus === "approved",
     isAdmin,
-    isLoading,
+    isLoading: isLoading || usersLoading,
     setUser,
-    setAllUsers,
+    setAllUsers: () => {}, // Not needed with Supabase
     setIsLoading,
     login,
     register,
@@ -76,13 +143,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     approveUser,
     rejectUser,
     restoreUser,
-    removeUser, // Add this property
-    restoreRemovedUser, // Add this property
+    removeUser: async () => {}, // Placeholder
+    restoreRemovedUser: async () => {}, // Placeholder
     getPendingUsers,
     loadInitialData,
-    checkExistingUser,
-    verifyEmail,
-    resendVerification
+    checkExistingUser: () => ({ exists: false, user: null }),
+    verifyEmail: () => true,
+    resendVerification: async () => "success"
   };
 
   return (
