@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/admin`,
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           name,
           business_name: businessName,
@@ -120,10 +120,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await supabase.auth.resend({
         type: 'signup',
         email,
-        options: { emailRedirectTo: `${window.location.origin}/admin` }
+        options: { emailRedirectTo: `${window.location.origin}/` }
       });
     } catch (e) {
       console.warn('Auth email resend failed:', e);
+    }
+
+    // Fallback: send a magic link via Edge Function (uses Resend)
+    try {
+      await supabase.functions.invoke('send-confirmation', {
+        body: {
+          email,
+          name,
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+    } catch (e) {
+      console.warn('Edge function send-confirmation failed:', e);
     }
   };
 
