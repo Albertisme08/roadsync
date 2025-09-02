@@ -46,13 +46,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                     id: profile.id,
                     email: profile.email,
                     name: profile.name || '',
-                    role: profile.role as User['role'],
+                    role: profile.role === 'admin' ? 'admin' : profile.role === 'carrier' ? 'carrier' : 'shipper',
                     approvalStatus: profile.approval_status as User['approvalStatus'],
                     verificationStatus: profile.verification_status as User['verificationStatus'],
                     businessName: profile.business_name || '',
                     dotNumber: profile.dot_number || '',
                     mcNumber: profile.mc_number || '',
                     phone: profile.phone || '',
+                    city: profile.city || '',
+                    address: profile.address || '',
+                    equipmentType: profile.equipment_type || '',
+                    maxWeight: profile.max_weight || '',
+                    description: profile.description || '',
                   });
                 }
                 setIsLoading(false);
@@ -105,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         emailRedirectTo: `${window.location.origin}/`,
         data: {
           name,
+          role, // Include role in metadata
           business_name: businessName,
           dot_number: dotNumber,
           mc_number: mcNumber,
