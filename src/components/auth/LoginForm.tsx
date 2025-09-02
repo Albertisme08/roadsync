@@ -23,6 +23,7 @@ import { toast } from "@/lib/sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { loginSchema, LoginFormValues } from "./validationSchemas";
+import { supabase } from "@/integrations/supabase/client";
 
 const LoginForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -44,16 +45,28 @@ const LoginForm: React.FC = () => {
       await login(values.email, values.password, values.role);
       toast.success("Login successful");
       
-      // Check if user is admin and redirect accordingly
-      setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const from = urlParams.get('from');
-        
-        if (values.email === 'alopezcargo@outlook.com') {
-          navigate('/admin');
-        } else if (from) {
-          navigate(from);
-        } else {
+      // Redirect based on role (admin -> /admin, else -> from param or /dashboard)
+      setTimeout(async () => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const from = urlParams.get('from');
+
+          let destination = '/dashboard';
+
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.id) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('user_id', user.id)
+              .maybeSingle();
+            if (profile?.role === 'admin') {
+              destination = '/admin';
+            }
+          }
+
+          navigate(from || destination);
+        } catch (e) {
           navigate('/dashboard');
         }
       }, 100);
