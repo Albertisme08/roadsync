@@ -43,7 +43,20 @@ const LoginForm: React.FC = () => {
     try {
       await login(values.email, values.password, values.role);
       toast.success("Login successful");
-      navigate("/dashboard");
+      
+      // Check if user is admin and redirect accordingly
+      setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const from = urlParams.get('from');
+        
+        if (values.email === 'alopezcargo@outlook.com') {
+          navigate('/admin');
+        } else if (from) {
+          navigate(from);
+        } else {
+          navigate('/dashboard');
+        }
+      }, 100);
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Failed to login. Please check your credentials.");
