@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               .from('profiles')
               .select('*')
               .eq('user_id', session.user!.id)
-              .single()
+              .maybeSingle()
               .then(({ data: profile }) => {
                 if (profile) {
                   setUser({
@@ -124,6 +124,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     });
     if (error) throw error;
+
+    // Notify admin about new registration (non-blocking)
+    try {
+      await supabase.functions.invoke('notify-admin', {
+        body: { email, name, role }
+      });
+    } catch (e) {
+      console.warn('Failed to notify admin of signup', e);
+    }
   };
 
   const logout = async () => {
