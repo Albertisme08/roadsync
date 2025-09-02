@@ -136,7 +136,26 @@ export const useSupabaseUsers = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    // Fetch only after session is available to satisfy RLS
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        fetchUsers();
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    // Re-fetch on auth changes (e.g., after login)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+        fetchUsers();
+      }
+      if (event === 'SIGNED_OUT') {
+        setUsers([]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return {
