@@ -40,20 +40,7 @@ const AdminPage = () => {
   // Render the admin dashboard for authenticated admins
   return (
     <div className="container mx-auto p-4">
-      <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="w-full border-b mb-0">
-          <TabsTrigger value="users" className="flex-1">User Management</TabsTrigger>
-          <TabsTrigger value="loads" className="flex-1">Load Approvals</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="users">
-          <AdminDashboard />
-        </TabsContent>
-        
-        <TabsContent value="loads">
-          <LoadApprovalDashboard />
-        </TabsContent>
-      </Tabs>
+      <LoadApprovalDashboard />
     </div>
   );
 };
