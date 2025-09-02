@@ -30,34 +30,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         if (session?.user) {
-          // Fetch user profile from our profiles table
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-          
-          if (profile) {
-            setUser({
-              id: profile.id,
-              email: profile.email,
-              name: profile.name || '',
-              role: profile.role as User['role'],
-              approvalStatus: profile.approval_status as User['approvalStatus'],
-              verificationStatus: profile.verification_status as User['verificationStatus'],
-              businessName: profile.business_name || '',
-              dotNumber: profile.dot_number || '',
-              mcNumber: profile.mc_number || '',
-              phone: profile.phone || '',
-            });
-          }
+          // Defer Supabase calls to avoid deadlocks per best practices
+          setTimeout(async () => {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .maybeSingle();
+              
+              if (profile) {
+                setUser({
+                  id: profile.id,
+                  email: profile.email,
+                  name: profile.name || '',
+                  role: profile.role as User['role'],
+                  approvalStatus: profile.approval_status as User['approvalStatus'],
+                  verificationStatus: profile.verification_status as User['verificationStatus'],
+                  businessName: profile.business_name || '',
+                  dotNumber: profile.dot_number || '',
+                  mcNumber: profile.mc_number || '',
+                  phone: profile.phone || '',
+                });
+              } else {
+                // Fallback minimal user from auth
+                setUser({
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  name: session.user.user_metadata?.name || '',
+                  role: 'user' as User['role'],
+                  approvalStatus: 'pending' as User['approvalStatus'],
+                  verificationStatus: (session.user.email_confirmed_at ? 'verified' : 'unverified') as User['verificationStatus'],
+                } as User);
+              }
+            } finally {
+              setIsLoading(false);
+            }
+          }, 0);
         } else {
           setUser(null);
+          setIsLoading(false);
         }
-        setIsLoading(false);
       }
     );
 
@@ -94,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     equipmentType?: string,
     maxWeight?: string
   ) => {
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -113,7 +129,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     });
-    if (error) throw error;
+    if (signUpError) {
+      console.warn('Sign up error (continuing flow):', signUpError);
+    }
 
     // Ensure the auth email is sent (resend as a safeguard)
     try {

@@ -47,6 +47,8 @@ serve(async (req) => {
       max_weight,
     } = body;
 
+    console.log('ensure-profile invoked for:', { email, role, hasName: !!name });
+
     if (!email) {
       return new Response(JSON.stringify({ error: 'email is required' }), {
         status: 400,
@@ -100,6 +102,8 @@ serve(async (req) => {
         .eq('user_id', user.id);
 
       if (updateErr) throw updateErr;
+      console.log('ensure-profile updated existing profile for:', email);
+    
     } else {
       // Insert new profile
       const { error: insertErr } = await supabaseAdmin
@@ -123,6 +127,8 @@ serve(async (req) => {
         });
 
       if (insertErr) throw insertErr;
+      console.log('ensure-profile inserted new profile for:', email);
+    
     }
 
     return new Response(JSON.stringify({ ok: true }), {
