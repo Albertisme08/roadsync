@@ -56,6 +56,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ control }) =>
             <FormControl>
               <Input type="password" placeholder="••••••" {...field} />
             </FormControl>
+            <div className="text-sm text-muted-foreground mt-2 space-y-1">
+              <p className="font-medium">Password Security Tips:</p>
+              <ul className="list-disc list-inside space-y-1 text-xs">
+                <li>Use a password manager to store and generate passwords</li>
+                <li>Avoid password reuse across websites and apps</li>
+                <li>Avoid using personal information in passwords</li>
+              </ul>
+            </div>
             <FormMessage />
           </FormItem>
         )}
