@@ -102,19 +102,6 @@ export const registerSchema = z.discriminatedUnion("role", [
   carrierSchema,
 ])
 .refine(
-  (data) => {
-    // Make MC or DOT number required only for carriers
-    if (data.role === "carrier") {
-      return Boolean(data.dotNumber || data.mcNumber);
-    }
-    return true;
-  },
-  {
-    message: "Please enter either an MC number or a DOT number",
-    path: ["dotNumber"],
-  }
-)
-.refine(
   (data) => data.password === data.confirmPassword,
   {
     message: "Passwords don't match",
