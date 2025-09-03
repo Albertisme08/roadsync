@@ -1,6 +1,35 @@
 
 import { z } from "zod";
 
+// Common leaked passwords list
+const commonPasswords = [
+  "password", "123456", "password123", "admin", "qwerty", "letmein", 
+  "welcome", "monkey", "dragon", "master", "123456789", "football"
+];
+
+// Enhanced password validation
+const validateSecurePassword = (password: string) => {
+  // Check minimum length
+  if (password.length < 8) return false;
+  
+  // Check for leaked/common passwords
+  if (commonPasswords.includes(password.toLowerCase())) return false;
+  
+  // Check for at least one uppercase letter
+  if (!/[A-Z]/.test(password)) return false;
+  
+  // Check for at least one lowercase letter
+  if (!/[a-z]/.test(password)) return false;
+  
+  // Check for at least one number
+  if (!/\d/.test(password)) return false;
+  
+  // Check for at least one special character
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return false;
+  
+  return true;
+};
+
 export const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, {
@@ -16,24 +45,27 @@ const validatePhoneNumber = (value: string) => {
   return digitsOnly.length === 10;
 };
 
-// MC and DOT number validation
+// MC and DOT number validation - stricter requirements
 const validateMCNumber = (value: string | undefined) => {
   if (!value) return true;
-  return /^MC-\d{5,8}$/.test(value) || /^\d{5,8}$/.test(value);
+  // Must be MC- followed by 6-8 digits or just 6-8 digits
+  return /^MC-\d{6,8}$/.test(value) || /^\d{6,8}$/.test(value);
 };
 
 const validateDOTNumber = (value: string | undefined) => {
   if (!value) return true;
-  return /^\d{5,8}$/.test(value);
+  // Must be exactly 6-8 digits
+  return /^\d{6,8}$/.test(value);
 };
 
 // Base schema with common fields
 const baseFields = {
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters",
-  }),
+  password: z.string()
+    .refine(validateSecurePassword, { 
+      message: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character. Common passwords are not allowed." 
+    }),
   confirmPassword: z.string().min(6),
   phone: z.string().refine(validatePhoneNumber, { 
     message: "Please enter a valid U.S. phone number" 
